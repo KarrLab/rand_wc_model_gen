@@ -8,7 +8,15 @@
 
 # wc_model_generator
 
-Write an overview
+The whole-cell model generator generates synthetic whole-cell model descriptions that are used to test downstream components of the whole-cell (WC) modeling pipeline. In particular, these synthetic models can be used to test model description systems and model simulators.
+
+Synthetic WC models are better for testing modeling pipeline components than WC models of real cells for several reasons:
+
+* Synthetic models are scalable
+* Synthetic models can have unusual properties
+* Synthetic models can be generated quickly
+
+This initial version of the model generator creates reaction network models.
 
 ## Installation
 1. Install dependencies
