@@ -1,0 +1,7 @@
+configparser
+six
+sphinx >= 1.6
+sphinx_rtd_theme
+robpol86_sphinxcontrib_googleanalytics
+sphinxcontrib_bibtex
+sphinxcontrib_spelling
