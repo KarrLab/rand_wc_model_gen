@@ -5,9 +5,9 @@
 :Copyright: 2018, Karr Lab
 :License: MIT
 """
-import yaml
 
 import argparse
+import yaml
 import wc_lang
 
 '''
