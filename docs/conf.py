@@ -5,7 +5,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
-import wc_model_generator
+import random_wc_model_generator
 
 # -- General configuration ------------------------------------------------
 
@@ -47,7 +47,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'wc_model_generator'
+project = u'random_wc_model_generator'
 copyright = u'2018, Karr Lab'
 author = u'Karr Lab'
 
@@ -56,7 +56,7 @@ author = u'Karr Lab'
 # built documents.
 #
 # The short X.Y version.
-version = wc_model_generator.__version__
+version = random_wc_model_generator.__version__
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -138,9 +138,9 @@ def linkcode_resolve(domain, info):
         return None
     rel_filename = info['module'].replace('.', '/')
     if os.path.isfile(os.path.join(os.path.dirname(__file__), '..', rel_filename + '.py')):
-        return "https://github.com/KarrLab/wc_model_generator/blob/master/{}.py".format(rel_filename)
+        return "https://github.com/KarrLab/random_wc_model_generator/blob/master/{}.py".format(rel_filename)
     else:
-        return "https://github.com/KarrLab/wc_model_generator/blob/master/{}/__init__.py".format(rel_filename)
+        return "https://github.com/KarrLab/random_wc_model_generator/blob/master/{}/__init__.py".format(rel_filename)
 
 
 # -- napoleon options -----------------------------------------------------
@@ -177,7 +177,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-# html_title = u'wc_model_generator v0.0.1'
+# html_title = u'random_wc_model_generator v0.0.1'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
@@ -277,7 +277,7 @@ html_show_copyright = True
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'wc_model_generator-doc'
+htmlhelp_basename = 'random_wc_model_generator-doc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -303,7 +303,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'wc_model_generator.tex', u'wc_model_generator documentation',
+    (master_doc, 'random_wc_model_generator.tex', u'random_wc_model_generator documentation',
      u'Karr Lab', 'manual'),
 ]
 
@@ -345,7 +345,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'wc_model_generator', u'wc_model_generator documentation',
+    (master_doc, 'random_wc_model_generator', u'random_wc_model_generator documentation',
      [author], 1)
 ]
 
@@ -360,8 +360,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'wc_model_generator', u'wc_model_generator documentation',
-     author, 'wc_model_generator', 'One line description of project.',
+    (master_doc, 'random_wc_model_generator', u'random_wc_model_generator documentation',
+     author, 'random_wc_model_generator', 'One line description of project.',
      'Miscellaneous'),
 ]
 

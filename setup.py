@@ -7,7 +7,7 @@ except ImportError:
     import pkg_utils
 import os
 
-name = 'wc_model_generator'
+name = 'random_wc_model_generator'
 dirname = os.path.dirname(__file__)
 package_data = {
     name: [

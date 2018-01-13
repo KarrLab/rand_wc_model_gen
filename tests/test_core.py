@@ -8,7 +8,7 @@
 import unittest
 import os
 
-from wc_model_generator.core import GenerateModel, main
+from random_wc_model_generator.core import GenerateModel, main
 
 
 class TestGenerateModel(unittest.TestCase):
