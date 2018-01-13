@@ -1,5 +1,5 @@
-wc_model_generator documentation
-================================
+random_wc_model_generator documentation
+=======================================
 
 Contents
 --------

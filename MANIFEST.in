@@ -2,7 +2,7 @@
 README.rst
 
 # version
-include wc_model_generator/VERSION
+include random_wc_model_generator/VERSION
 
 # license
 include LICENSE
