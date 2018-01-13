@@ -6,14 +6,24 @@
 :License: MIT
 """
 import unittest
+import os
 
-import wc_model_generator
+from wc_model_generator.core import GenerateModel, main
 
 
 class TestGenerateModel(unittest.TestCase):
 
     def setUp(self):
-        pass
+        fixtures = os.path.join(os.path.dirname(__file__), 'fixtures')
+        self.CONIG_FILENAME = os.path.join(fixtures, 'config.yml')
+        self.MODEL_FILENAME = os.path.join(fixtures, 'wc_model')
 
-    def test_test(self):
-        pass
+    def generate_model(self, config_file, output_file, model_format=None):
+        args = [config_file, output_file]
+        if model_format is not None:
+            args.append("--model_format {}".format(model_format))
+        return main(args)
+
+    def test_generate_model(self):
+        generate_model = self.generate_model(self.CONIG_FILENAME, self.MODEL_FILENAME + '.xlsx')
+        self.assertEqual(generate_model.config['genes'], 100)
