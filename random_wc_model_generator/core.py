@@ -79,7 +79,7 @@ class CreateWcLangModel(object):
 
 
 class GenerateModel(object):
-    """ Generate a synthetic whole-cell model.
+    """ Generate a synthetic whole-cell model
 
     Attributes:
         args (:obj:`Namespace`): command line arguments
@@ -104,11 +104,12 @@ class GenerateModel(object):
         parser.add_argument('config_file', type=argparse.FileType('r'),
             help="Configuration file, in YAML")
         parser.add_argument('generated_model', type=argparse.FileType('w'),
-            help="Output file for wc_lang model; if model_format is in {'tsv', 'csv'}, root for set of delimited files")
+            help="Output file for wc_lang model; if model_format is in {'tsv', 'csv'}, "
+                "root for set of delimited files")
         parser.add_argument('--model_format', default='xlsx', choices=['xlsx', 'tsv', 'csv'],
             help="Format for wc_lang model file; default: %(default)s")
         if test_args is None:
-            return parser.parse_args()
+            return parser.parse_args()  # pragma: no cover
         else:
             return parser.parse_args(test_args)
 
@@ -144,10 +145,10 @@ class GenerateModel(object):
 # TODO: exclude command line lines vrom cov analysis
 def main(test_args=None):
     if test_args is None:
-        args = GenerateModel.parse_command_line()
+        args = GenerateModel.parse_command_line()   # pragma: no cover
     else:
         args = GenerateModel.parse_command_line(test_args)
     return GenerateModel(args).run()
 
 if __name__ == '__main__':
-    main()
+    main()  # pragma: no cover
