@@ -1,4 +1,4 @@
-"# codon, amino acid, molecular weight, charge",,,
+#codon,amino acid,molecular weight,charge
 AUU,I,131.172,0
 AUC,I,131.172,0
 AUA,I,131.172,0

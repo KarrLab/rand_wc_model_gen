@@ -18,8 +18,8 @@ class RandomSeqGen(object):
     START_CODON = 'AUG'
     STOP_CODON = 'UAG'
     NUCLEOTIDE_COMP = {'A':'T','U':'A','C':'G','G':'C'}
-    RANGE_MIN = 100
-    RANGE_MAX = 1000
+    MIN_PROT_LEN = 100
+    MAX_PROT_LEN = 1000
     CODON_TRANS_FILE = os.path.join(os.path.dirname(__file__), 'data/fixtures/codon_translation.csv')
 
     def __init__(self):
@@ -28,14 +28,14 @@ class RandomSeqGen(object):
         self.translation_table = {}
 
         for line in open(RandomSeqGen.CODON_TRANS_FILE):
-            if line[1] == '#': continue      
+            # use '#' to identify header or other comment lines, partly disregarding RFC 4180
+            if line[0] == '#': continue
             line   = line.rstrip('\n')       
-
-            fields = line.split(',')
+            (codon, amino_acid, molecular_weight, charge) = line.split(',')
     
             # key = each codon in translation table
             # values = corresponding amino acid, molecular weight, and charge
-            self.translation_table[fields[0]] = [fields[1], float(fields[2]), int(fields[3])]
+            self.translation_table[codon] = [amino_acid, float(molecular_weight), int(charge)]
             
     def prot_seq(self, length):
         """ Randomly create nucleotide sequence for protein 
@@ -90,16 +90,18 @@ class RandomSeqGen(object):
 
         return aminoacid, molweight, charge
     
-    def prot_len(self, num_genes):
+    def prot_len(self, num_genes, min_prot_len=MIN_PROT_LEN, max_prot_len=MAX_PROT_LEN):
         """ Randomly generate lengths (in amino acids) of all proteins in cell
 
         Args:
             num_genes (:obj:`int`): number of genes in cell
+            min_prot_len
+            min_prot_len
 
         Returns:
             :obj:`list`: list of ints for length of each protein
         """
-        prot_length = np.random.randint(RandomSeqGen.RANGE_MIN, RandomSeqGen.RANGE_MAX, num_genes)
+        prot_length = np.random.randint(min_prot_len, max_prot_len, num_genes)
         return prot_length
     
     def make_rna(self, num_genes, prot_len):

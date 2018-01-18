@@ -8,7 +8,7 @@
 import unittest
 import numpy as np
 
-from random_polymer import RandomSeqGen
+from random_wc_model_generator.random_polymer import RandomSeqGen
 
 NUM_GENES=10
 
