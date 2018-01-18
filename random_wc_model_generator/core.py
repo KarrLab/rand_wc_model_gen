@@ -142,7 +142,7 @@ class GenerateModel(object):
         self.summarize_generated_model(wc_lang_model)
         return self
 
-# TODO: exclude command line lines vrom cov analysis
+# TODO: exclude command line lines from coverage analysis
 def main(test_args=None):
     if test_args is None:
         args = GenerateModel.parse_command_line()   # pragma: no cover

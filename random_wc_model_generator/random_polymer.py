@@ -10,7 +10,7 @@ import os
 import numpy as np
 
 class RandomSeqGen(object):
-    """ Make random sequences
+    """ Make random genetic sequences
     """
 
     # genetic constants
@@ -25,7 +25,7 @@ class RandomSeqGen(object):
         # read and store codon translation table
         self.translation_table = {}
 
-        for line in open(CODON_TRANS_FILE):
+        for line in open(RandomSeqGen.CODON_TRANS_FILE):
             if line[0] == '#': continue      
             line   = line.rstrip('\n')       
 
@@ -44,22 +44,22 @@ class RandomSeqGen(object):
         Returns:
             :obj:`string`: nucleotide sequence of protein
         """
-        protein = random_seq_gen.START_CODON
+        protein = RandomSeqGen.START_CODON
 
         for i in range(length-2):
             valid = False
         
             while not(valid):
-                nuc1 = '{}'.format(np.random.choice(random_seq_gen.RNA_NUCLEOTIDES))
-                nuc2 = '{}'.format(np.random.choice(random_seq_gen.RNA_NUCLEOTIDES))
-                nuc3 = '{}'.format(np.random.choice(random_seq_gen.RNA_NUCLEOTIDES))
+                nuc1 = '{}'.format(np.random.choice(RandomSeqGen.RNA_NUCLEOTIDES))
+                nuc2 = '{}'.format(np.random.choice(RandomSeqGen.RNA_NUCLEOTIDES))
+                nuc3 = '{}'.format(np.random.choice(RandomSeqGen.RNA_NUCLEOTIDES))
                 codon = nuc1 + nuc2 + nuc3
                 
                 if codon in self.translation_table.keys():
                     valid = True
             protein += codon
     
-        protein += random_seq_gen.STOP_CODON
+        protein += RandomSeqGen.STOP_CODON
 
         return protein
     
@@ -141,7 +141,7 @@ class RandomSeqGen(object):
         dna_sequence = ''
     
         for nuc in rna_sequence:
-            dna_sequence += random_seq_gen.NUCLEOTIDE_COMP[nuc]
+            dna_sequence += RandomSeqGen.NUCLEOTIDE_COMP[nuc]
     
         return dna_sequence
 
@@ -199,8 +199,10 @@ class RandomSeqGen(object):
             for p in proteins:
                 outfile.write('%s' % p[0] + ',' + '%s' % p[1] + ',' + '%s' % p[2] +'\n')
 
-random_seq_gen = RandomSeqGen()
+'''
+RandomSeqGen = RandomSeqGen()
 NUM_GENES = 10
-(genes, rna, proteins) = random_seq_gen.gen_species_types(NUM_GENES)
+(genes, rna, proteins) = RandomSeqGen.gen_species_types(NUM_GENES)
 OUT_FILE = 'protein_data.csv'
-random_seq_gen.output_sequences(proteins, OUT_FILE)
+RandomSeqGen.output_sequences(proteins, OUT_FILE)
+'''
