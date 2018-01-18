@@ -8,10 +8,9 @@
 import unittest
 import numpy as np
 
-from random_wc_model_generator.random_polymer import RandomSeqGen
+from random_polymer import RandomSeqGen
 
 NUM_GENES=10
-
 
 class TestGenerateSeq(unittest.TestCase):
     
@@ -21,25 +20,28 @@ class TestGenerateSeq(unittest.TestCase):
     def test_length(self):
         ''' Compare length of protein (in amino acids) with length assigned by randomized protein length list
         '''
+        
         prot_length = self.rsg.prot_len(num_genes=NUM_GENES)
-        genes = self.rsg.make_genes(NUM_GENES, prot_length)
-        proteins = self.rsg.make_proteins(genes)
-
-        for i in range(len(genes)):
-            self.assertEqual(len(proteins[0][i]), prot_length[i])
+        rna = self.rsg.make_rna(NUM_GENES, prot_length)
+        proteins = self.rsg.make_proteins(rna)
+        
+        for i in range(len(rna)):
+            # account for lack of stop codon amino acid with +1
+            self.assertEqual(len(proteins[0][i])+1, prot_length[i])
         
     def test_base_stats(self):
         ''' Check abundance of each base in gene nucleotide sequence
         '''
         
         prot_length = self.rsg.prot_len(num_genes=NUM_GENES)
-        genes = self.rsg.make_genes(NUM_GENES, prot_length)
+        rna = self.rsg.make_rna(NUM_GENES, prot_length)
+        genes = self.rsg.make_genes(rna)
         
         base_abundance = np.zeros((len(genes),4))
         for i in range(len(genes)):
             base_abundance[i][0] = genes[i].count('A')/len(genes[i])
             base_abundance[i][1] = genes[i].count('C')/len(genes[i])
-            base_abundance[i][2] = genes[i].count('U')/len(genes[i])
+            base_abundance[i][2] = genes[i].count('T')/len(genes[i])
             base_abundance[i][3] = genes[i].count('G')/len(genes[i])
         for j in range(0,4):
             np.testing.assert_allclose(np.mean(base_abundance[:][j]), 0.25, rtol = 0.2)
@@ -52,4 +54,4 @@ class TestGenerateSeq(unittest.TestCase):
         self.assertGreater(mw,0)
         self.assertIsInstance(charge, int)
 
-        
+    

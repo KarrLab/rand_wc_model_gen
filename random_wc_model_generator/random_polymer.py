@@ -18,6 +18,8 @@ class RandomSeqGen(object):
     START_CODON = 'AUG'
     STOP_CODON = 'UAG'
     NUCLEOTIDE_COMP = {'A':'T','U':'A','C':'G','G':'C'}
+    RANGE_MIN = 100
+    RANGE_MAX = 1000
     CODON_TRANS_FILE = os.path.join(os.path.dirname(__file__), 'data/fixtures/codon_translation.csv')
 
     def __init__(self):
@@ -26,15 +28,15 @@ class RandomSeqGen(object):
         self.translation_table = {}
 
         for line in open(RandomSeqGen.CODON_TRANS_FILE):
-            if line[0] == '#': continue      
+            if line[1] == '#': continue      
             line   = line.rstrip('\n')       
 
             fields = line.split(',')
     
             # key = each codon in translation table
             # values = corresponding amino acid, molecular weight, and charge
-            self.translation_table[fields[0]] = fields[1:4]
-
+            self.translation_table[fields[0]] = [fields[1], float(fields[2]), int(fields[3])]
+            
     def prot_seq(self, length):
         """ Randomly create nucleotide sequence for protein 
 
@@ -83,8 +85,8 @@ class RandomSeqGen(object):
             
             if codon in self.translation_table.keys():        
                 aminoacid += self.translation_table[codon][0]
-                molweight += float(self.translation_table[codon][1])
-                charge += int(self.translation_table[codon][2])
+                molweight += self.translation_table[codon][1]
+                charge += self.translation_table[codon][2]
 
         return aminoacid, molweight, charge
     
@@ -97,59 +99,50 @@ class RandomSeqGen(object):
         Returns:
             :obj:`list`: list of ints for length of each protein
         """
-        prot_length = np.random.randint(50,1000,num_genes)
+        prot_length = np.random.randint(RandomSeqGen.RANGE_MIN, RandomSeqGen.RANGE_MAX, num_genes)
         return prot_length
     
-    def make_genes(self, num_genes, prot_len):
-        """ Create compiled list of nucleotide sequences for the proteins in cell
+    def make_rna(self, num_genes, prot_len):
+        """ Create compiled list of RNA nucleotide sequences for the proteins in cell
 
         Args:
             num_genes (:obj:`int`): number of genes in cell
             prot_len (:obj:'list'): list of ints for length of each protein
 
         Returns:
-            :obj:`list`: list of nucleotide sequences of each protein
+            :obj:`list`: list of RNA nucleotide sequences of each protein
         """
-        genes = []
+        prot_rna = []
         for i in range(num_genes):
             prot_nucl_seq = self.prot_seq(prot_len[i])
-            genes.append(prot_nucl_seq)
+            prot_rna.append(prot_nucl_seq)
+        return prot_rna
+    
+    def make_genes(self, prot_rna):
+        """ Create compiled list of DNA nucleotide (gene) sequences for the proteins in cell
+
+        Args:
+            prot_rna (:obj:`list`): list of RNA nucleotide sequence of each protein
+
+        Returns:
+            :obj:`list`: list of DNA nucleotide sequences of each protein
+        """
+        genes = []
+    
+        for nuc in prot_rna:
+            dna = ''
+            for i in range(len(nuc)):
+                dna += RandomSeqGen.NUCLEOTIDE_COMP[nuc[i]]
+            
+            genes.append(dna)
+    
         return genes
-    
-    def make_rna(self, genes):
-        """ Find RNA sequence
 
-        Args:
-            genes (:obj:`list`): list of nucleotide sequences of all proteins
-
-        Returns:
-            :obj:`string`: RNA sequence of cell
-        """
-        rna_sequence = ''.join(genes)
-
-        return rna_sequence
-
-    def make_dna(self, rna_sequence):
-        """ Find DNA sequence
-
-        Args:
-            rna_sequence (:obj:`string`): RNA nucleotide sequence
-
-        Returns:
-            :obj:`string`: DNA sequence of cell
-        """
-        dna_sequence = ''
-    
-        for nuc in rna_sequence:
-            dna_sequence += RandomSeqGen.NUCLEOTIDE_COMP[nuc]
-    
-        return dna_sequence
-
-    def make_proteins(self, genes):
+    def make_proteins(self, prot_rna):
         """ Make compiled lists of data (amino acid sequence, molecular weight, and charge) for the proteins in cell
 
         Args:
-            genes (:obj:`list`): list of nucleotide sequences of each protein
+            prot_rna (:obj:`list`): list of RNA nucleotide sequences of each protein
 
         Returns:
             :obj:`tuple`: lists of amino acid sequences, molecular weights, and charges corresponding to each protein
@@ -158,8 +151,8 @@ class RandomSeqGen(object):
         prot_mw = []
         prot_charge = []
         
-        for i in range(len(genes)):
-            aminoacid, molweight, charge = self.prot_data(genes[i])
+        for i in range(len(prot_rna)):
+            aminoacid, molweight, charge = self.prot_data(prot_rna[i])
             
             prot_aa.append(aminoacid)
             prot_mw.append(molweight)
@@ -174,12 +167,12 @@ class RandomSeqGen(object):
             num_genes (:obj:`int`): number of genes in cell
 
         Returns:
-            :obj:`tuple`: lists for nucleotide sequences of each protein and RNA and amino acid sequence/molecular weight/charge data
+            :obj:`tuple`: lists for DNA, RNA, and amino acid sequence/molecular weight/charge data for each protein
         """
         prot_lengths = self.prot_len(num_genes)
-        genes = self.make_genes(num_genes,prot_lengths)
-        rna = self.make_rna(genes)
-        proteins = self.make_proteins(genes)
+        rna = self.make_rna(num_genes,prot_lengths)
+        genes = self.make_genes(rna)
+        proteins = self.make_proteins(rna)
         return (genes, rna, proteins)
 
     def output_sequences(self, proteins, out_file):
