@@ -88,22 +88,6 @@ class RandomSeqGen(object):
 
         return aminoacid, molweight, charge
     
-    def dna_seq(self, rna_sequence):
-        """ Find DNA sequence
-
-        Args:
-            rna_sequence (:obj:`string`): RNA nucleotide sequence
-
-        Returns:
-            :obj:`string`: DNA sequence of cell
-        """
-        dna_sequence = ''
-    
-        for nuc in rna_sequence:
-            dna_sequence += random_seq_gen.NUCLEOTIDE_COMP[nuc]
-    
-        return dna_sequence
-
     def prot_len(self, num_genes):
         """ Randomly generate lengths (in amino acids) of all proteins in cell
 
@@ -113,8 +97,8 @@ class RandomSeqGen(object):
         Returns:
             :obj:`list`: list of ints for length of each protein
         """
-        prot_len = np.random.randint(50,1000,num_genes)
-        return prot_len
+        prot_length = np.random.randint(50,1000,num_genes)
+        return prot_length
     
     def make_genes(self, num_genes, prot_len):
         """ Create compiled list of nucleotide sequences for the proteins in cell
@@ -144,6 +128,22 @@ class RandomSeqGen(object):
         rna_sequence = ''.join(genes)
 
         return rna_sequence
+
+    def make_dna(self, rna_sequence):
+        """ Find DNA sequence
+
+        Args:
+            rna_sequence (:obj:`string`): RNA nucleotide sequence
+
+        Returns:
+            :obj:`string`: DNA sequence of cell
+        """
+        dna_sequence = ''
+    
+        for nuc in rna_sequence:
+            dna_sequence += random_seq_gen.NUCLEOTIDE_COMP[nuc]
+    
+        return dna_sequence
 
     def make_proteins(self, genes):
         """ Make compiled lists of data (amino acid sequence, molecular weight, and charge) for the proteins in cell
@@ -199,10 +199,8 @@ class RandomSeqGen(object):
             for p in proteins:
                 outfile.write('%s' % p[0] + ',' + '%s' % p[1] + ',' + '%s' % p[2] +'\n')
 
-
 random_seq_gen = RandomSeqGen()
 NUM_GENES = 10
-
 (genes, rna, proteins) = random_seq_gen.gen_species_types(NUM_GENES)
 OUT_FILE = 'protein_data.csv'
 random_seq_gen.output_sequences(proteins, OUT_FILE)
