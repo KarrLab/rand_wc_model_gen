@@ -12,6 +12,8 @@ from random_wc_model_generator.random_polymer import RandomSeqGen
 
 NUM_GENES=10
 NUM_RUNS=100
+DNA_NUCLEOTIDES = ['A','T','C','G']
+NUCLEOTIDE_COMPLEMENT = {'A':'U','T':'A','C':'G','G':'C'}
 
 class TestGenerateSeq(unittest.TestCase):
     
@@ -47,6 +49,18 @@ class TestGenerateSeq(unittest.TestCase):
         for j in range(0,4):
             np.testing.assert_allclose(np.mean(base_abundance[:][j]), 0.25, rtol = 0.2)
 
+    def test_rna_transcript(self):
+        ''' Check genome is properly transcripted into RNA
+        '''
+        prot_length = self.rsg.prot_len(num_genes=NUM_GENES)
+        genome = self.rsg.make_genome(prot_length)
+        wc_rna = self.rsg.rna_transcript(genome)
+        
+        gen_base = {}
+        for nuc in DNA_NUCLEOTIDES:
+            gen_base[nuc] = genome.count(nuc)
+            self.assertEqual(gen_base[nuc], wc_rna.count(NUCLEOTIDE_COMPLEMENT[nuc]))
+
     def test_prot_data_reading(self):
         ''' Check valid values are being read and stored from protein data file
         '''
@@ -55,3 +69,13 @@ class TestGenerateSeq(unittest.TestCase):
             aa, mw, charge = self.rsg.prot_data(rnas[i])
             self.assertGreater(mw,0)
             self.assertIsInstance(charge, int)
+
+    def test_output(self):
+        ''' Check whether protein data strings are prepared for writing out into file
+        '''
+        (genes, rnas, proteins) = self.rsg.gen_species_types(NUM_GENES)
+        prot_data_string = self.rsg.output_prot_data(proteins)
+        self.assertEqual(len(prot_data_string), NUM_GENES)
+        
+        for gene in prot_data_string:
+            self.assertIsInstance(gene, str)

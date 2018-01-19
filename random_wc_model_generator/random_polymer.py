@@ -18,6 +18,7 @@ class RandomSeqGen(object):
     DNA_START_CODON = 'TAC'
     DNA_STOP_CODON = 'ATC'
     NUCLEOTIDE_COMPLEMENT = {'A':'U','T':'A','C':'G','G':'C'}
+    PROT_DATA_HEADER = 'aa sequence,molecular weight,charge \n'
     DEFAULT_MIN_PROT_LEN = 100
     DEFAULT_MAX_PROT_LEN = 1000
     RNA_CODON_TRANS_FILE = os.path.join(os.path.dirname(__file__), 'data/fixtures/codon_translation.csv')
@@ -76,7 +77,7 @@ class RandomSeqGen(object):
         """
         rna = ''
         for nuc in genome:
-            rna += RandomSeqGen.NUCLEOTIDE_COMPLEMENT[nuc[i]]
+            rna += RandomSeqGen.NUCLEOTIDE_COMPLEMENT[nuc]
 
         return rna
 
@@ -203,20 +204,36 @@ class RandomSeqGen(object):
 
         return (genes, rnas, proteins)
 
-    def output_sequences(self, proteins, out_file):
-        """ Make compiled lists of data (amino acid sequence, molecular weight, and charge) for the proteins in cell
+    def output_prot_data(self, proteins):
+        """ Compile data (amino acid sequence, molecular weight, and charge) for the proteins in cell
 
         Args:
             proteins (:obj:`tuple`): lists of amino acid sequences, molecular weights, and charges corresponding to each protein
             out_file (:obj:`string`): destination file for writing data
 
+        Return:
+            prot_data_string (:obj:`list`): strings of structural data corresponding to each protein
+
         """
         proteins = np.array(proteins)
         proteins = proteins.transpose()
+        prot_data_string = []
+        
+        for p in proteins:
+            prot_data_string.append('%s' % p[0] + ',' + '%s' % p[1] + ',' + '%s' % p[2] +'\n')
 
-        with open(out_file, 'w') as outfile:
-            outfile.write('aa sequence , molecular weight , charge \n')
+        return prot_data_string
+                
+    def write_output(self, data_string, outfile, header=PROT_DATA_HEADER):
+        """ Write out data (amino acid sequence, molecular weight, and charge for the proteins in cell, by default)
 
-            for p in proteins:
-                outfile.write('%s' % p[0] + ',' + '%s' % p[1] + ',' + '%s' % p[2] +'\n')
-
+        Args:
+            prot_data_string (:obj:`list`): strings of amino acid sequences, molecular weights, and charges corresponding to each protein
+            out_file (:obj:`string`): destination file for writing data
+            header (:obj:`string`, optional): titles for each column of data
+            
+        """
+        with open(outfile, 'w') as outfile:
+            outfile.write(header)
+            for s in data_string:
+                outfile.write(s)
