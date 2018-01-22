@@ -18,7 +18,7 @@ class RandomSeqGen(object):
     DNA_START_CODON = 'TAC'
     DNA_STOP_CODON = 'ATC'
     NUCLEOTIDE_COMPLEMENT = {'A':'U','T':'A','C':'G','G':'C'}
-    PROT_DATA_HEADER = 'aa sequence,molecular weight,charge \n'
+    PROT_DATA_HEADER = 'aa sequence,molecular weight,charge\n'
     DEFAULT_MIN_PROT_LEN = 100
     DEFAULT_MAX_PROT_LEN = 1000
     RNA_CODON_TRANS_FILE = os.path.join(os.path.dirname(__file__), 'data/fixtures/codon_translation.csv')

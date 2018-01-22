@@ -12,8 +12,6 @@ from random_wc_model_generator.random_polymer import RandomSeqGen
 
 NUM_GENES=10
 NUM_RUNS=100
-DNA_NUCLEOTIDES = ['A','T','C','G']
-NUCLEOTIDE_COMPLEMENT = {'A':'U','T':'A','C':'G','G':'C'}
 
 class TestGenerateSeq(unittest.TestCase):
     
@@ -57,9 +55,9 @@ class TestGenerateSeq(unittest.TestCase):
         wc_rna = self.rsg.rna_transcript(genome)
         
         gen_base = {}
-        for nuc in DNA_NUCLEOTIDES:
+        for nuc in RandomSeqGen.DNA_NUCLEOTIDES:
             gen_base[nuc] = genome.count(nuc)
-            self.assertEqual(gen_base[nuc], wc_rna.count(NUCLEOTIDE_COMPLEMENT[nuc]))
+            self.assertEqual(gen_base[nuc], wc_rna.count(RandomSeqGen.NUCLEOTIDE_COMPLEMENT[nuc]))
 
     def test_prot_data_reading(self):
         ''' Check valid values are being read and stored from protein data file
