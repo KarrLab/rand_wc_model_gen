@@ -8,6 +8,8 @@
 import unittest
 import os
 
+from wc_lang.io import Reader
+#from wc_utils.workbook.io import read as read_workbook
 from random_wc_model_generator.core import GenerateModel, main
 
 
@@ -27,3 +29,8 @@ class TestGenerateModel(unittest.TestCase):
     def test_generate_model(self):
         generate_model = self.generate_model(self.CONIG_FILENAME, self.MODEL_FILENAME + '.xlsx')
         self.assertEqual(generate_model.config['genes'], 100)
+
+    def test_metabolism_core(self):
+        metabolism_core = os.path.join(os.path.dirname(__file__),
+            '../random_wc_model_generator/data/fixtures', 'metabolism.xlsx')
+        model = Reader().run(metabolism_core)
