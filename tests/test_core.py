@@ -32,5 +32,5 @@ class TestGenerateModel(unittest.TestCase):
 
     def test_metabolism_core(self):
         metabolism_core = os.path.join(os.path.dirname(__file__),
-            '../random_wc_model_generator/data/fixtures', 'metabolism.xlsx')
+            '../random_wc_model_generator/data/fixtures', 'model_core.xlsx')
         model = Reader().run(metabolism_core)
