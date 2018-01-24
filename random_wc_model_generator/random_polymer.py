@@ -57,7 +57,8 @@ class RandomSeqGen(object):
                     nuc1 = '{}'.format(np.random.choice(RandomSeqGen.DNA_NUCLEOTIDES))
                     nuc2 = '{}'.format(np.random.choice(RandomSeqGen.DNA_NUCLEOTIDES))
                     nuc3 = '{}'.format(np.random.choice(RandomSeqGen.DNA_NUCLEOTIDES))
-                    codon = RandomSeqGen.NUCLEOTIDE_COMPLEMENT[nuc1] + RandomSeqGen.NUCLEOTIDE_COMPLEMENT[nuc2] + RandomSeqGen.NUCLEOTIDE_COMPLEMENT[nuc3]
+                    codon = RandomSeqGen.NUCLEOTIDE_COMPLEMENT[nuc1] + \
+                        RandomSeqGen.NUCLEOTIDE_COMPLEMENT[nuc2] + RandomSeqGen.NUCLEOTIDE_COMPLEMENT[nuc3]
 
                     if codon in self.translation_table.keys():
                         valid = True
@@ -208,7 +209,8 @@ class RandomSeqGen(object):
         """ Compile data (amino acid sequence, molecular weight, and charge) for the proteins in cell
 
         Args:
-            proteins (:obj:`tuple`): lists of amino acid sequences, molecular weights, and charges corresponding to each protein
+            proteins (:obj:`tuple`): lists of amino acid sequences, molecular weights, and charges
+                corresponding to each protein
             out_file (:obj:`string`): destination file for writing data
 
         Return:
@@ -228,7 +230,8 @@ class RandomSeqGen(object):
         """ Write out data (amino acid sequence, molecular weight, and charge for the proteins in cell, by default)
 
         Args:
-            prot_data_string (:obj:`list`): strings of amino acid sequences, molecular weights, and charges corresponding to each protein
+            prot_data_string (:obj:`list`): strings of amino acid sequences, molecular weights, and
+                charges corresponding to each protein
             out_file (:obj:`string`): destination file for writing data
             header (:obj:`string`, optional): titles for each column of data
             
