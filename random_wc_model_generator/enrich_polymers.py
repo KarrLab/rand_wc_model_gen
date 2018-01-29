@@ -84,3 +84,4 @@ class Enrich_Polymers (object):
             :obj:`int`: charge of RNA molecule
         """
         return    (-1 * (len(rna) + 1)) #Charge of RNA molecule is the negative of its (nucleotide length + 1)
+
