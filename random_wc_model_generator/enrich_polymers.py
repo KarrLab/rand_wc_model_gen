@@ -1,4 +1,6 @@
 """
+APG: put long desc. in Enrich_Polymers; https://google.github.io/styleguide/pyguide.html
+ 
 Takes in a wc_lang model as input, matches RNA/protein IDs with random RNA/protein sequences, molecular weights, and charges, creates transcription, translation, and RNA degradation reactions
 for the randomly generated sequences, outputs the updated model into an Excel spreadsheet
 
@@ -14,9 +16,20 @@ import wc_lang.core
 import xlrd
 
 class Enrich_Polymers (object):
+    """ Species (tuple of species type, compartment)
 
-    def __init__ (self, filename): #filename that contains wc_lang model
-        #print('enter')
+    Attributes:
+        species_type (:obj:`SpeciesType`): species type
+    """
+
+    def __init__ (self, filename):
+        """ 
+
+        Args:
+            filename (:obj:`str`): filename that contains wc_lang model
+            model_filename
+            files with ids and names
+        """
         randomseq = RandomSeqGen()
         core_wc_model = wc_lang.io.Reader().run(filename)
         rnacount = 0
@@ -117,9 +130,10 @@ class Enrich_Polymers (object):
                 reaction = nameList[index]
                 current_id = idList[index]
                 transcript = wc_lang.core.Reaction(id=current_id, name = reaction, submodel = transSubModel)
-                transcript.participants.create(species = wc_lang.core.Species(species_type = core_model.species_types.get(id='ATP'),
-                                                                              compartment = core_model.compartments.get(id='c')),
-                                                                              coefficient=-1 * element.structure.count('A'))
+                transcript.participants.create(species = wc_lang.core.Species(
+                    species_type = core_model.species_types.get(id='ATP'),
+                    compartment = core_model.compartments.get(id='c')),
+                    coefficient=-1 * element.structure.count('A'))
                 transcript.participants.create(species = wc_lang.core.Species(species_type = core_model.species_types.get(id='GTP'),
                                                                               compartment = core_model.compartments.get(id='c')),
                                                                               coefficient=-1 * element.structure.count('G'))
