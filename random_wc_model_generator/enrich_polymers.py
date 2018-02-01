@@ -94,6 +94,7 @@ class Enrich_Polymers (object):
 
         Args:
             core_model (:obj:`Model`): wc_lang random model
+            species_types (:obj:'list'): list of SpeciesType objects in core_model
 
         """
         b = xlrd.open_workbook("Model.xlsx")
@@ -108,11 +109,11 @@ class Enrich_Polymers (object):
         #write the transcription reactions into the model in memory
         index = 0
         submodels = core_model.get_submodels()
-        for submodel in submodels:
+        for submodel in submodels: #finding the transcription submodel among all the submodels
             if submodel.name == "Transcription":
                 transSubModel = submodel
         for element in species_types:
-            if element.type == wc_lang.core.SpeciesTypeType.rna:
+            if element.type == wc_lang.core.SpeciesTypeType.rna: #if SpeciesType object is RNA, then create transcription reaction with correct numbers of reactants and products
                 reaction = nameList[index]
                 current_id = idList[index]
                 transcript = wc_lang.core.Reaction(id=current_id, name = reaction, submodel = transSubModel)
@@ -149,6 +150,7 @@ class Enrich_Polymers (object):
 
         Args:
             core_model (:obj:`Model`): wc_lang random model
+            species_types (:obj:'list'): list of SpeciesType objects in core_model
 
 
         """
@@ -164,13 +166,17 @@ class Enrich_Polymers (object):
         #write the translation reactions into the model in memory
         index = 0
         submodels = core_model.get_submodels()
-        for submodel in submodels:
+        for submodel in submodels: #finding the translation submodel among all the submodels
             if submodel.name == "Translation":
                 transSubModel = submodel
+
+        #dictionary mapping one-letter to three-letter amino acid abbreviations
         dictionary ={'V':'VAL', 'I':'ILE', 'L':'LEU', 'E':'GLU', 'Q':'GLN', 
         'D':'ASP', 'N':'ASN', 'H':'HIS', 'W':'TRP', 'F':'PHE', 'Y':'TYR',    
         'R':'ARG', 'K':'LYS', 'S':'SER', 'T':'THR', 'M':'MET', 'A':'ALA',    
         'G':'GLY', 'P':'PRO', 'C':'CYS'}
+
+        #creating Species objects for the common reactants and products beforehand
         gtp = wc_lang.core.Species(species_type = core_model.species_types.get(id='GTP'),
                                                                               compartment = core_model.compartments.get(id='c'))
         h2o = wc_lang.core.Species(species_type = core_model.species_types.get(id='H2O'),
@@ -186,11 +192,11 @@ class Enrich_Polymers (object):
         
         
         for element in species_types:
-            if element.type == wc_lang.core.SpeciesTypeType.protein:
+            if element.type == wc_lang.core.SpeciesTypeType.protein: #if SpeciesType object is protein, then create translation reaction with correct numbers of reactants and products
                 reaction = nameList[index]
                 current_id = idList[index]
                 transcript = wc_lang.core.Reaction(id=current_id, name = reaction, submodel = transSubModel)
-                for aa in dictionary:
+                for aa in dictionary:  #goes through all amino acids, counts number of that amino acid in protein sequence, adds Species object of that amino acid to the reaction
                     count = element.structure.count(aa)
                     if count != 0:
                         transcript.participants.create(species = wc_lang.core.Species(species_type = core_model.species_types.get(id=dictionary[aa]),
@@ -212,6 +218,8 @@ class Enrich_Polymers (object):
 
         Args:
             core_model (:obj:`Model`): wc_lang random model
+            species_types (:obj:'list'): list of SpeciesType objects in core_model
+
 
         """
         b = xlrd.open_workbook("Model.xlsx")
@@ -226,10 +234,11 @@ class Enrich_Polymers (object):
         #write the rna degradation reactions into the model in memory
         index = 0
         submodels = core_model.get_submodels()
-        for submodel in submodels:
+        for submodel in submodels: #finding the rna degradation submodel among all the submodels
             if submodel.name == "RNA degradation":
                 transSubModel = submodel
 
+        #creating Species objects for the common reactants and products beforehand
 
         h2o = wc_lang.core.Species(species_type = core_model.species_types.get(id='H2O'),
                                                                               compartment = core_model.compartments.get(id='c'))
@@ -250,7 +259,7 @@ class Enrich_Polymers (object):
         
         
         for element in species_types:
-            if element.type == wc_lang.core.SpeciesTypeType.rna:
+            if element.type == wc_lang.core.SpeciesTypeType.rna: #if SpeciesType object is RNA, then create RNA degradation reaction with correct numbers of reactants and products
                 reaction = nameList[index]
                 current_id = idList[index]
                 transcript = wc_lang.core.Reaction(id=current_id, name = reaction, submodel = transSubModel)
