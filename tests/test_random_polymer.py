@@ -1,6 +1,7 @@
 """ Test polymer sequence generation
 
 :Author: Cathy Wang <cathy_wang@college.harvard.edu>
+:Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2018-01-17
 :Copyright: 2018, Karr Lab
 :License: MIT
@@ -11,7 +12,7 @@ import numpy as np
 from random_wc_model_generator.random_polymer import RandomSeqGen
 
 NUM_GENES = 10
-NUM_RUNS = 100
+NUM_RUNS = 20
 
 
 class TestGenerateSeq(unittest.TestCase):
