@@ -1,9 +1,4 @@
 """
-APG: put long desc. in Enrich_Polymers; https://google.github.io/styleguide/pyguide.html
- 
-Takes in a wc_lang model as input, matches RNA/protein IDs with random RNA/protein sequences, molecular weights, and charges, creates transcription, translation, and RNA degradation reactions
-for the randomly generated sequences, outputs the updated model into an Excel spreadsheet
-
 :Author: Ashwin Srinivasan <ashwins@mit.edu>
 :Date: 2018-01-26
 :Copyright: 2018, Karr Lab
@@ -13,22 +8,32 @@ for the randomly generated sequences, outputs the updated model into an Excel sp
 from random_wc_model_generator.random_polymer import RandomSeqGen
 import wc_lang.io
 import wc_lang.core
-import xlrd
+import os
 
 class Enrich_Polymers (object):
-    """ Species (tuple of species type, compartment)
+    """ Enrich_Polymers:
+        Takes in a wc_lang model as input, matches RNA/protein IDs with random RNA/protein sequences, molecular weights, and charges, creates transcription, translation, and RNA degradation reactions
+        for the randomly generated sequences, outputs the updated model into an Excel spreadsheet
 
-    Attributes:
-        species_type (:obj:`SpeciesType`): species type
     """
+    BASE_WEIGHTS = {'A':329.2, 'U':306.2, 'C':305.2, 'G':345.2} #Each nucleotide base mapped to its molecular weight (including sugar and phosphate)
+    RNAMW = 159 #weight of 5' phosphate
+    IDS_NAMES = os.path.join(os.path.dirname(__file__), 'data/fixtures/ids_names.csv')
 
-    def __init__ (self, filename):
-        """ 
+    #dictionary mapping one-letter to three-letter amino acid abbreviations
+    ABBREVIATIONS ={'V':'VAL', 'I':'ILE', 'L':'LEU', 'E':'GLU', 'Q':'GLN', 
+    'D':'ASP', 'N':'ASN', 'H':'HIS', 'W':'TRP', 'F':'PHE', 'Y':'TYR',    
+    'R':'ARG', 'K':'LYS', 'S':'SER', 'T':'THR', 'M':'MET', 'A':'ALA',    
+    'G':'GLY', 'P':'PRO', 'C':'CYS'}
+
+
+    def __init__ (self, filename, model_filename): 
+
+        """
 
         Args:
             filename (:obj:`str`): filename that contains wc_lang model
-            model_filename
-            files with ids and names
+            model_filename (:obj: 'str'): filename with the updated output model
         """
         randomseq = RandomSeqGen()
         core_wc_model = wc_lang.io.Reader().run(filename)
@@ -68,7 +73,6 @@ class Enrich_Polymers (object):
         self.transcription(core_wc_model, species_types)
         self.translation(core_wc_model, species_types)
         self.rnadegradation(core_wc_model, species_types)
-        model_filename = "random_model.xlsx" #outputs updated model to Excel file
         wc_lang.io.Writer().run(model_filename, core_wc_model)
 
 
@@ -81,13 +85,12 @@ class Enrich_Polymers (object):
         Returns:
             :obj:`float`: molecular weight 
         """
-        dictionary = {'A':329.2, 'U':306.2, 'C':305.2, 'G':345.2} #Each nucleotide base mapped to its molecular weight (including sugar and phosphate)
-        rnamw = 159 #weight of 5' phosphate
         for j in range(len(rna)):
+            rna_weight = Enrich_Polymers.RNAMW
             base = rna[j]
-            rnamw += dictionary[base]
+            rna_weight += Enrich_Polymers.BASE_WEIGHTS[base]
 
-        return rnamw
+        return rna_weight
 
     def rnacharge (self, rna): 
         """ Calculates charge for RNA molecule
@@ -108,53 +111,60 @@ class Enrich_Polymers (object):
         Args:
             core_model (:obj:`Model`): wc_lang random model
             species_types (:obj:'list'): list of SpeciesType objects in core_model
-
-        """
-        b = xlrd.open_workbook("Model.xlsx")
-        reactions = b.sheet_by_index(3)
+            
+"""
         nameList = []
         idList = []
-        for i in range(reactions.nrows):
-            current_row = reactions.row_values(i)
-            if current_row[2] == 'Transcription':
-                nameList.append(current_row[1])
-                idList.append(current_row[0].replace('-', '_'))
+        for line in open(Enrich_Polymers.IDS_NAMES):
+            line   = line.rstrip('\n')
+            lineList = line.split(',')
+            #print(lineList)
+            ID = lineList[0]
+            name = lineList[1]
+            submodel = lineList[2]
+            if ID == 'Id':
+                continue
+            if submodel == 'Transcription':
+                idList.append(ID.replace('-', '_'))
+                nameList.append(name)
+            
+           
         #write the transcription reactions into the model in memory
         index = 0
         submodels = core_model.get_submodels()
         for submodel in submodels: #finding the transcription submodel among all the submodels
             if submodel.name == "Transcription":
                 transSubModel = submodel
+
+                
+        speciesList = core_model.get_species()
+        atp = self.find_species(core_model,speciesList, "ATP")
+        gtp = self.find_species(core_model,speciesList, "GTP")
+        utp = self.find_species(core_model,speciesList, "UTP")
+        ctp = self.find_species(core_model,speciesList, "CTP")
+        h2o = self.find_species(core_model,speciesList, "H2O")
+        ppi = self.find_species(core_model,speciesList, "PPI")
+        h = self.find_species(core_model,speciesList, "H")
+
+        
         for element in species_types:
             if element.type == wc_lang.core.SpeciesTypeType.rna: #if SpeciesType object is RNA, then create transcription reaction with correct numbers of reactants and products
                 reaction = nameList[index]
                 current_id = idList[index]
                 transcript = wc_lang.core.Reaction(id=current_id, name = reaction, submodel = transSubModel)
-                transcript.participants.create(species = wc_lang.core.Species(
-                    species_type = core_model.species_types.get(id='ATP'),
-                    compartment = core_model.compartments.get(id='c')),
-                    coefficient=-1 * element.structure.count('A'))
-                transcript.participants.create(species = wc_lang.core.Species(species_type = core_model.species_types.get(id='GTP'),
-                                                                              compartment = core_model.compartments.get(id='c')),
-                                                                              coefficient=-1 * element.structure.count('G'))
-                transcript.participants.create(species = wc_lang.core.Species(species_type = core_model.species_types.get(id='UTP'),
-                                                                              compartment = core_model.compartments.get(id='c')),
-                                                                              coefficient=-1 * element.structure.count('U'))
-                transcript.participants.create(species = wc_lang.core.Species(species_type = core_model.species_types.get(id='CTP'),
-                                                                              compartment = core_model.compartments.get(id='c')),
-                                                                              coefficient=-1 * element.structure.count('C'))
-                transcript.participants.create(species = wc_lang.core.Species(species_type = core_model.species_types.get(id='H2O'),
-                                                                              compartment = core_model.compartments.get(id='c')),
-                                                                              coefficient=-1)
-                transcript.participants.create(species = wc_lang.core.Species(species_type = core_model.species_types.get(id='H'),
-                                                                              compartment = core_model.compartments.get(id='c')),
-                                                                              coefficient=1)
-                transcript.participants.create(species = wc_lang.core.Species(species_type = element,
-                                                                              compartment = core_model.compartments.get(id='c')),
-                                                                              coefficient=1)
-                transcript.participants.create(species = wc_lang.core.Species(species_type = core_model.species_types.get(id='PPI'),
-                                                                              compartment = core_model.compartments.get(id='c')),
-                                                                              coefficient=element.structure.count('A')+element.structure.count('G')+element.structure.count('U')+element.structure.count('C') )
+                transcript.participants.create(species = atp, coefficient=-1 * element.structure.count('A'))
+                transcript.participants.create(species = gtp,coefficient=-1 * element.structure.count('G'))
+                transcript.participants.create(species = utp, coefficient=-1 * element.structure.count('U'))
+                transcript.participants.create(species = ctp, coefficient=-1 * element.structure.count('C'))
+                transcript.participants.create(species = h2o, coefficient=-1)
+                transcript.participants.create(species = h, coefficient=1)
+                if self.find_species(core_model,speciesList, element.id) != None:
+                    transcript.participants.create(species = self.find_species(core_model,speciesList, element.id), coefficient = 1)
+                else:
+                    transcript.participants.create(species = wc_lang.core.Species(species_type = element,
+                                                                                 compartment = core_model.compartments.get(id='c')),
+                                                                                  coefficient=1)
+                transcript.participants.create(species = ppi,coefficient=element.structure.count('A')+element.structure.count('G')+element.structure.count('U')+element.structure.count('C') )
                 index += 1
 
 
@@ -168,15 +178,21 @@ class Enrich_Polymers (object):
 
 
         """
-        b = xlrd.open_workbook("Model.xlsx")
-        reactions = b.sheet_by_index(3)
+
         nameList = []
         idList = []
-        for i in range(reactions.nrows):
-            current_row = reactions.row_values(i)
-            if current_row[2] == 'Translation':
-                nameList.append(current_row[1])
-                idList.append(current_row[0].replace('-', '_'))
+        for line in open(Enrich_Polymers.IDS_NAMES):
+            line   = line.rstrip('\n')
+            lineList = line.split(',')
+            ID = lineList[0]
+            name = lineList[1]
+            submodel = lineList[2]
+            if ID == 'Id':
+                continue
+            if submodel == 'Translation':
+                idList.append(ID.replace('-', '_'))
+                nameList.append(name)
+                
         #write the translation reactions into the model in memory
         index = 0
         submodels = core_model.get_submodels()
@@ -184,46 +200,47 @@ class Enrich_Polymers (object):
             if submodel.name == "Translation":
                 transSubModel = submodel
 
-        #dictionary mapping one-letter to three-letter amino acid abbreviations
-        dictionary ={'V':'VAL', 'I':'ILE', 'L':'LEU', 'E':'GLU', 'Q':'GLN', 
-        'D':'ASP', 'N':'ASN', 'H':'HIS', 'W':'TRP', 'F':'PHE', 'Y':'TYR',    
-        'R':'ARG', 'K':'LYS', 'S':'SER', 'T':'THR', 'M':'MET', 'A':'ALA',    
-        'G':'GLY', 'P':'PRO', 'C':'CYS'}
 
-        #creating Species objects for the common reactants and products beforehand
-        gtp = wc_lang.core.Species(species_type = core_model.species_types.get(id='GTP'),
-                                                                              compartment = core_model.compartments.get(id='c'))
-        h2o = wc_lang.core.Species(species_type = core_model.species_types.get(id='H2O'),
-                                                                              compartment = core_model.compartments.get(id='c'))
-        gdp = wc_lang.core.Species(species_type = core_model.species_types.get(id='GDP'),
-                                                                              compartment = core_model.compartments.get(id='c'))
+        #getting Species objects for the common reactants and products beforehand
+        speciesList = core_model.get_species()
+        gtp = self.find_species(core_model,speciesList, "GTP")
+        h2o = self.find_species(core_model,speciesList, "H2O")
+        gdp = self.find_species(core_model,speciesList, "GDP")
+        pi = self.find_species(core_model,speciesList, "PI")
+        h = self.find_species(core_model,speciesList, "H")
 
-        pi = wc_lang.core.Species(species_type = core_model.species_types.get(id='PI'),
-                                                                              compartment = core_model.compartments.get(id='c'))
-
-        h = wc_lang.core.Species(species_type = core_model.species_types.get(id='H'),
-                                                                              compartment = core_model.compartments.get(id='c'))
+        for aa in Enrich_Polymers.ABBREVIATIONS:  #creating Species objects for each amino acid beforehand
+            if self.find_species(core_model,speciesList, Enrich_Polymers.ABBREVIATIONS[aa]) == None:
+                species = wc_lang.core.Species(species_type = core_model.species_types.get(id=Enrich_Polymers.ABBREVIATIONS[aa]),
+                                                                      compartment = core_model.compartments.get(id='c'))
         
         
         for element in species_types:
             if element.type == wc_lang.core.SpeciesTypeType.protein: #if SpeciesType object is protein, then create translation reaction with correct numbers of reactants and products
+                #print(element)
                 reaction = nameList[index]
                 current_id = idList[index]
                 transcript = wc_lang.core.Reaction(id=current_id, name = reaction, submodel = transSubModel)
-                for aa in dictionary:  #goes through all amino acids, counts number of that amino acid in protein sequence, adds Species object of that amino acid to the reaction
+                
+                length = len(element.structure)
+
+                for aa in Enrich_Polymers.ABBREVIATIONS: #goes through all amino acids, counts number of that amino acid in protein sequence, adds Species object of that amino acid to the reaction
                     count = element.structure.count(aa)
                     if count != 0:
-                        transcript.participants.create(species = wc_lang.core.Species(species_type = core_model.species_types.get(id=dictionary[aa]),
-                                                                              compartment = core_model.compartments.get(id='c')),
-                                                       coefficient = -count)
-                length = len(element.structure)
+                        transcript.participants.create(species = self.find_species(core_model,speciesList, Enrich_Polymers.ABBREVIATIONS[aa]), coefficient = -1 * count)
+                    
+
                 transcript.participants.create(species = gtp,  coefficient=-1 * (2 * length + 3)  )
                 transcript.participants.create(species = h2o, coefficient=-1 * (length + 4))
                 transcript.participants.create(species = gdp, coefficient= 2 * length + 3)
                 transcript.participants.create(species = pi, coefficient = 2*length + 3)
-                transcript.participants.create(species = h , coefficient = 2 * length + 3)
-                transcript.participants.create(species = wc_lang.core.Species(species_type = element,
-                                                                              compartment = core_model.compartments.get(id='c')), coefficient = 1)
+                transcript.participants.create(species = h, coefficient = 2 * length + 3)
+                if self.find_species(core_model,speciesList, element.id) != None:
+                    transcript.participants.create(species = self.find_species(core_model,speciesList, element.id), coefficient = 1)
+                else:
+                    transcript.participants.create(species = wc_lang.core.Species(species_type = element,
+                                                                                 compartment = core_model.compartments.get(id='c')),
+                                                                                  coefficient=1)
                         
                 index += 1
 
@@ -236,15 +253,21 @@ class Enrich_Polymers (object):
 
 
         """
-        b = xlrd.open_workbook("Model.xlsx")
-        reactions = b.sheet_by_index(3)
+
         nameList = []
         idList = []
-        for i in range(reactions.nrows):
-            current_row = reactions.row_values(i)
-            if current_row[2] == 'RnaDegradation':
-                nameList.append(current_row[1])
-                idList.append(current_row[0].replace('-', '_'))
+        for line in open(Enrich_Polymers.IDS_NAMES):
+            line   = line.rstrip('\n')
+            lineList = line.split(',')
+            ID = lineList[0]
+            name = lineList[1]
+            submodel = lineList[2]
+            if ID == 'Id':
+                continue
+            if submodel == 'RnaDegradation':
+                idList.append(ID.replace('-', '_'))
+                nameList.append(name)
+                
         #write the rna degradation reactions into the model in memory
         index = 0
         submodels = core_model.get_submodels()
@@ -252,26 +275,18 @@ class Enrich_Polymers (object):
             if submodel.name == "RNA degradation":
                 transSubModel = submodel
 
-        #creating Species objects for the common reactants and products beforehand
+        #finding the Species objects for the common reactants and products beforehand
 
-        h2o = wc_lang.core.Species(species_type = core_model.species_types.get(id='H2O'),
-                                                                              compartment = core_model.compartments.get(id='c'))
-        gmp = wc_lang.core.Species(species_type = core_model.species_types.get(id='GMP'),
-                                                                              compartment = core_model.compartments.get(id='c'))
+        speciesList = core_model.get_species()
 
-        amp = wc_lang.core.Species(species_type = core_model.species_types.get(id='AMP'),
-                                                                              compartment = core_model.compartments.get(id='c'))
+        gmp = self.find_species(core_model,speciesList, "GMP")
+        h2o = self.find_species(core_model,speciesList, "H2O")
+        amp = self.find_species(core_model,speciesList, "AMP")
+        cmp = self.find_species(core_model,speciesList, "CMP")
+        ump = self.find_species(core_model,speciesList, "UMP")
+        h = self.find_species(core_model,speciesList, "H")
 
-        cmp = wc_lang.core.Species(species_type = core_model.species_types.get(id='CMP'),
-                                                                              compartment = core_model.compartments.get(id='c'))
-        
-        ump = wc_lang.core.Species(species_type = core_model.species_types.get(id='UMP'),
-                                                                              compartment = core_model.compartments.get(id='c'))
-
-        h = wc_lang.core.Species(species_type = core_model.species_types.get(id='H'),
-                                                                              compartment = core_model.compartments.get(id='c'))
-        
-        
+       
         for element in species_types:
             if element.type == wc_lang.core.SpeciesTypeType.rna: #if SpeciesType object is RNA, then create RNA degradation reaction with correct numbers of reactants and products
                 reaction = nameList[index]
@@ -284,9 +299,30 @@ class Enrich_Polymers (object):
                 transcript.participants.create(species = ump, coefficient = element.structure.count('U') )
                 transcript.participants.create(species = h2o , coefficient = -1 * ( element.structure.count('A')+element.structure.count('G')+element.structure.count('U')+element.structure.count('C') - 1))
                 transcript.participants.create(species = h , coefficient = element.structure.count('A')+element.structure.count('G')+element.structure.count('U')+element.structure.count('C') - 1)
-                transcript.participants.create(species = wc_lang.core.Species(species_type = element, compartment = core_model.compartments.get(id='c')), coefficient = -1)
-                        
+                if self.find_species(core_model,speciesList, element.id) != None:
+                    transcript.participants.create(species = self.find_species(core_model,speciesList, element.id), coefficient = 1)
+                else:
+                    transcript.participants.create(species = wc_lang.core.Species(species_type = element,
+                                                                                 compartment = core_model.compartments.get(id='c')),
+                                                                                  coefficient=1)
                 index += 1
 
-        
 
+    def find_species (self, core_model, speciesList, ID):
+        '''Finds species with given SpeciesType ID
+
+        Args:
+            core_model (:obj:`Model`): wc_lang random model
+            speciesList (:obj:'list'): list of Species objects in core_model
+
+        Returns:
+            :obj:`Species`: Species object corresponding to the given SpeciesType ID 
+
+        '''
+
+
+        for species in speciesList:
+            if species.species_type.id == ID and species.compartment == core_model.compartments.get(id='c'):
+                return species
+
+        return None
