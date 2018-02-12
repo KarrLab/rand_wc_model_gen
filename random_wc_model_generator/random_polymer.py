@@ -1,6 +1,7 @@
 """ Make random sequence of polymers
 
 :Author: Cathy Wang <cathy_wang@college.harvard.edu>
+:Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2018-01-14
 :Copyright: 2018, Karr Lab
 :License: MIT
@@ -9,8 +10,20 @@
 import os
 import numpy as np
 
+# TODO(Arthur): double-check that Start and Stop codons are being handled correctly
+# TODO(Arthur): create config file
+# use it to replace some constants like DEFAULT_MIN_PROT_LEN, DEFAULT_MAX_PROT_LEN, RNA_CODON_TRANS_FILE
+# TODO(Arthur): combine this with enrich_polymers.py in core.py
+# TODO(Arthur): enable config of PRNG seed for reproducibility
+# TODO(Arthur): catch exceptions, such as in write_output()
+
+
 class RandomSeqGen(object):
     """ Make random genetic sequences
+
+    Attributes:
+        translation_table (:obj:`dict`): map of amino acid encoding codons, from codon to
+            corresponding AA, molecular weight, and charge
     """
 
     # genetic constants
@@ -41,17 +54,21 @@ class RandomSeqGen(object):
     def make_genome(self, prot_lengths):
         """ Make random genome (DNA nucleotide) sequence
 
+        The genome consists of `len(prot_lengths)` protein coding genes. Each gene is a sequence of
+        valid coding codons, bounded by start and stop codons. All valid coding codons are equally
+        likely.
+
         Args:
-            prot_lengths (:obj:`list`): list of lengths of each protein
+            prot_lengths (:obj:`list` of :obj:`int`): the nucleotide lengths of proteins in the genome
 
         Returns:
-            :obj:`string`: genome sequence for cell
+            :obj:`string`: DNA nucleotides in genome sequence for cell
         """
         genome = ''
         for i in range(len(prot_lengths)):
             genome += RandomSeqGen.DNA_START_CODON
 
-            for j in range(prot_lengths[i]-2):
+            for j in range(prot_lengths[i]):
                 valid = False
                 while not(valid):
                     nuc1 = '{}'.format(np.random.choice(RandomSeqGen.DNA_NUCLEOTIDES))
@@ -71,7 +88,7 @@ class RandomSeqGen(object):
         """ Complement genome to find mRNA transcript
 
         Args:
-            genome (:obj:`string`): genome (DNA nucleotide) sequence for cell (includes all genes)
+            genome (:obj:`string`): genome (DNA nucleotide) sequence for cell
 
         Returns:
             :obj:`string`: mRNA nucleotide sequence for cell
@@ -83,15 +100,17 @@ class RandomSeqGen(object):
         return rna
 
     def prot_data(self, protein):
-        """ Find amino acid sequence, molecular weight, and charge of protein
+        """ Find amino acid sequence, molecular weight, and charge of a protein
 
         Args:
-            protein (:obj:`string`): nucleotide sequence of protein
+            protein (:obj:`string`): DNA nucleotide sequence of a protein
 
         Returns:
-            :obj:`string`: amino acid sequence of protein
-            :obj:`float`: molecular weight of protein
-            :obj:`int`: charge of protein
+            (`tuple`):
+
+                (:obj:`string`: amino acid sequence of protein,
+                :obj:`float`: molecular weight of protein,
+                :obj:`int`: charge of protein)
         """
         aminoacid = ''
         molweight = 0
@@ -108,12 +127,12 @@ class RandomSeqGen(object):
         return aminoacid, molweight, charge
 
     def prot_len(self, num_genes, min_prot_len=DEFAULT_MIN_PROT_LEN, max_prot_len=DEFAULT_MAX_PROT_LEN):
-        """ Randomly generate lengths (in amino acids) of all proteins in cell
+        """ Generate random lengths (in amino acids) for all proteins in a cell
 
         Args:
             num_genes (:obj:`int`): number of genes in cell
-            min_prot_len (:obj:`int`, optional): shortest desired protein length
-            max_prot_len (:obj:`int`, optional): longest desired protein length
+            min_prot_len (:obj:`int`, optional): the shortest desired protein length
+            max_prot_len (:obj:`int`, optional): the longest desired protein length
 
         Returns:
             :obj:`list`: list of ints for length of each protein
@@ -125,24 +144,20 @@ class RandomSeqGen(object):
         """ Parse genome to create list of DNA nucleotide (gene) sequences for the proteins in cell
 
         Args:
-            genome (:obj:`string`): genome (DNA nucleotide) sequence for cell (includes all genes)
+            genome (:obj:`string`): genome (DNA nucleotide) sequence for cell
 
         Returns:
-            :obj:`list`: list of DNA nucleotide sequences of each protein
+            :obj:`list`: DNA nucleotide sequence of each protein in `genome`
         """
-        genes = ['']
-        codon = ''
-        index = 0
+        genes = []
+        gene = ''
 
         for j in range(0, len(genome), 3):
             codon = genome[j:j+3]
-            genes[index] += codon
+            gene += codon
             if codon == RandomSeqGen.DNA_STOP_CODON:
-                index += 1
-                genes.append('')
-
-        # get rid of last empty string in list
-        genes = genes[:-1]
+                genes.append(gene)
+                gene = []
 
         return genes
 
@@ -166,21 +181,26 @@ class RandomSeqGen(object):
 
         return prot_rna
 
-    def make_proteins(self, prot_rna):
-        """ Make lists of data (amino acid sequence, molecular weight, and charge) for the proteins in cell
+    def make_proteins(self, mrna_seqs):
+        """ Make lists of the properties of the proteins in a cell
+
+        The properties are amino acid sequence, molecular weight, and charge.
 
         Args:
-            prot_rna (:obj:`list`): list of mRNA nucleotide sequences of each protein
+            mrna_seqs (:obj:`list` of :obj:`str`): mRNA nucleotide sequence for each protein
 
         Returns:
-            :obj:`tuple`: lists of amino acid sequences, molecular weights, and charges corresponding to each protein
+            (`tuple`): parallel lists of protein properties:
+
+                (:obj:`list` of :obj:`str`: amino acid sequences, :obj:`list` of :obj:`float`: molecular weights,
+                :obj:`list` of :obj:`float`: charges)
         """
         prot_aa = []
         prot_mw = []
         prot_charge = []
 
-        for i in range(len(prot_rna)):
-            aminoacid, molweight, charge = self.prot_data(prot_rna[i])
+        for i in range(len(mrna_seqs)):
+            aminoacid, molweight, charge = self.prot_data(mrna_seqs[i])
 
             prot_aa.append(aminoacid)
             prot_mw.append(molweight)
@@ -188,30 +208,33 @@ class RandomSeqGen(object):
 
         return (prot_aa, prot_mw, prot_charge)
 
-    def gen_species_types(self, num_genes):
-        """ Creates and stores genetic and structural data for each protein
+    def gen_polymers(self, num_genes):
+        """ Generates genetic sequences and structural data for a cell
 
         Args:
-            num_genes (:obj:`int`): number of genes in cell
+            num_genes (:obj:`int`): number of genes in the cell
 
         Returns:
-            :obj:`tuple`: lists for DNA, RNA, and amino acid sequence/molecular weight/charge data for each protein
+            (:obj:`tuple`): the genome, genes, mRNAs, and proteins in a cell; see respective `make_<polymer>()` methods for details
+
+                (:obj:`str`: DNA nucleotides, :obj:`tuple` of :obj:`list`: gene properties,
+                :obj:`tuple` of :obj:`list`: mRNA properties,
+                :obj:`tuple` of :obj:`list`: protein properties)
         """
         prot_lengths = self.prot_len(num_genes)
         genome = self.make_genome(prot_lengths)
         genes = self.make_genes(genome)
-        rnas = self.make_mrnas(genes)
-        proteins = self.make_proteins(rnas)
+        mrnas = self.make_mrnas(genes)
+        proteins = self.make_proteins(mrnas)
 
-        return (genes, rnas, proteins)
+        return (genome, genes, mrnas, proteins)
 
-    def output_prot_data(self, proteins):
-        """ Compile data (amino acid sequence, molecular weight, and charge) for the proteins in cell
+    def format_prot_data(self, proteins):
+        """ Format data (amino acid sequence, molecular weight, and charge) for the proteins in cell
 
         Args:
             proteins (:obj:`tuple`): lists of amino acid sequences, molecular weights, and charges
                 corresponding to each protein
-            out_file (:obj:`string`): destination file for writing data
 
         Return:
             prot_data_string (:obj:`list`): strings of structural data corresponding to each protein
@@ -220,23 +243,22 @@ class RandomSeqGen(object):
         proteins = np.array(proteins)
         proteins = proteins.transpose()
         prot_data_string = []
-        
+
         for p in proteins:
             prot_data_string.append('%s' % p[0] + ',' + '%s' % p[1] + ',' + '%s' % p[2] +'\n')
 
         return prot_data_string
-                
-    def write_output(self, data_string, outfile, header=PROT_DATA_HEADER):
-        """ Write out data (amino acid sequence, molecular weight, and charge for the proteins in cell, by default)
+
+    def write_output(self, prot_data_string, outfile, header=PROT_DATA_HEADER):
+        """ Write protein data to a file
 
         Args:
             prot_data_string (:obj:`list`): strings of amino acid sequences, molecular weights, and
                 charges corresponding to each protein
             out_file (:obj:`string`): destination file for writing data
-            header (:obj:`string`, optional): titles for each column of data
-            
+            header (:obj:`string`, optional): titles for column of data in `out_file`
         """
         with open(outfile, 'w') as outfile:
             outfile.write(header)
-            for s in data_string:
+            for s in prot_data_string:
                 outfile.write(s)

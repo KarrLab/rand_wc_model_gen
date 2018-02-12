@@ -8,6 +8,8 @@
 """
 import unittest
 import numpy as np
+import os
+import tempfile
 
 from random_wc_model_generator.random_polymer import RandomSeqGen
 
@@ -19,6 +21,11 @@ class TestGenerateSeq(unittest.TestCase):
 
     def setUp(self):
         self.rsg = RandomSeqGen()
+        _, self.filename = tempfile.mkstemp()
+
+    def tearDown(self):
+        if os.path.isfile(self.filename):
+            os.remove(self.filename)
 
     def test_length(self):
         ''' Compare length of protein (in amino acids) with length assigned by randomized protein length list
@@ -30,8 +37,8 @@ class TestGenerateSeq(unittest.TestCase):
         proteins = self.rsg.make_proteins(rnas)
 
         for i in range(len(rnas)):
-            # account for lack of stop codon amino acid with +1
-            self.assertEqual(len(proteins[0][i])+1, prot_lengths[i])
+            # account for extra start codon amino acid with -1
+            self.assertEqual(len(proteins[0][i])-1, prot_lengths[i])
 
     def test_base_stats(self):
         ''' Check abundance of each base in gene nucleotide sequence
@@ -63,7 +70,7 @@ class TestGenerateSeq(unittest.TestCase):
     def test_prot_data_reading(self):
         ''' Check valid values are being read and stored from protein data file
         '''
-        (genes, rnas, proteins) = self.rsg.gen_species_types(NUM_GENES)
+        (genome, genes, rnas, proteins) = self.rsg.gen_polymers(NUM_GENES)
         for i in range(NUM_GENES):
             aa, mw, charge = self.rsg.prot_data(rnas[i])
             self.assertGreater(mw, 0)
@@ -72,9 +79,14 @@ class TestGenerateSeq(unittest.TestCase):
     def test_output(self):
         ''' Check whether protein data strings are prepared for writing out into file
         '''
-        (genes, rnas, proteins) = self.rsg.gen_species_types(NUM_GENES)
-        prot_data_string = self.rsg.output_prot_data(proteins)
+        (genome, genes, rnas, proteins) = self.rsg.gen_polymers(NUM_GENES)
+        prot_data_string = self.rsg.format_prot_data(proteins)
         self.assertEqual(len(prot_data_string), NUM_GENES)
 
         for gene in prot_data_string:
             self.assertIsInstance(gene, str)
+
+        try:
+            self.rsg.write_output(prot_data_string, self.filename)
+        except:
+            self.fail("write_output() threw exception")

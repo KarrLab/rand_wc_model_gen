@@ -45,12 +45,8 @@ class Enrich_Polymers(object):
                 rnacount += 1
 
         # Use the RandomSeqGen class to randomly generate RNA/protein sequences (also protein charges and molecular weights)
-        lists = randomseq.gen_species_types(rnacount)
-        proteins = lists[2]
-        seq = proteins[0]
-        mw = proteins[1]
-        charge = proteins[2]
-        rnas = lists[1]
+        (genome, genes, rnas, proteins) = randomseq.gen_polymers(rnacount)
+        (seq, mw, charge) = proteins
 
         # Go through all the RNA IDs in species_types list and matches them with sequence, weight, and charge
         species_types = core_wc_model.get_species_types()
