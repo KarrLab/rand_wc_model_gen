@@ -71,7 +71,7 @@ class Enrich_Polymers(object):
         self.transcription(core_wc_model, species_types)
         self.translation(core_wc_model, species_types)
         self.rna_degradation(core_wc_model, species_types)
-        wc_lang.io.Writer().run(model_filename, core_wc_model)
+        wc_lang.io.Writer().run(core_wc_model, model_filename)
 
     def rna_weight(self, rna):
         """ Calculate molecular weight of a RNA molecule
