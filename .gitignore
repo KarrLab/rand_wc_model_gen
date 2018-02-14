@@ -30,6 +30,7 @@ docs/_build
 
 # pytest .cache directory
 .cache/
+.pytest_cache/
 
 # passwords
 tests/fixtures/secret/
