@@ -142,6 +142,7 @@ class GenerateModel(object):
         self.summarize_generated_model(wc_lang_model)
         return self
 
+# todo: move to __main__.py
 def main(test_args=None):
     if test_args is None:
         args = GenerateModel.parse_command_line()   # pragma: no cover
