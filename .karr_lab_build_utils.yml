@@ -1,3 +1,4 @@
-downstream_dependencies: []
+downstream_dependencies:
+  - wc
 email_notifications:
   - arthur.p.goldberg@mssm.edu
