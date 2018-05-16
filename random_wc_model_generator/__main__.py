@@ -8,7 +8,7 @@
 
 from cement.core.foundation import CementApp
 from cement.core.controller import CementBaseController, expose
-import random_wc_model_generator
+import rand_wc_model_gen
 
 
 class BaseController(CementBaseController):
@@ -18,7 +18,7 @@ class BaseController(CementBaseController):
         label = 'base'
         description = "Random whole-cell model generator"
         arguments = [
-            (['-v', '--version'], dict(action='version', version=random_wc_model_generator.__version__)),
+            (['-v', '--version'], dict(action='version', version=rand_wc_model_gen.__version__)),
         ]
 
     @expose(hide=True)
@@ -29,7 +29,7 @@ class BaseController(CementBaseController):
 class App(CementApp):
     """ Command line application """
     class Meta:
-        label = 'random_wc_model_generator'
+        label = 'rand_wc_model_gen'
         base_controller = 'base'
         handlers = [
             BaseController,

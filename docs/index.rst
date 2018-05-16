@@ -1,4 +1,4 @@
-random_wc_model_generator documentation
+rand_wc_model_gen documentation
 =======================================
 
 Contents

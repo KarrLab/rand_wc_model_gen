@@ -6,13 +6,13 @@
 :License: MIT
 """
 
-import random_wc_model_generator
+import rand_wc_model_gen
 import types
 import unittest
 
 
 class ApiTestCase(unittest.TestCase):
     def test(self):
-        self.assertIsInstance(random_wc_model_generator, types.ModuleType)
-        self.assertIsInstance(random_wc_model_generator.CreateWcLangModel, type)
-        self.assertIsInstance(random_wc_model_generator.enrich_polymers, types.ModuleType)
+        self.assertIsInstance(rand_wc_model_gen, types.ModuleType)
+        self.assertIsInstance(rand_wc_model_gen.CreateWcLangModel, type)
+        self.assertIsInstance(rand_wc_model_gen.enrich_polymers, types.ModuleType)

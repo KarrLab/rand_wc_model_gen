@@ -7,7 +7,7 @@ except ImportError:
     import pkg_utils
 import os
 
-name = 'random_wc_model_generator'
+name = 'rand_wc_model_gen'
 dirname = os.path.dirname(__file__)
 package_data = {
     name: [
@@ -45,7 +45,7 @@ setuptools.setup(
     ],
     entry_points={
         'console_scripts': [
-            'random_wc_model_generator = random_wc_model_generator.__main__:main',
+            'rand_wc_model_gen = rand_wc_model_gen.__main__:main',
         ],
     },
 )

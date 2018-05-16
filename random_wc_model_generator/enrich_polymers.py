@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from random_wc_model_generator.random_polymer import RandomSeqGen
+from rand_wc_model_gen.random_polymer import RandomSeqGen
 import wc_lang.io
 import wc_lang.core
 import os

@@ -48,7 +48,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'random_wc_model_generator'
+project = u'rand_wc_model_gen'
 copyright = u'{}, Karr Lab'.format(datetime.datetime.now().year)
 author = u'Karr Lab'
 
@@ -57,7 +57,7 @@ author = u'Karr Lab'
 # built documents.
 #
 # The short X.Y version.
-filename = os.path.join(os.path.dirname(__file__), '..', 'random_wc_model_generator', 'VERSION')
+filename = os.path.join(os.path.dirname(__file__), '..', 'rand_wc_model_gen', 'VERSION')
 with open(filename, 'r') as file:
     version = file.read()
 # The full version, including alpha/beta/rc tags.
@@ -141,9 +141,9 @@ def linkcode_resolve(domain, info):
         return None
     rel_filename = info['module'].replace('.', '/')
     if os.path.isfile(os.path.join(os.path.dirname(__file__), '..', rel_filename + '.py')):
-        return "https://github.com/KarrLab/random_wc_model_generator/blob/master/{}.py".format(rel_filename)
+        return "https://github.com/KarrLab/rand_wc_model_gen/blob/master/{}.py".format(rel_filename)
     else:
-        return "https://github.com/KarrLab/random_wc_model_generator/blob/master/{}/__init__.py".format(rel_filename)
+        return "https://github.com/KarrLab/rand_wc_model_gen/blob/master/{}/__init__.py".format(rel_filename)
 
 
 # -- napoleon options -----------------------------------------------------
@@ -180,7 +180,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-# html_title = u'random_wc_model_generator v0.0.1'
+# html_title = u'rand_wc_model_gen v0.0.1'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
@@ -280,7 +280,7 @@ html_show_copyright = True
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'random_wc_model_generator-doc'
+htmlhelp_basename = 'rand_wc_model_gen-doc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -306,7 +306,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'random_wc_model_generator.tex', u'random_wc_model_generator documentation',
+    (master_doc, 'rand_wc_model_gen.tex', u'rand_wc_model_gen documentation',
      u'Karr Lab', 'manual'),
 ]
 
@@ -348,7 +348,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'random_wc_model_generator', u'random_wc_model_generator documentation',
+    (master_doc, 'rand_wc_model_gen', u'rand_wc_model_gen documentation',
      [author], 1)
 ]
 
@@ -363,8 +363,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'random_wc_model_generator', u'random_wc_model_generator documentation',
-     author, 'random_wc_model_generator', 'One line description of project.',
+    (master_doc, 'rand_wc_model_gen', u'rand_wc_model_gen documentation',
+     author, 'rand_wc_model_gen', 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -392,5 +392,5 @@ googleanalytics_id = 'UA-86340737-1'
 
 # -- if RTD, redirect to https://docs.karrlab.org  ------------------------
 
-addmetahtml_content = '<meta http-equiv="refresh" content="0; url=https://docs.karrlab.org/random_wc_model_generator" />'
+addmetahtml_content = '<meta http-equiv="refresh" content="0; url=https://docs.karrlab.org/rand_wc_model_gen" />'
 addmetahtml_enabled = os.getenv('READTHEDOCS', '') == 'True'

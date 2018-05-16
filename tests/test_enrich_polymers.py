@@ -7,7 +7,7 @@
 
 import unittest
 
-from random_wc_model_generator.enrich_polymers import Enrich_Polymers
+from rand_wc_model_gen.enrich_polymers import Enrich_Polymers
 
 class TestEventQueue(unittest.TestCase):
 

@@ -11,7 +11,7 @@ import numpy as np
 import os
 import tempfile
 
-from random_wc_model_generator.random_polymer import RandomSeqGen
+from rand_wc_model_gen.random_polymer import RandomSeqGen
 
 NUM_GENES = 10
 NUM_RUNS = 20
