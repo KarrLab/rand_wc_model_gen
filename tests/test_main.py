@@ -21,6 +21,12 @@ class CliTestCase(unittest.TestCase):
                 __main__.main()
                 self.assertRegexpMatches(context.Exception, 'usage: random_wc_model_generator')
 
+        with mock.patch('sys.argv', ['random_wc_model_generator']):
+            with abduct.captured(abduct.out(), abduct.err()) as (stdout, stderr):
+                __main__.main()
+                self.assertRegexpMatches(stdout.getvalue().strip(), 'usage: random_wc_model_generator')
+                self.assertEqual(stderr.getvalue(), '')
+
     def test_get_version(self):
         with abduct.captured(abduct.out(), abduct.err()) as (stdout, stderr):
             with __main__.App(argv=['-v']) as app:

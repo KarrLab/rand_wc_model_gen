@@ -21,6 +21,10 @@ class BaseController(CementBaseController):
             (['-v', '--version'], dict(action='version', version=random_wc_model_generator.__version__)),
         ]
 
+    @expose(hide=True)
+    def default(self):
+        self.app.args.print_help()
+
 
 class App(CementApp):
     """ Command line application """
