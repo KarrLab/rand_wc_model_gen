@@ -10,6 +10,7 @@
 import configobj
 import os
 import pkg_resources
+import rand_wc_model_gen
 import wc_utils.config.core
 
 
@@ -35,4 +36,7 @@ def get_config(extra_path=None, extra_vals=None):
     if extra_path:
         paths.user.insert(0, extra_path)
 
-    return wc_utils.config.core.ConfigManager(paths).get_config(extra=extra_vals)
+    context = {
+        'version': rand_wc_model_gen.__version__,
+    }
+    return wc_utils.config.core.ConfigManager(paths).get_config(extra=extra_vals, context=context)

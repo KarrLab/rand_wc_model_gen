@@ -5,6 +5,6 @@ with open(pkg_resources.resource_filename('rand_wc_model_gen', 'VERSION'), 'r') 
     __version__ = file.read().strip()
 
 # API
-from .core import CreateWcLangModel, GenerateModel
-from . import enrich_polymers
-from . import random_polymer
+from . import config
+from . import kb_gen
+from . import model_gen

@@ -14,5 +14,12 @@ import unittest
 class ApiTestCase(unittest.TestCase):
     def test(self):
         self.assertIsInstance(rand_wc_model_gen, types.ModuleType)
-        self.assertIsInstance(rand_wc_model_gen.CreateWcLangModel, type)
-        self.assertIsInstance(rand_wc_model_gen.enrich_polymers, types.ModuleType)
+
+        self.assertIsInstance(rand_wc_model_gen.config, types.ModuleType)
+        self.assertIsInstance(rand_wc_model_gen.config.get_config, types.FunctionType)
+
+        self.assertIsInstance(rand_wc_model_gen.kb_gen, types.ModuleType)
+        self.assertIsInstance(rand_wc_model_gen.kb_gen.KbGenerator, type)
+
+        self.assertIsInstance(rand_wc_model_gen.model_gen, types.ModuleType)
+        self.assertIsInstance(rand_wc_model_gen.model_gen.ModelGenerator, type)
