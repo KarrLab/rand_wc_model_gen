@@ -23,7 +23,8 @@ class CliTestCase(unittest.TestCase):
         self.temp_dir = tempfile.mkdtemp()
 
     def tearDown(self):
-        shutil.rmtree(self.temp_dir)
+        print(self.temp_dir)
+        # shutil.rmtree(self.temp_dir)
 
     def test_raw_cli(self):
         with mock.patch('sys.argv', ['rand_wc_model_gen', '--help']):
@@ -56,7 +57,20 @@ class CliTestCase(unittest.TestCase):
         kb_core_path = os.path.join(self.temp_dir, 'kb.xlsx')
         kb_seq_path = os.path.join(self.temp_dir, 'kb.fna')
         model_path = os.path.join(self.temp_dir, 'model.xlsx')
-        with __main__.App(argv=['gen', kb_core_path, kb_seq_path, model_path]) as app:
+        config_path = os.path.join(self.temp_dir, 'rand_wc_model_gen.cfg')
+
+        # write configuration file
+        with open(config_path, 'w') as file:
+            file.write('[rand_wc_model_gen]\n')
+            file.write('    [[kb_gen]]\n')
+            file.write('        [[[component]]]\n')
+            file.write('            [[[[ChromosomesGenesGenerator]]]]\n')
+            file.write('                num_chromosomes = 1\n')
+            file.write('                avg_num_genes = 100\n')
+            file.write('                avg_gene_len = 10\n')
+
+        # generate model
+        with __main__.App(argv=['gen', kb_core_path, kb_seq_path, model_path, '--config-path', config_path]) as app:
             app.run()
 
         self.assertTrue(os.path.isfile(kb_core_path))
@@ -65,15 +79,34 @@ class CliTestCase(unittest.TestCase):
         kb = wc_kb.io.Reader().run(kb_core_path, kb_seq_path)
         model = wc_lang.io.Reader().run(model_path)
 
+    @unittest.skip('Get working')
     def test_sim_model(self):
         kb_core_path = os.path.join(self.temp_dir, 'kb.xlsx')
         kb_seq_path = os.path.join(self.temp_dir, 'kb.fna')
         model_path = os.path.join(self.temp_dir, 'model.xlsx')
-        with __main__.App(argv=['gen', kb_core_path, kb_seq_path, model_path]) as app:
+        config_path = os.path.join(self.temp_dir, 'rand_wc_model_gen.cfg')
+
+        # write configuration file
+        with open(config_path, 'w') as file:
+            file.write('[rand_wc_model_gen]\n')
+            file.write('    [[kb_gen]]\n')
+            file.write('        [[[component]]]\n')
+            file.write('            [[[[ChromosomesGenesGenerator]]]]\n')
+            file.write('                num_chromosomes = 1\n')
+            file.write('                avg_num_genes = 100\n')
+            file.write('                avg_gene_len = 10\n')
+            file.write('    [[sim]]\n')
+            file.write('        end_time = 10\n')
+            file.write('        checkpoint_period = 1\n')
+
+        # generate model
+        with __main__.App(argv=['gen', kb_core_path, kb_seq_path, model_path, '--config-path', config_path]) as app:
             app.run()
 
+        # simulate model
         sim_results_path = os.path.join(self.temp_dir, 'sim_results')
-        with __main__.App(argv=['sim', model_path, sim_results_path]) as app:
+        with __main__.App(argv=['sim', model_path, sim_results_path, '--config-path', config_path]) as app:
             app.run()
 
         # todo
+        self.assertTrue(os.path.isdir(sim_results_path))

@@ -15,7 +15,7 @@ import rand_wc_model_gen.kb_gen
 import rand_wc_model_gen.model_gen
 import wc_kb.io
 import wc_lang.io
-import wc_sim.multialgorithm
+import wc_sim.multialgorithm.simulation
 
 
 class BaseController(CementBaseController):
@@ -70,14 +70,18 @@ class SimController(CementBaseController):
         arguments = [
             (['model_path'], dict(type=str, help='Path to model (.csv, .tsv, .xlsx)')),
             (['sim_results_path'], dict(type=str, help='Path to save simulation results in HDF5 format')),
-            (['--len'], dict(type=float, help='Length of time to simulation in s')),
+            (['--config-path'], dict(type=str, default=None, help='Path to configuration file')),
         ]
 
     @expose(hide=True)
     def default(self):
         args = self.app.pargs
+        config = rand_wc_model_gen.config.get_config(extra_path=args.config_path)['rand_wc_model_gen']
         model = wc_lang.io.Reader().run(args.model_path)
-        # wc_sim.multialgorithm(model, args.results_path) # todo
+        simulation = wc_sim.multialgorithm.simulation.Simulation(model)
+        simulation.run(end_time=config['sim']['end_time'],
+                       checkpoint_period=config['sim']['checkpoint_period'],
+                       results_dir=args.sim_results_path)
 
 
 class App(CementApp):

@@ -26,32 +26,39 @@ class ChromosomesGenesGenerator(wc_kb_gen.KbComponentGenerator):
     * avg_coding_frac (:obj:`float`): average coding fraction of the genome
     """
 
-    def get_data(self):
-        """ Get data for knowledge base components """
-        pass  # pragma: no cover
+    def clean_and_validate_options(self):
+        """ Apply default options and validate options """
+        options = self.options
 
-    def process_data(self):
-        """ Process data for knowledge base components """
-        pass  # pragma: no cover
+        num_chromosomes = options.get('num_chromosomes', 1)
+        assert(num_chromosomes >= 1 and int(num_chromosomes) == num_chromosomes)
+        options['num_chromosomes'] = num_chromosomes
+
+        avg_gc_frac = options.get('avg_gc_frac', 0.5)
+        assert(avg_gc_frac >= 0 and avg_gc_frac <= 1)
+        options['avg_gc_frac'] = avg_gc_frac
+
+        avg_num_genes = options.get('avg_num_genes', 2000)
+        assert(avg_num_genes >= 1)
+        options['avg_num_genes'] = avg_num_genes
+
+        avg_gene_len = options.get('avg_gene_len', 924)  # DOI: 10.1093/molbev/msk019
+        assert(avg_gene_len >= 1)
+        options['avg_gene_len'] = avg_gene_len
+
+        avg_coding_frac = options.get('avg_coding_frac', 0.88)  # DOI: 10.1007/s10142-015-0433-4
+        assert(avg_coding_frac > 0 and avg_coding_frac < 1)
+        options['avg_coding_frac'] = avg_coding_frac
 
     def gen_components(self):
         """ Construct knowledge base components """
 
-        # get and validate options
-        num_chromosomes = self.options.get('num_chromosomes', 1)
-        assert(num_chromosomes >= 1 and int(num_chromosomes) == num_chromosomes)
-
-        avg_gc_frac = self.options.get('avg_gc_frac', 0.5)
-        assert(avg_gc_frac >= 0 and avg_gc_frac <= 1)
-
-        avg_num_genes = self.options.get('avg_num_genes', 2000)
-        assert(avg_num_genes >= 1)
-
-        avg_gene_len = self.options.get('avg_gene_len', 924)  # DOI: 10.1093/molbev/msk019
-        assert(avg_gene_len >= 1)
-
-        avg_coding_frac = self.options.get('avg_coding_frac', 0.88)  # DOI: 10.1007/s10142-015-0433-4
-        assert(avg_coding_frac > 0 and avg_coding_frac < 1)
+        # get options
+        num_chromosomes = self.options.get('num_chromosomes')
+        avg_gc_frac = self.options.get('avg_gc_frac')
+        avg_num_genes = self.options.get('avg_num_genes')
+        avg_gene_len = self.options.get('avg_gene_len')
+        avg_coding_frac = self.options.get('avg_coding_frac')
 
         # generate chromosomes and genes
         cell = self.knowledge_base.cell
@@ -73,9 +80,9 @@ class ChromosomesGenesGenerator(wc_kb_gen.KbComponentGenerator):
                 circular=True,
                 double_stranded=True,
                 seq=seq)
-            
+
             gene_starts = numpy.int64(numpy.cumsum(numpy.concatenate(([0], gene_lens[0:-1])) +
-                                       numpy.concatenate((numpy.round(intergene_lens[0:1] / 2), intergene_lens[1:]))))
+                                                   numpy.concatenate((numpy.round(intergene_lens[0:1] / 2), intergene_lens[1:]))))
             for i_gene in range(num_genes):
                 wc_kb.GeneLocus(
                     cell=cell,
