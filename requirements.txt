@@ -2,8 +2,8 @@ cement
 configobj
 numpy
 setuptools
-git+https://github.com/KarrLab/wc_kb.git#egg=wc_lang-0.0.1
-git+https://github.com/KarrLab/wc_kb_gen.git#egg=wc_lang-0.0.1
+git+https://github.com/KarrLab/wc_kb.git#egg=wc_kb-0.0.1
+git+https://github.com/KarrLab/wc_kb_gen.git#egg=wc_kb_gen-0.0.1
 git+https://github.com/KarrLab/wc_lang.git#egg=wc_lang-0.0.1
-git+https://github.com/KarrLab/wc_model_gen.git#egg=wc_lang-0.0.1
+git+https://github.com/KarrLab/wc_model_gen.git#egg=wc_model_gen-0.0.1
 git+https://github.com/KarrLab/wc_utils.git#egg=wc_utils-0.0.1a5
