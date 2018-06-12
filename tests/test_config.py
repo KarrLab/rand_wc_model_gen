@@ -26,7 +26,7 @@ class Test(unittest.TestCase):
     def test_get_config(self):
         config = rand_wc_model_gen.config.get_config()
         self.assertEqual(config['rand_wc_model_gen']['kb_gen']['component']['ChromosomesGenesGenerator']['num_chromosomes'], 1)
-        self.assertEqual(config['rand_wc_model_gen']['kb_gen']['component']['ChromosomesGenesGenerator']['avg_gc_frac'], 0.5)
+        self.assertEqual(config['rand_wc_model_gen']['kb_gen']['component']['ChromosomesGenesGenerator']['mean_gc_frac'], 0.5)
 
     def test_get_config_extra_path(self):
         with open(self.extra_path, 'w') as file:
@@ -38,7 +38,7 @@ class Test(unittest.TestCase):
 
         config = rand_wc_model_gen.config.get_config(extra_path=self.extra_path)
         self.assertEqual(config['rand_wc_model_gen']['kb_gen']['component']['ChromosomesGenesGenerator']['num_chromosomes'], 5)
-        self.assertEqual(config['rand_wc_model_gen']['kb_gen']['component']['ChromosomesGenesGenerator']['avg_gc_frac'], 0.5)
+        self.assertEqual(config['rand_wc_model_gen']['kb_gen']['component']['ChromosomesGenesGenerator']['mean_gc_frac'], 0.5)
 
     def test_get_config_extra_vals(self):
         config = rand_wc_model_gen.config.get_config(extra_vals={
@@ -53,4 +53,4 @@ class Test(unittest.TestCase):
             }
         })
         self.assertEqual(config['rand_wc_model_gen']['kb_gen']['component']['ChromosomesGenesGenerator']['num_chromosomes'], 10)
-        self.assertEqual(config['rand_wc_model_gen']['kb_gen']['component']['ChromosomesGenesGenerator']['avg_gc_frac'], 0.5)
+        self.assertEqual(config['rand_wc_model_gen']['kb_gen']['component']['ChromosomesGenesGenerator']['mean_gc_frac'], 0.5)

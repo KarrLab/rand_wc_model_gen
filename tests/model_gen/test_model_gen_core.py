@@ -18,8 +18,8 @@ class ModelGeneratorTestCase(unittest.TestCase):
             'component': {
                 'ChromosomesGenesGenerator': {
                     'num_chromosomes': 1,
-                    'avg_num_genes': 100,
-                    'avg_gene_len': 100,
+                    'mean_num_genes': 100,
+                    'mean_gene_len': 100,
                 },
             },
         }).run()

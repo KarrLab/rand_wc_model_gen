@@ -20,10 +20,10 @@ class ChromosomesGenesGenerator(wc_kb_gen.KbComponentGenerator):
     Options:
 
     * num_chromosomes (:obj:`int`): number of chromosomes
-    * avg_gc_frac (:obj:`float`): fraction of chromosomes which are G or C
-    * avg_num_genes (:obj:`float`): average number of genes
-    * avg_gene_len (:obj:`float`): average length of a gene
-    * avg_coding_frac (:obj:`float`): average coding fraction of the genome
+    * mean_gc_frac (:obj:`float`): fraction of chromosomes which are G or C
+    * mean_num_genes (:obj:`float`): mean number of genes
+    * mean_gene_len (:obj:`float`): mean length of a gene
+    * mean_coding_frac (:obj:`float`): mean coding fraction of the genome
     """
 
     def clean_and_validate_options(self):
@@ -34,42 +34,42 @@ class ChromosomesGenesGenerator(wc_kb_gen.KbComponentGenerator):
         assert(num_chromosomes >= 1 and int(num_chromosomes) == num_chromosomes)
         options['num_chromosomes'] = num_chromosomes
 
-        avg_gc_frac = options.get('avg_gc_frac', 0.5)
-        assert(avg_gc_frac >= 0 and avg_gc_frac <= 1)
-        options['avg_gc_frac'] = avg_gc_frac
+        mean_gc_frac = options.get('mean_gc_frac', 0.5)
+        assert(mean_gc_frac >= 0 and mean_gc_frac <= 1)
+        options['mean_gc_frac'] = mean_gc_frac
 
-        avg_num_genes = options.get('avg_num_genes', 2000)
-        assert(avg_num_genes >= 1)
-        options['avg_num_genes'] = avg_num_genes
+        mean_num_genes = options.get('mean_num_genes', 2000)
+        assert(mean_num_genes >= 1)
+        options['mean_num_genes'] = mean_num_genes
 
-        avg_gene_len = options.get('avg_gene_len', 924)  # DOI: 10.1093/molbev/msk019
-        assert(avg_gene_len >= 1)
-        options['avg_gene_len'] = avg_gene_len
+        mean_gene_len = options.get('mean_gene_len', 924)  # DOI: 10.1093/molbev/msk019
+        assert(mean_gene_len >= 1)
+        options['mean_gene_len'] = mean_gene_len
 
-        avg_coding_frac = options.get('avg_coding_frac', 0.88)  # DOI: 10.1007/s10142-015-0433-4
-        assert(avg_coding_frac > 0 and avg_coding_frac < 1)
-        options['avg_coding_frac'] = avg_coding_frac
+        mean_coding_frac = options.get('mean_coding_frac', 0.88)  # DOI: 10.1007/s10142-015-0433-4
+        assert(mean_coding_frac > 0 and mean_coding_frac < 1)
+        options['mean_coding_frac'] = mean_coding_frac
 
     def gen_components(self):
         """ Construct knowledge base components """
 
         # get options
         num_chromosomes = self.options.get('num_chromosomes')
-        avg_gc_frac = self.options.get('avg_gc_frac')
-        avg_num_genes = self.options.get('avg_num_genes')
-        avg_gene_len = self.options.get('avg_gene_len')
-        avg_coding_frac = self.options.get('avg_coding_frac')
+        mean_gc_frac = self.options.get('mean_gc_frac')
+        mean_num_genes = self.options.get('mean_num_genes')
+        mean_gene_len = self.options.get('mean_gene_len')
+        mean_coding_frac = self.options.get('mean_coding_frac')
 
         # generate chromosomes and genes
         cell = self.knowledge_base.cell
         for i_chr in range(num_chromosomes):
-            num_genes = self.rand(avg_num_genes / num_chromosomes)[0]
-            gene_lens = self.rand(avg_gene_len, count=num_genes)
-            intergene_lens = self.rand(avg_gene_len / avg_coding_frac * (1 - avg_coding_frac), count=num_genes)
+            num_genes = self.rand(mean_num_genes / num_chromosomes)[0]
+            gene_lens = self.rand(mean_gene_len, count=num_genes)
+            intergene_lens = self.rand(mean_gene_len / mean_coding_frac * (1 - mean_coding_frac), count=num_genes)
 
             seq_len = numpy.sum(gene_lens) + numpy.sum(intergene_lens)
             seq = Seq.Seq(''.join(random.choice(('A', 'C', 'G', 'T'),
-                                                p=((1 - avg_gc_frac) / 2, avg_gc_frac / 2, avg_gc_frac / 2, (1 - avg_gc_frac) / 2),
+                                                p=((1 - mean_gc_frac) / 2, mean_gc_frac / 2, mean_gc_frac / 2, (1 - mean_gc_frac) / 2),
                                                 size=(seq_len, ))),
                           Alphabet.DNAAlphabet())
 

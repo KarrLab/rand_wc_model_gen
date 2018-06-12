@@ -7,6 +7,7 @@
 """
 
 from .chrs_genes import ChromosomesGenesGenerator
+from .properties import PropertiesGenerator
 import wc_kb_gen
 
 
@@ -17,5 +18,6 @@ class KbGenerator(wc_kb_gen.KbGenerator):
     """
 
     DEFAULT_COMPONENT_GENERATORS = (
-        ChromosomesGenesGenerator,
+        PropertiesGenerator,
+        ChromosomesGenesGenerator,        
     )

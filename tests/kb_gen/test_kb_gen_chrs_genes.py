@@ -20,17 +20,17 @@ class ChromosomesGenesGeneratorTestCase(unittest.TestCase):
         self.assertGreater((numpy.mean(ints)-1000) / 1000, -1e-2)
         self.assertLess((numpy.mean(ints)-1000) / 1000, 1e-2)
 
-    def test_gen_components(self):
+    def test_run(self):
         kb = wc_kb.KnowledgeBase()
         cell = kb.cell = wc_kb.Cell()
         gen = chrs_genes.ChromosomesGenesGenerator(kb, options={
             'num_chromosomes': 2,
-            'avg_gc_frac': 1,
-            'avg_num_genes': 100,
-            'avg_gene_len': 100,
-            'avg_coding_frac': 0.75,
+            'mean_gc_frac': 1,
+            'mean_num_genes': 100,
+            'mean_gene_len': 100,
+            'mean_coding_frac': 0.75,
         })
-        gen.gen_components()
+        gen.run()
 
         self.assertEqual(len(cell.species_types), 2)
 

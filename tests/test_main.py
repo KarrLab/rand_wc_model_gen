@@ -66,8 +66,8 @@ class CliTestCase(unittest.TestCase):
             file.write('        [[[component]]]\n')
             file.write('            [[[[ChromosomesGenesGenerator]]]]\n')
             file.write('                num_chromosomes = 1\n')
-            file.write('                avg_num_genes = 100\n')
-            file.write('                avg_gene_len = 10\n')
+            file.write('                mean_num_genes = 100\n')
+            file.write('                mean_gene_len = 10\n')
 
         # generate model
         with __main__.App(argv=['gen', kb_core_path, kb_seq_path, model_path, '--config-path', config_path]) as app:
@@ -93,8 +93,8 @@ class CliTestCase(unittest.TestCase):
             file.write('        [[[component]]]\n')
             file.write('            [[[[ChromosomesGenesGenerator]]]]\n')
             file.write('                num_chromosomes = 1\n')
-            file.write('                avg_num_genes = 100\n')
-            file.write('                avg_gene_len = 10\n')
+            file.write('                mean_num_genes = 100\n')
+            file.write('                mean_gene_len = 10\n')
             file.write('    [[sim]]\n')
             file.write('        end_time = 10\n')
             file.write('        checkpoint_period = 1\n')
