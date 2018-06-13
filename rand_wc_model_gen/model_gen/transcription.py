@@ -17,9 +17,11 @@ class TranscriptionSubmodelGenerator(wc_model_gen.SubmodelGenerator):
     """ Generator for transcription submodel """
 
     def gen_compartments(self):
+        cell = self.knowledge_base.cell
         model = self.model
         cytosol = model.compartments.get_or_create(id='c')
         cytosol.name = 'cytosol'
+        cytosol.initial_volume = cell.properties.get_one(id='mean_volume').value
 
     def gen_species(self):
         """ Generate species associated with submodel """
@@ -60,7 +62,7 @@ class TranscriptionSubmodelGenerator(wc_model_gen.SubmodelGenerator):
         model_h2o_c.concentration = wc_lang.Concentration(value=kb_h2o.concentration, units='M')
         model_h_c.concentration = wc_lang.Concentration(value=kb_h.concentration, units='M')
 
-        # get or create RNA species        
+        # get or create RNA species
         rnas = cell.species_types.get(__type=wc_kb.RnaSpeciesType)
         for rna in rnas:
             species_type = model.species_types.get_or_create(id=rna.id)

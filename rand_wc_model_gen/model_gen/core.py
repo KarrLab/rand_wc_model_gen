@@ -6,8 +6,9 @@
 :License: MIT
 """
 
-from .transcription import TranscriptionSubmodelGenerator
+from .metabolism import MetabolismSubmodelGenerator
 from .rna_degradation import RnaDegradationSubmodelGenerator
+from .transcription import TranscriptionSubmodelGenerator
 import wc_model_gen
 
 
@@ -16,6 +17,7 @@ class ModelGenerator(wc_model_gen.ModelGenerator):
     """
 
     DEFAULT_COMPONENT_GENERATORS = (
+        MetabolismSubmodelGenerator,
         TranscriptionSubmodelGenerator,
         #RnaDegradationSubmodelGenerator,
     )
