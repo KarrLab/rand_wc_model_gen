@@ -7,8 +7,7 @@
 """
 import unittest
 import numpy as np
-rand_wc_model_gen.Syntheticn
-
+from rand_wc_model_gen.Synthetic import Synthetic
 
 GEN_LEN = 20
 INTER_LEN = 20
@@ -25,3 +24,5 @@ class TestSynthetic(unittest.TestCase):
 
     def test_length(self):
         synthetic.generate(GEN_LEN, INTER_LEN, GEN_NUM, TRANSLATION_TABLE)
+
+    def multiple_models(self):
