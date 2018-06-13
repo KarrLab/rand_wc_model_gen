@@ -20,11 +20,6 @@ class Synthetic(object):
 
     """
 
-    def __init__(self):
-        self.kb = wc_kb.KnowledgeBase()  # knowledge base instance has attribute cell
-        cell = wc_kb.Cell()
-        self.kb.cell = cell
-
     def generate(self, gen_len, inter_len, gen_num, translation_table=1):
         """
         Args:
@@ -33,6 +28,9 @@ class Synthetic(object):
             gen_num (:obj:`int`): number of genes on chromosome
             translation_table (:obj:int'): integer specifying the translation table to use
         """
+        self.kb = wc_kb.KnowledgeBase()  # knowledge base instance has attribute cell
+        cell = wc_kb.Cell()
+        self.kb.cell = cell
         self.kb.translation_table = translation_table  # translation table for RNA codons
         # indexList of start/end positions of each gene, creates 'synthetic' chromosome
         indexList = self.create_chromosome(gen_len, inter_len, gen_num)
