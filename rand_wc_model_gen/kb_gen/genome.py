@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-import wc_kb
+import wc_kb_gen
 import math
 import numpy as np
 import random
@@ -25,15 +25,17 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
         options = self.options
 
-        gen_len = int(options.get('gen_len', 300)) #for prokaryote (~924 bp)
+        gen_len = int(options.get('gen_len', 1000))  # for prokaryote (~924 bp)
         assert(gen_len > 0)
         options['gen_len'] = gen_len
 
-        inter_len = int(options.get('inter_len', 30)) #for prokaryote (~100 bp)
+        # for prokaryote (~100 bp)
+        inter_len = int(options.get('inter_len', 100))
         assert(gen_len > 0)
         options['inter_len'] = inter_len
 
-        gen_num = int(options.get('gen_num', 4400)) #for E. coli (~4400); number of genes varies widely among prokaryotes
+        # for E. coli (~4400); number of genes varies widely among prokaryotes
+        gen_num = int(options.get('gen_num', 4400))
         assert(gen_num > 0)
         options['gen_num'] = gen_num
 
@@ -41,13 +43,10 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(translation_table > 0)
         options['translation_table'] = translation_table
 
-        
-        
     def gen_components(self):
-
         '''Construct knowledge base components'''
 
-        #get options
+        # get options
         options = self.options
         gen_len = options.get('gen_len')
         inter_len = options.get('inter_len')
