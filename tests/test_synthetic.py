@@ -8,7 +8,7 @@
 import unittest
 import numpy as np
 
-from rand_wc_model_gen.Synthetic import create_chromosome, create_rnas_proteins
+from rand_wc_model_gen.Synthetic import Synthetic
 
 
 class TestSynthetic(unittest.TestCase):
@@ -17,5 +17,5 @@ class TestSynthetic(unittest.TestCase):
     def tearDown(self):
         pass
     
+    def multiple_models(self):
         
-
