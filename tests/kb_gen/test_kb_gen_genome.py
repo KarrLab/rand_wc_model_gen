@@ -5,25 +5,33 @@
 :Copyright: 2018, Karr Lab
 :License: MIT
 """
+import wc_kb
 import unittest
 import numpy as np
-from rand_wc_model_gen.kbgen.GenomeGenerator import GenomeGenerator
+from rand_wc_model_gen.kbgen import genome
 
 GEN_LEN = 20
 INTER_LEN = 20
 GEN_NUM = 20
 TRANSLATION_TABLE = 1
+gen = None
 
 
 class TestSynthetic(unittest.TestCase):
     def setUp(self):
-        synthetic = Synthetic()
+        kb = wc_kb.knowledge_base
+       
+        gen = genome.GenomeGenerator(kb)
 
     def tearDown(self):
         pass
 
+    def test_run(self):
+        gen.generate_genome(GEN_LEN, INTER_LEN, GEN_NUM, TRANSLATION_TABLE)
+       
+
     def test_length(self):
-        synthetic.generate(GEN_LEN, INTER_LEN, GEN_NUM, TRANSLATION_TABLE)
+        gen.generate_genome(GEN_LEN, INTER_LEN, GEN_NUM, TRANSLATION_TABLE)
 
     def multiple_models(self):
         pass

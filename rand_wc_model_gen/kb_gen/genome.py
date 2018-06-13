@@ -5,7 +5,7 @@
 :Copyright: 2018, Karr Lab
 :License: MIT
 """
-
+import wc_kb
 import wc_kb_gen
 import math
 import numpy as np
