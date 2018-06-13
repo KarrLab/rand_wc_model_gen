@@ -1,4 +1,4 @@
-""" Generator for chromosomes and genes of random in silico organisms
+""" Generator for RNA of random in silico organisms
 
 :Author: Jonathan Karr <karr@mssm.edu>
 :Date: 2018-06-11
@@ -14,7 +14,7 @@ import wc_kb_gen
 
 
 class RnaGenerator(wc_kb_gen.KbComponentGenerator):
-    """ Generator for chromosomes and genes for random in silico organisms
+    """ Generator for RNA for random in silico organisms
 
     Options:
 
@@ -44,11 +44,12 @@ class RnaGenerator(wc_kb_gen.KbComponentGenerator):
         mean_half_life = options.get('mean_half_life')
         mean_volume = cell.properties.get_one(id='mean_volume').value
 
-        # generate chromosomes and genes        
-        genes = cell.loci.get(__type=wc_kb.GeneLocus)
-        for gene in genes:
-            rna = cell.species_types.get_or_create(id=gene.id.replace('gene_', 'rna_'), __type=wc_kb.RnaSpeciesType)
-            rna.name = gene.name.replace('Gene', 'RNA')
+        # generate RNA
+        tus = cell.loci.get(__type=wc_kb.TranscriptionUnitLocus)
+        for tu in tus:
+            rna = cell.species_types.get_or_create(id=tu.id.replace('tu_', 'rna_'), __type=wc_kb.RnaSpeciesType)
+            rna.transcription_units = [tu]
+            rna.name = tu.name.replace('Transcription unit', 'RNA')
+            rna.type = wc_kb.RnaType[tu.genes[0].type.name]
             rna.concentration = random.gamma(1, mean_copy_number) / scipy.constants.Avogadro / mean_volume
             rna.half_life = random.normal(mean_half_life, numpy.sqrt(mean_half_life))
-            rna.type = wc_kb.RnaType[gene.type.name]

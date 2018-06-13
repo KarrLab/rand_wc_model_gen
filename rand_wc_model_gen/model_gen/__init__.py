@@ -1,2 +1,3 @@
 from .core import ModelGenerator
+from .rna_degradation import RnaDegradationSubmodelGenerator
 from .transcription import TranscriptionSubmodelGenerator

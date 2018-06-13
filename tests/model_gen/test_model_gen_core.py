@@ -16,7 +16,7 @@ class ModelGeneratorTestCase(unittest.TestCase):
     def test(self):
         kb = kb_gen.KbGenerator(options={
             'component': {
-                'ChromosomesGenesGenerator': {
+                'ChromosomesGenesTusGenerator': {
                     'num_chromosomes': 1,
                     'mean_num_genes': 100,
                     'mean_gene_len': 100,
@@ -26,3 +26,4 @@ class ModelGeneratorTestCase(unittest.TestCase):
         model = model_gen.ModelGenerator(kb).run()
 
         self.assertIsInstance(model.submodels.get_one(id='transcription'), wc_lang.Submodel)
+        #self.assertIsInstance(model.submodels.get_one(id='rna_degradation'), wc_lang.Submodel)

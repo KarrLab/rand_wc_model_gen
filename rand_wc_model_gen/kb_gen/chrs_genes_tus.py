@@ -1,4 +1,4 @@
-""" Generator for chromosomes and genes of random in silico organisms
+""" Generator for chromosomes, transcription units, and genes of random in silico organisms
 
 :Author: Jonathan Karr <karr@mssm.edu>
 :Date: 2018-06-11
@@ -14,8 +14,8 @@ import wc_kb
 import wc_kb_gen
 
 
-class ChromosomesGenesGenerator(wc_kb_gen.KbComponentGenerator):
-    """ Generator for chromosomes and genes for random in silico organisms
+class ChromosomesGenesTusGenerator(wc_kb_gen.KbComponentGenerator):
+    """ Generator for chromosomes, transcription units, and genes for random in silico organisms
 
     Options:
 

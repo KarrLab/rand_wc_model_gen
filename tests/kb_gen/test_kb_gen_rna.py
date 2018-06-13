@@ -19,22 +19,29 @@ class RnaGeneratorTestCase(unittest.TestCase):
         cell = kb.cell = wc_kb.Cell()
         cell.properties.create(id='mean_volume', value=1, units='L')
 
-        for i_gene in range(1000):
-            cell.loci.create(__type=wc_kb.GeneLocus,
-                             id='gene_{}'.format(i_gene + 1),
-                             start=10 + 20 * (i_gene), end=20 + 20 * (i_gene), strand=wc_kb.PolymerStrand.positive,
-                             type=wc_kb.GeneType.mRna)
+        tus = []
+        for i_tu in range(1000):
+            tu = cell.loci.create(__type=wc_kb.TranscriptionUnitLocus,
+                                  id='tu_{}'.format(i_tu + 1),
+                                  name='Transcription unit {}'.format(i_tu + 1),
+                                  start=10 + 20 * (i_tu), end=20 + 20 * (i_tu), strand=wc_kb.PolymerStrand.positive)
+            tu.genes.create(id='gene_{}'.format(i_tu + 1), type=wc_kb.GeneType.mRna)
+            tus.append(tu)
 
         gen = kb_gen.rna.RnaGenerator(kb, options={
-            'mean_copy_number': 10,
-            'mean_half_life': 120,
+            'mean_copy_number': 10.,
+            'mean_half_life': 120.,
         })
         gen.run()
 
         rnas = cell.species_types.get(__type=wc_kb.RnaSpeciesType)
         self.assertEqual(len(rnas), 1000)
 
+        self.assertEqual(rnas[0].transcription_units, [tus[0]])
+        self.assertEqual(rnas[0].name, 'RNA 1')
+        self.assertEqual(rnas[0].type, wc_kb.RnaType.mRna)
+
         concs = [rna.concentration for rna in rnas]
         half_lives = [rna.half_life for rna in rnas]
-        self.assertAlmostEqual(numpy.mean(concs), 10 / scipy.constants.Avogadro / 1, delta=5 * numpy.sqrt(10 / 1000))
-        self.assertAlmostEqual(numpy.mean(half_lives), 120, delta=5 * numpy.sqrt(120 / 1000))
+        self.assertAlmostEqual(numpy.mean(concs), 10. / scipy.constants.Avogadro / 1., delta=5. * numpy.sqrt(10. / 1000.))
+        self.assertAlmostEqual(numpy.mean(half_lives), 120., delta=5. * numpy.sqrt(120. / 1000.))

@@ -6,7 +6,8 @@
 :License: MIT
 """
 
-from .chrs_genes import ChromosomesGenesGenerator
+from .chrs_genes_tus import ChromosomesGenesTusGenerator
+from .metabolites import MetabolitesGenerator
 from .properties import PropertiesGenerator
 from .rna import RnaGenerator
 from numpy import random
@@ -25,14 +26,16 @@ class KbGenerator(wc_kb_gen.KbGenerator):
     * version
     * component
 
+        * ChromosomesGenesTusGenerator
+        * MetabolitesGenerator
         * PropertiesGenerator
-        * ChromosomesGenesGenerator
         * RnaGenerator
     """
 
     DEFAULT_COMPONENT_GENERATORS = (
         PropertiesGenerator,
-        ChromosomesGenesGenerator,
+        ChromosomesGenesTusGenerator,
+        MetabolitesGenerator,
         RnaGenerator,
     )
 

@@ -6,15 +6,15 @@
 :License: MIT
 """
 
-from rand_wc_model_gen.kb_gen import chrs_genes
+from rand_wc_model_gen.kb_gen import chrs_genes_tus
 import numpy
 import unittest
 import wc_kb
 
 
-class ChromosomesGenesGeneratorTestCase(unittest.TestCase):
+class ChromosomesGenesTusGeneratorTestCase(unittest.TestCase):
     def test_rand(self):
-        gen = chrs_genes.ChromosomesGenesGenerator(None)
+        gen = chrs_genes_tus.ChromosomesGenesTusGenerator(None)
         ints = gen.rand(1000, 10000)
         numpy.testing.assert_equal(numpy.ceil(ints), ints)
         self.assertGreater((numpy.mean(ints)-1000) / 1000, -1e-2)
@@ -23,7 +23,7 @@ class ChromosomesGenesGeneratorTestCase(unittest.TestCase):
     def test_run(self):
         kb = wc_kb.KnowledgeBase()
         cell = kb.cell = wc_kb.Cell()
-        gen = chrs_genes.ChromosomesGenesGenerator(kb, options={
+        gen = chrs_genes_tus.ChromosomesGenesTusGenerator(kb, options={
             'num_chromosomes': 2,
             'mean_gc_frac': 1,
             'mean_num_genes': 100,

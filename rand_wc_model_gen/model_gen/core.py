@@ -7,6 +7,7 @@
 """
 
 from .transcription import TranscriptionSubmodelGenerator
+from .rna_degradation import RnaDegradationSubmodelGenerator
 import wc_model_gen
 
 
@@ -16,4 +17,5 @@ class ModelGenerator(wc_model_gen.ModelGenerator):
 
     DEFAULT_COMPONENT_GENERATORS = (
         TranscriptionSubmodelGenerator,
+        #RnaDegradationSubmodelGenerator,
     )
