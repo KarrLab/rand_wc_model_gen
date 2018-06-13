@@ -7,7 +7,7 @@
 """
 import unittest
 import numpy as np
-from rand_wc_model_gen.Synthetic import Synthetic
+from rand_wc_model_gen.kbgen.GenomeGenerator import GenomeGenerator
 
 GEN_LEN = 20
 INTER_LEN = 20

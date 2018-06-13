@@ -13,14 +13,14 @@ import random
 from Bio.Seq import Seq
 
 
-class Synthetic(object):
+class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
     """
     Creates synthetic chromosome with randomized genes/intergenic regions. Creates RNA and protein objects corresponding to the genes on this chromosome. Associates the chromosome, RNAs, proteins
     with a knowledge base object (and its Cell attribute)
 
     """
 
-    def generate(self, gen_len, inter_len, gen_num, translation_table=1):
+    def generate_genome(self, gen_len, inter_len, gen_num, translation_table=1):
         """
         Args:
             gen_len (:obj:`int`): average gene length
