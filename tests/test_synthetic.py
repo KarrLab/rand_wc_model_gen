@@ -10,3 +10,12 @@ import numpy as np
 
 from rand_wc_model_gen.Synthetic import create_chromosome, create_rnas_proteins
 
+
+class TestSynthetic(unittest.TestCase):
+    def setUp(self):
+        pass
+    def tearDown(self):
+        pass
+    
+        
+
