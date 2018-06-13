@@ -20,18 +20,40 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
     """
 
-    def generate_genome(self, gen_len, inter_len, gen_num, translation_table=1):
-        """
-        Args:
-            gen_len (:obj:`int`): average gene length
-            inter_len (:obj:`int`): average intergenic region length
-            gen_num (:obj:`int`): number of genes on chromosome
-            translation_table (:obj:int'): integer specifying the translation table to use
-        """
-        self.kb = wc_kb.KnowledgeBase()  # knowledge base instance has attribute cell
-        cell = wc_kb.Cell()
-        self.kb.cell = cell
-        self.kb.translation_table = translation_table  # translation table for RNA codons
+    def clean_and_validate_options(self):
+        """ Apply default options and validate options """
+
+        options = self.options
+
+        gen_len = int(options.get('gen_len', 300)) #for prokaryote (~924 bp)
+        assert(gen_len > 0)
+        options['gen_len'] = gen_len
+
+        inter_len = int(options.get('inter_len', 30)) #for prokaryote (~100 bp)
+        assert(gen_len > 0)
+        options['inter_len'] = inter_len
+
+        gen_num = int(options.get('gen_num', 4400)) #for E. coli (~4400); number of genes varies widely among prokaryotes
+        assert(gen_num > 0)
+        options['gen_num'] = gen_num
+
+        translation_table = int(options.get('translation_table', 1))
+        assert(translation_table > 0)
+        options['translation_table'] = translation_table
+
+        
+        
+    def gen_components(self):
+
+        '''Construct knowledge base components'''
+
+        #get options
+        options = self.options
+        gen_len = options.get('gen_len')
+        inter_len = options.get('inter_len')
+        gen_num = options.get('gen_num')
+        translation_table = options.get('translation_table')
+
         # indexList of start/end positions of each gene, creates 'synthetic' chromosome
         indexList = self.create_chromosome(gen_len, inter_len, gen_num)
         # creates RNA and protein objects corresponding to the genes on chromosome
@@ -92,7 +114,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         # associate the random chromosome sequence with the DnaSpeciesType object
         chromosome.seq = Seq(seq)
         # add chromosome to kb.cell speciestypes list
-        self.kb.cell.species_types.append(chromosome)
+        self.knowledge_base.cell.species_types.append(chromosome)
 
         return indexList
 
@@ -105,7 +127,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
         """
 
-        chromosome = self.kb.cell.species_types[0]
+        chromosome = self.knowledge_base.cell.species_types[0]
 
         for i in range(gen_num):
             # creates RnaSpeciesType for RNA sequence corresponding to gene
@@ -115,7 +137,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             gene.start = indexList[i][0]
             gene.end = indexList[i][1]
             gene.polymer = chromosome
-            gene.cell = self.kb.cell
+            gene.cell = self.knowledge_base.cell
             # TranscriptionUnitLocus object - attribute of RnaSpeciesType object, associated with gene sequence
             transcription_locus = wc_kb.TranscriptionUnitLocus()
             transcription_locus.polymer = chromosome
@@ -125,7 +147,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             rna.transcription_units.append(transcription_locus)
 
             # adds corresponding mRNA sequence to speciestypes list of kb.cell
-            self.kb.cell.species_types.append(rna)
+            self.knowledge_base.cell.species_types.append(rna)
 
             # creates ProteinSpeciesType object for corresponding protein sequence
             prot = wc_kb.ProteinSpeciesType()
@@ -133,4 +155,4 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             prot.gene = gene  # associates protein with GeneLocus object for corresponding gene
 
             # adds ProteinSpeciesType object to kb.cell speciestypes list
-            self.kb.cell.species_types.append(prot)
+            self.knowledge_base.cell.species_types.append(prot)
