@@ -26,3 +26,4 @@ class TestSynthetic(unittest.TestCase):
         synthetic.generate(GEN_LEN, INTER_LEN, GEN_NUM, TRANSLATION_TABLE)
 
     def multiple_models(self):
+        pass
