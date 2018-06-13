@@ -15,12 +15,17 @@ class PropertiesGenerator(wc_kb_gen.KbComponentGenerator):
 
     Options:
 
+    * mean_volume (:obj:`float`): mean volume in L
     * mean_doubling_time (:obj:`float`): mean doubling time in s
     """
 
     def clean_and_validate_options(self):
         """ Apply default options and validate options """
         options = self.options
+
+        mean_volume = options.get('mean_volume', 1e-15)
+        assert(mean_volume > 0)
+        options['mean_volume'] = mean_volume
 
         mean_doubling_time = options.get('mean_doubling_time', 30 * 60)
         assert(mean_doubling_time > 0)
@@ -31,10 +36,14 @@ class PropertiesGenerator(wc_kb_gen.KbComponentGenerator):
 
         # get options
         options = self.options
-        mean_doubling_time = options.get('mean_doubling_time')
 
         # generate properties
         cell = self.knowledge_base.cell
+
+        prop = cell.properties.get_or_create(id='mean_volume')
+        prop.value = options.get('mean_volume')
+        prop.units = 'L'
+
         prop = cell.properties.get_or_create(id='mean_doubling_time')
-        prop.value = mean_doubling_time
+        prop.value = options.get('mean_doubling_time')
         prop.units = 's'

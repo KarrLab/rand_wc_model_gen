@@ -34,6 +34,10 @@ class ChromosomesGenesGenerator(wc_kb_gen.KbComponentGenerator):
         assert(num_chromosomes >= 1 and int(num_chromosomes) == num_chromosomes)
         options['num_chromosomes'] = num_chromosomes
 
+        chromosome_topology = options.get('chromosome_topology', 'circular')
+        assert(chromosome_topology in ['circular', 'linear'])
+        options['chromosome_topology'] = chromosome_topology
+
         mean_gc_frac = options.get('mean_gc_frac', 0.5)
         assert(mean_gc_frac >= 0 and mean_gc_frac <= 1)
         options['mean_gc_frac'] = mean_gc_frac
@@ -54,11 +58,13 @@ class ChromosomesGenesGenerator(wc_kb_gen.KbComponentGenerator):
         """ Construct knowledge base components """
 
         # get options
-        num_chromosomes = self.options.get('num_chromosomes')
-        mean_gc_frac = self.options.get('mean_gc_frac')
-        mean_num_genes = self.options.get('mean_num_genes')
-        mean_gene_len = self.options.get('mean_gene_len')
-        mean_coding_frac = self.options.get('mean_coding_frac')
+        options = self.options
+        num_chromosomes = options.get('num_chromosomes')
+        chromosome_topology = options.get('chromosome_topology')
+        mean_gc_frac = options.get('mean_gc_frac')
+        mean_num_genes = options.get('mean_num_genes')
+        mean_gene_len = options.get('mean_gene_len')
+        mean_coding_frac = options.get('mean_coding_frac')
 
         # generate chromosomes and genes
         cell = self.knowledge_base.cell
@@ -73,25 +79,30 @@ class ChromosomesGenesGenerator(wc_kb_gen.KbComponentGenerator):
                                                 size=(seq_len, ))),
                           Alphabet.DNAAlphabet())
 
-            chr = wc_kb.DnaSpeciesType(
-                cell=cell,
-                id='chr_{}'.format(i_chr + 1),
-                name='Chromosome {}'.format(i_chr + 1),
-                circular=True,
-                double_stranded=True,
-                seq=seq)
+            chr = cell.species_types.get_or_create(id='chr_{}'.format(i_chr + 1), __type=wc_kb.DnaSpeciesType)
+            chr.name = 'Chromosome {}'.format(i_chr + 1)
+            chr.circular = chromosome_topology == 'circular'
+            chr.double_stranded = True
+            chr.seq = seq
 
             gene_starts = numpy.int64(numpy.cumsum(numpy.concatenate(([0], gene_lens[0:-1])) +
                                                    numpy.concatenate((numpy.round(intergene_lens[0:1] / 2), intergene_lens[1:]))))
             for i_gene in range(num_genes):
-                wc_kb.GeneLocus(
-                    cell=cell,
-                    polymer=chr,
-                    id='gene_{}_{}'.format(i_chr + 1, i_gene + 1),
-                    name='Gene {}-{}'.format(i_chr + 1, i_gene + 1),
-                    start=gene_starts[i_gene],
-                    end=gene_starts[i_gene] + gene_lens[i_gene] - 1
-                )
+                tu = cell.loci.get_or_create(id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.TranscriptionUnitLocus)
+                tu.polymer = chr
+                tu.name = 'Transcription unit {}-{}'.format(i_chr + 1, i_gene + 1)
+                tu.start = gene_starts[i_gene]
+                tu.end = gene_starts[i_gene] + gene_lens[i_gene] - 1
+                tu.strand = random.choice((wc_kb.PolymerStrand.positive, wc_kb.PolymerStrand.negative))
+
+                gene = cell.loci.get_or_create(id='gene_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.GeneLocus)
+                gene.polymer = chr
+                gene.transcription_units.append(tu)
+                gene.name = 'Gene {}-{}'.format(i_chr + 1, i_gene + 1)
+                gene.start = gene_starts[i_gene]
+                gene.end = gene_starts[i_gene] + gene_lens[i_gene] - 1
+                gene.type = wc_kb.GeneType.mRna
+                gene.strand = tu.strand
 
     def rand(self, mean, count=1):
         """ Generated 1 or more random normally distributed integer(s) with standard deviation equal

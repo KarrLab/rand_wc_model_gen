@@ -41,13 +41,20 @@ class ChromosomesGenesGeneratorTestCase(unittest.TestCase):
             chr_len += len(chr.seq)
         self.assertEqual(gc / chr_len, 1)
 
-        self.assertAlmostEqual(len(cell.loci), 100, delta=25)
+        tus = cell.loci.get(__type=wc_kb.TranscriptionUnitLocus)
+        genes = cell.loci.get(__type=wc_kb.GeneLocus)
+        self.assertAlmostEqual(len(tus), 100, delta=5 * numpy.sqrt(100))
+        self.assertAlmostEqual(len(genes), 100, delta=5 * numpy.sqrt(100))
 
-        self.assertAlmostEqual(cell.loci[0].start, 100 / 0.75 * 0.25 / 2, delta=20)
+        mu = 100 / 0.75 * 0.25 / 2
+        self.assertAlmostEqual(genes[0].start, mu, delta=5 * numpy.sqrt(mu))
 
         gene_len = 0
-        for gene in cell.loci:
+        gene_pos = 0
+        for gene in genes:
             gene_len += gene.get_len()
-        self.assertAlmostEqual(gene_len / len(cell.loci), 100, delta=5)
+            gene_pos += gene.strand == wc_kb.PolymerStrand.positive
+        self.assertAlmostEqual(gene_len / len(genes), 100, delta=5 * numpy.sqrt(100/100))
+        self.assertAlmostEqual(gene_pos / len(genes), 0.5, delta=5 * numpy.sqrt((1 - 0.5) * 0.5 / 100))
 
-        self.assertAlmostEqual(gene_len / chr_len, 0.75, delta=0.1)
+        self.assertAlmostEqual(gene_len / chr_len, 0.75, delta=5 * numpy.sqrt((1 - 0.75) * 0.75 / 100))

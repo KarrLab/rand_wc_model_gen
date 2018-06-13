@@ -17,8 +17,23 @@ class KbGeneratorTestCase(unittest.TestCase):
             'component': {
                 'ChromosomesGenesGenerator': {
                     'num_chromosomes': 10,
+                    'mean_num_genes': 100,
                 }
             }
         })
+
         kb = gen.run()
         self.assertEqual(len(kb.cell.species_types.get(__type=wc_kb.DnaSpeciesType)), 10)
+
+    def test_clean_and_validate_options(self):
+        gen = kb_gen.KbGenerator()
+
+        gen.options = {'seed': None}
+        gen.clean_and_validate_options()
+
+        gen.options = {'seed': int(2)}
+        gen.clean_and_validate_options()
+
+        gen.options = {'seed': 'ABC'}
+        with self.assertRaises(ValueError):
+            gen.clean_and_validate_options()
