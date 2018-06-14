@@ -54,17 +54,18 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         translation_table = options.get('translation_table')
 
         # indexList of start/end positions of each gene, creates 'synthetic' chromosome
-        indexList = self.create_chromosome(gen_len, inter_len, gen_num)
+        indexList = self.gen_genome(gen_len, inter_len, gen_num)
         # creates RNA and protein objects corresponding to the genes on chromosome
-        self.create_rnas_proteins(gen_num, indexList)
+        self.gen_rnas_proteins(gen_num, indexList)
 
-    def create_chromosome(self, gen_len, inter_len, gen_num):
+    def gen_genome(self, gen_len, inter_len, gen_num, translation_table):
         """ Creates 'synthetic' chromsome with randomized genes/intergenic regions
 
         Args:
             gen_len (:obj:`int`): average gene length
             inter_len (:obj:`int`): average intergenic region length
             gen_num (:obj:`int`): number of genes on chromosome
+            translation_table (:obj:`int`): translation table
 
 
         Returns:
@@ -117,7 +118,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
         return indexList
 
-    def create_rnas_proteins(self, gen_num, indexList):
+    def gen_rnas_proteins(self, gen_num, indexList):
         """ Creates RNA and protein objects corresponding to genes on chromosome
 
         Args:
