@@ -7,7 +7,7 @@
 """
 
 from .metabolism import MetabolismSubmodelGenerator
-from .rna_degradation import RnaDegradationSubmodelGenerator
+#from .rna_degradation import RnaDegradationSubmodelGenerator
 from .transcription import TranscriptionSubmodelGenerator
 import wc_model_gen
 
