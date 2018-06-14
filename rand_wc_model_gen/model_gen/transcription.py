@@ -35,7 +35,7 @@ class TranscriptionSubmodelGenerator(wc_model_gen.SubmodelGenerator):
             kb_met = cell.species_types.get_one(id=id)
             model_met = model.species_types.get_or_create(id=id)
             model_met.molecular_weight = kb_met.get_mol_wt()
-            model_met_c = model_met.species.get_or_create(compartment=cytosol)            
+            model_met_c = model_met.species.get_or_create(compartment=cytosol)
             model_met_c.concentration = wc_lang.Concentration(value=kb_met.concentration, units='M')
 
         # get or create RNA species
@@ -83,10 +83,21 @@ class TranscriptionSubmodelGenerator(wc_model_gen.SubmodelGenerator):
         mean_volume = cell.properties.get_one(id='mean_volume').value
         mean_doubling_time = cell.properties.get_one(id='mean_doubling_time').value
 
+        equation = None
+        for rxn in self.model.get_reactions():
+            for rl in rxn.rate_laws:
+                if rl.equation.expression == 'k_cat':
+                    equation = rl.equation
+                    break
+            if equation is not None:
+                break
+        if equation is None:
+            equation = wc_lang.RateLawEquation(expression='k_cat')
+
         rnas = cell.species_types.get(__type=wc_kb.RnaSpeciesType)
         for rna, rxn in zip(rnas, self.submodel.reactions):
             rl = rxn.rate_laws.create()
             rl.direction = wc_lang.RateLawDirection.forward
-            rl.equation = wc_lang.RateLawEquation(expression='k_cat')
+            rl.equation = equation
             rl.k_cat = rna.concentration * scipy.constants.Avogadro * mean_volume * numpy.log(2) * (1 / rna.half_life)
             rl.k_m = None
