@@ -54,7 +54,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         translation_table = options.get('translation_table')
 
         # indexList of start/end positions of each gene, creates 'synthetic' chromosome
-        indexList = self.gen_genome(gen_len, inter_len, gen_num)
+        indexList = self.gen_genome(
+            gen_len, inter_len, gen_num, translation_table)
         # creates RNA and protein objects corresponding to the genes on chromosome
         self.gen_rnas_proteins(gen_num, indexList)
 
