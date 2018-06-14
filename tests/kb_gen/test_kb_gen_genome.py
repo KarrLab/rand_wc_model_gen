@@ -93,6 +93,46 @@ class TestGenomeGenerator(unittest.TestCase):
         self.assertAlmostEqual(
             avg_len, 3 * INTER_LEN, delta=3*math.sqrt(INTER_LEN))
 
+
+    def test_rna_start_codon(self):
+        for rna in self.gen.knowledge_base.cell.species_types.get(__type=wc_kb.core.RnaSpeciesType):
+            seq = str(rna.get_seq())
+            self.assertEqual(seq[0:3], 'AUG')
+
+
+    def test_rna_stop_codon(self):
+        STOP_CODONS = ['UAG', 'UAA', 'UGA']
+        for rna in self.gen.knowledge_base.cell.species_types.get(__type=wc_kb.core.RnaSpeciesType):
+            seq = str(rna.get_seq())
+            self.assertIn(seq[-3:], STOP_CODONS)
+        
+
+    def test_protein_start_codon(self):
+        for protein in self.gen.knowledge_base.cell.species_types.get(__type=wc_kb.core.ProteinSpeciesType):
+            seq = str(protein.get_seq())
+            self.assertEqual(seq[0], 'M')
+
+
+    def test_protein_stop_codon(self):
+        for protein in self.gen.knowledge_base.cell.species_types.get(__type=wc_kb.core.ProteinSpeciesType):
+            seq = str(protein.get_seq())
+            self.assertEqual(seq[-1], '*')
+
+
+    def test_number_of_rnas(self):
+        count = 0
+        for rna in self.gen.knowledge_base.cell.species_types.get(__type=wc_kb.core.RnaSpeciesType):
+            count += 1
+        self.assertEqual(count, GEN_NUM)
+        
+
+    def test_number_of_proteins(self):
+        count = 0
+        for protein in self.gen.knowledge_base.cell.species_types.get(__type=wc_kb.core.ProteinSpeciesType):
+            count += 1
+        self.assertEqual(count, GEN_NUM)
+
+
     def tearDown(self):
         pass
 
