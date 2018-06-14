@@ -14,8 +14,8 @@ from rand_wc_model_gen.kb_gen import genome
 from Bio.Seq import Seq
 
 GEN_LEN = 200  # the average number of codons in each gene
-INTER_LEN = 100  # the average number of codons between genes
-GEN_NUM = 1000  # the exact number of genes present
+INTER_LEN = 200  # the average number of codons between genes
+GEN_NUM = 500  # the exact number of genes present
 TRANSLATION_TABLE = 1  # the codon table to use
 
 
@@ -40,20 +40,22 @@ class TestGenomeGenerator(unittest.TestCase):
         self.seq_str = str(self.seq)
 
         # a list of tuples containing the starting and ending indices of each gene
-        self.indexlist = self.gen.indexList
+        self.indexlist = self.gen.indexList  # Index starts at 1
 
         # generates a list of the genes and of the intergenic regions
         self.genes = []
         self.intergenes = []
-
         lastend = None
 
         for tuple in self.indexlist:
-            self.genes.append(self.seq_str[tuple[0]:tuple[1]+1])
+            self.genes.append(self.seq_str[tuple[0]-1:tuple[1]])
 
             if lastend:
                 self.intergenes.append(self.seq_str[lastend:tuple[0]])
-            lastend = tuple[1]
+            lastend = tuple[1]-1
+
+       # print(self.genes)
+        # print(self.intergenes)
 
     def test_run(self):
         self.assertIsInstance(self.seq, Seq)
@@ -61,6 +63,15 @@ class TestGenomeGenerator(unittest.TestCase):
     def test_number_of_genes(self):
         self.assertEqual(len(self.genes), GEN_NUM)
         self.assertEqual(len(self.intergenes), GEN_NUM - 1)
+
+    def test_start_codon(self):
+        for gene in self.genes:
+            # print(gene)
+            self.assertIn(gene[0:3], self.gen.START_CODONS)
+
+    def test_stop_codon(self):
+        for gene in self.genes:
+            self.assertIn(gene[-3:], self.gen.STOP_CODONS)
 
     def test_length(self):
 
