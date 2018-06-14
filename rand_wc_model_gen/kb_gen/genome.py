@@ -40,7 +40,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         options['gen_num'] = gen_num
 
         translation_table = int(options.get('translation_table', 1))
-        assert(translation_table > 0)
+        assert(translation_table in [1])
         options['translation_table'] = translation_table
 
     def gen_components(self):
@@ -118,10 +118,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         # associate the random chromosome sequence with the DnaSpeciesType object
         chromosome.seq = Seq(seq)
         # add chromosome to kb.cell speciestypes list
-        try:
-            self.knowledge_base.cell.species_types[0] = chromosome
-        except IndexError:
-            self.knowledge_base.cell.species_types.append(chromosome)
+
+        self.knowledge_base.cell.species_types.append(chromosome)
 
         return indexList
 
