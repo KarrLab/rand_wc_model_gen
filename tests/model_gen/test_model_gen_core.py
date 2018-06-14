@@ -13,6 +13,7 @@ import unittest
 import wc_lang
 import wc_utils.util.string
 
+
 class ModelGeneratorTestCase(unittest.TestCase):
     def test(self):
         kb = kb_gen.KbGenerator(options={
@@ -27,7 +28,6 @@ class ModelGeneratorTestCase(unittest.TestCase):
         model = model_gen.ModelGenerator(kb).run()
 
         self.assertIsInstance(model.submodels.get_one(id='transcription'), wc_lang.Submodel)
-        #self.assertIsInstance(model.submodels.get_one(id='rna_degradation'), wc_lang.Submodel)
 
         errors = obj_model.Validator().run(model, get_related=True)
         self.assertEqual(errors, None, msg=wc_utils.util.string.indent_forest(errors))

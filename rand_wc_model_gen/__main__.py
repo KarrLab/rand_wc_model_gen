@@ -79,13 +79,21 @@ class SimController(CementBaseController):
         config = rand_wc_model_gen.config.get_config(extra_path=args.config_path)['rand_wc_model_gen']
         model = wc_lang.io.Reader().run(args.model_path)
         simulation = wc_sim.multialgorithm.simulation.Simulation(model)
-        simulation.run(end_time=config['sim']['end_time'],
-                       checkpoint_period=config['sim']['checkpoint_period'],
-                       results_dir=args.sim_results_path)
+        num_events, sim_results_path = simulation.run(end_time=config['sim']['end_time'],
+                                                      checkpoint_period=config['sim']['checkpoint_period'],
+                                                      results_dir=args.sim_results_path)
+        self.app.results = {
+            'num_events': num_events,
+            'sim_results_path': sim_results_path,
+        }
 
 
 class App(CementApp):
-    """ Command line application """
+    """ Command line application 
+
+    Attributes:
+        results (:obj:`object`): handler results
+    """
     class Meta:
         label = 'rand_wc_model_gen'
         base_controller = 'base'
@@ -94,6 +102,15 @@ class App(CementApp):
             GenController,
             SimController,
         ]
+
+    def __init__(self, label=None, **kw):
+        """
+        Args:
+            label (:obj:`str`, optional): label
+            **kw (:obj:`dict`, optional)
+        """
+        self.results = None
+        super(App, self).__init__(label=label, **kw)
 
 
 def main():

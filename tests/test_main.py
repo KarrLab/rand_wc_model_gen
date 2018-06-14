@@ -23,8 +23,7 @@ class CliTestCase(unittest.TestCase):
         self.temp_dir = tempfile.mkdtemp()
 
     def tearDown(self):
-        print(self.temp_dir)
-        # shutil.rmtree(self.temp_dir)
+        shutil.rmtree(self.temp_dir)
 
     def test_raw_cli(self):
         with mock.patch('sys.argv', ['rand_wc_model_gen', '--help']):
@@ -79,7 +78,6 @@ class CliTestCase(unittest.TestCase):
         kb = wc_kb.io.Reader().run(kb_core_path, kb_seq_path)
         model = wc_lang.io.Reader().run(model_path)
 
-    @unittest.skip('Get working')
     def test_sim_model(self):
         kb_core_path = os.path.join(self.temp_dir, 'kb.xlsx')
         kb_seq_path = os.path.join(self.temp_dir, 'kb.fna')
@@ -108,5 +106,5 @@ class CliTestCase(unittest.TestCase):
         with __main__.App(argv=['sim', model_path, sim_results_path, '--config-path', config_path]) as app:
             app.run()
 
-        # todo
-        self.assertTrue(os.path.isdir(sim_results_path))
+        # assert
+        self.assertTrue(os.path.isfile(os.path.join(app.results['sim_results_path'], 'run_results.h5')))
