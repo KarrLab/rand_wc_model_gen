@@ -11,6 +11,7 @@ from .metabolites import MetabolitesGenerator
 from .properties import PropertiesGenerator
 from .rna import RnaGenerator
 from numpy import random
+import rand_wc_model_gen
 import wc_kb
 import wc_kb_gen
 
@@ -51,9 +52,19 @@ class KbGenerator(wc_kb_gen.KbGenerator):
 
     def clean_and_validate_options(self):
         """ Apply default options and validate options """
-        super(KbGenerator, self).clean_and_validate_options()
-
         options = self.options
+
+        id = options.get('id', 'rand_wc_model')
+        assert(isinstance(id, str) or id is None)
+        options['id'] = id
+
+        name = options.get('name', 'Random whole-cell model')
+        assert(isinstance(name, str) or name is None)
+        options['name'] = name
+
+        version = options.get('version', rand_wc_model_gen.__version__)
+        assert(isinstance(version, str) or version is None)
+        options['version'] = version
 
         seed = options.get('seed', None)
         if seed is not None:
