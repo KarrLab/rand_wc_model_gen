@@ -53,6 +53,11 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         gen_num = options.get('gen_num')
         translation_table = options.get('translation_table')
 
+        # create codon list
+        # TODO enable use of translation table
+        self.START_CODONS = ['ATG']  # start codon
+        self.STOP_CODONS = ['TAG', 'TAA', 'TGA']  # stop codons
+
         # indexList of start/end positions of each gene, creates 'synthetic' chromosome
         self.indexList = self.gen_genome(
             gen_len, inter_len, gen_num, translation_table)
@@ -82,8 +87,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         chromosome = wc_kb.DnaSpeciesType()
         seq = ''
         arr = ['A', 'G', 'C', 'T']
-        START_CODON = 'ATG'  # start codon
-        STOP_CODONS = ['TAG', 'TAA', 'TGA']  # stop codons
         indexList = []
         index = 1
         for i in range(2 * gen_num):
@@ -91,16 +94,16 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                 gene = ''
                 gen_length = gene_dist.pop()
                 indexList.append((index, index + (gen_length * 3) - 1))
-                gene += START_CODON  # add start codon
+                gene += random.choice(self.START_CODONS)  # add start codon
                 for k in range(gen_length - 2):
-                    codon = 'TAG'
+                    codon = self.STOP_CODONS[0]
                     # to make sure random codon is not stop codon (premature termination)
-                    while codon in STOP_CODONS:
+                    while codon in self.STOP_CODONS:
                         # create random codon
                         codon = random.choice(
                             arr) + random.choice(arr) + random.choice(arr)
                     gene += codon  # add randomly chosen codon
-                gene += random.choice(STOP_CODONS)  # add stop codon
+                gene += random.choice(self.STOP_CODONS)  # add stop codon
                 index += gen_length * 3
                 seq += gene
 
