@@ -115,7 +115,10 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         # associate the random chromosome sequence with the DnaSpeciesType object
         chromosome.seq = Seq(seq)
         # add chromosome to kb.cell speciestypes list
-        self.knowledge_base.cell.species_types.append(chromosome)
+        try:
+            self.knowledge_base.cell.species_types[0] = chromosome
+        except IndexError:
+            self.knowledge_base.cell.species_types.append(chromosome)
 
         return indexList
 
