@@ -1,4 +1,4 @@
-""" Tests of transcription submodel generation
+""" Tests of RNA degradation submodel generation
 
 :Author: Jonathan Karr <karr@mssm.edu>
 :Date: 2018-06-11
@@ -7,7 +7,7 @@
 """
 
 from rand_wc_model_gen import kb_gen
-from rand_wc_model_gen.model_gen import transcription
+from rand_wc_model_gen.model_gen import rna_degradation
 import numpy
 import scipy
 import unittest
@@ -15,7 +15,7 @@ import wc_kb
 import wc_lang
 
 
-class TranscriptionSubmodelGeneratorTestCase(unittest.TestCase):
+class RnaDegradationSubmodelGeneratorTestCase(unittest.TestCase):
     def test(self):
         kb = kb_gen.KbGenerator(options={
             'component': {
@@ -40,19 +40,19 @@ class TranscriptionSubmodelGeneratorTestCase(unittest.TestCase):
         rnas = cell.species_types.get(__type=wc_kb.RnaSpeciesType)
 
         model = wc_lang.Model()
-        gen = transcription.TranscriptionSubmodelGenerator(kb, model, options={})
+        gen = rna_degradation.RnaDegradationSubmodelGenerator(kb, model, options={})
         gen.run()
 
-        submodel = model.submodels.get_one(id='transcription')
+        submodel = model.submodels.get_one(id='rna_degradation')
 
         # check compartments generated
         cytosol = model.compartments.get_one(id='c')
         self.assertEqual(cytosol.name, 'cytosol')
 
         # check species types and species generated
-        atp = model.species_types.get_one(id='atp')
-        atp_cytosol = atp.species.get_one(compartment=cytosol)
-        self.assertEqual(atp_cytosol.concentration.units, 'M')
+        amp = model.species_types.get_one(id='amp')
+        amp_cytosol = amp.species.get_one(compartment=cytosol)
+        self.assertEqual(amp_cytosol.concentration.units, 'M')
 
         concs = []
         for species_type in model.species_types:
@@ -64,38 +64,34 @@ class TranscriptionSubmodelGeneratorTestCase(unittest.TestCase):
 
         # check reactions generated
         self.assertEqual(len(submodel.reactions), len(rnas))
-        atp = model.species_types.get_one(id='atp').species.get_one(compartment=cytosol)
-        ctp = model.species_types.get_one(id='ctp').species.get_one(compartment=cytosol)
-        gtp = model.species_types.get_one(id='gtp').species.get_one(compartment=cytosol)
-        utp = model.species_types.get_one(id='utp').species.get_one(compartment=cytosol)
-        ppi = model.species_types.get_one(id='ppi').species.get_one(compartment=cytosol)
+        amp = model.species_types.get_one(id='amp').species.get_one(compartment=cytosol)
+        cmp = model.species_types.get_one(id='cmp').species.get_one(compartment=cytosol)
+        gmp = model.species_types.get_one(id='gmp').species.get_one(compartment=cytosol)
+        ump = model.species_types.get_one(id='ump').species.get_one(compartment=cytosol)
         h2o = model.species_types.get_one(id='h2o').species.get_one(compartment=cytosol)
         h = model.species_types.get_one(id='h').species.get_one(compartment=cytosol)
         self.assertEqual(
-            + submodel.reactions[0].participants.get_one(species=atp).coefficient
-            + submodel.reactions[0].participants.get_one(species=ctp).coefficient
-            + submodel.reactions[0].participants.get_one(species=gtp).coefficient
-            + submodel.reactions[0].participants.get_one(species=utp).coefficient,
-            -rnas[0].get_len())
-        self.assertEqual(
-            + submodel.reactions[0].participants.get_one(species=ppi).coefficient,
+            + submodel.reactions[0].participants.get_one(species=amp).coefficient
+            + submodel.reactions[0].participants.get_one(species=cmp).coefficient
+            + submodel.reactions[0].participants.get_one(species=gmp).coefficient
+            + submodel.reactions[0].participants.get_one(species=ump).coefficient,
             rnas[0].get_len())
         self.assertEqual(
             + submodel.reactions[0].participants.get_one(species=h2o).coefficient,
-            rnas[0].get_len() - 1)
+            -(rnas[0].get_len() - 1))
         self.assertEqual(
             + submodel.reactions[0].participants.get_one(species=h).coefficient,
-            -(rnas[0].get_len() - 1))
+            rnas[0].get_len() - 1)
 
         # check rate laws
-        for rxn in submodel.reactions:
+        for rna, rxn in zip(rnas, submodel.reactions):
             self.assertEqual(len(rxn.rate_laws), 1)
             rl = rxn.rate_laws[0]
             self.assertEqual(rl.direction.name, 'forward')
-            self.assertEqual(rl.equation.expression, 'k_cat')
-            self.assertEqual(rl.equation.modifiers, [])
-            self.assertEqual(rl.equation.parameters, [])            
-            self.assertEqual(rl.k_m, None)
+            self.assertEqual(rl.equation.expression, 'k_cat * {0}[c] / (k_m + {0}[c])'.format(rna.id))
+            self.assertEqual(rl.equation.modifiers, [rxn.participants[0].species])
+            self.assertEqual(rl.equation.parameters, [])
+            self.assertEqual(rl.k_m, rna.concentration)
 
         k_cats = [rxn.rate_laws[0].k_cat for rxn in submodel.reactions]
-        numpy.testing.assert_almost_equal(numpy.mean(k_cats), 10. * numpy.log(2.) * (1. / 120.), decimal=2)
+        numpy.testing.assert_almost_equal(numpy.mean(k_cats), 2. * numpy.log(2.) * (1. / 120.), decimal=2)

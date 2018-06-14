@@ -7,7 +7,7 @@
 """
 
 from .metabolism import MetabolismSubmodelGenerator
-#from .rna_degradation import RnaDegradationSubmodelGenerator
+from .rna_degradation import RnaDegradationSubmodelGenerator
 from .transcription import TranscriptionSubmodelGenerator
 import rand_wc_model_gen
 import wc_model_gen
@@ -20,7 +20,7 @@ class ModelGenerator(wc_model_gen.ModelGenerator):
     DEFAULT_COMPONENT_GENERATORS = (
         MetabolismSubmodelGenerator,
         TranscriptionSubmodelGenerator,
-        # RnaDegradationSubmodelGenerator,
+        RnaDegradationSubmodelGenerator,
     )
 
     def clean_and_validate_options(self):
