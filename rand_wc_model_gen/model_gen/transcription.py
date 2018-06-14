@@ -33,16 +33,26 @@ class TranscriptionSubmodelGenerator(wc_model_gen.SubmodelGenerator):
         ids = ['atp', 'ctp', 'gtp', 'utp', 'ppi', 'h2o', 'h']
         for id in ids:
             kb_met = cell.species_types.get_one(id=id)
-            model_met = model.species_types.get_or_create(id=id)
-            model_met.molecular_weight = kb_met.get_mol_wt()
-            model_met_c = model_met.species.get_or_create(compartment=cytosol)
-            model_met_c.concentration = wc_lang.Concentration(value=kb_met.concentration, units='M')
+            species_type = model.species_types.get_or_create(id=id)
+            species_type.name = kb_met.id
+            species_type.type = wc_lang.SpeciesTypeType.metabolite
+            species_type.structure = kb_met.structure
+            species_type.empirical_formula = kb_met.get_empirical_formula()
+            species_type.molecular_weight = kb_met.get_mol_wt()
+            species_type.charge = kb_met.get_charge()
+            species_type_c = species_type.species.get_or_create(compartment=cytosol)
+            species_type_c.concentration = wc_lang.Concentration(value=kb_met.concentration, units='M')
 
         # get or create RNA species
         rnas = cell.species_types.get(__type=wc_kb.RnaSpeciesType)
         for rna in rnas:
             species_type = model.species_types.get_or_create(id=rna.id)
+            species_type.name = rna.name
+            species_type.type = wc_lang.SpeciesTypeType.rna
+            species_type.structure = rna.get_seq()
+            species_type.empirical_formula = rna.get_empirical_formula()
             species_type.molecular_weight = rna.get_mol_wt()
+            species_type.charge = rna.get_charge()
             species = species_type.species.get_or_create(compartment=cytosol)
             species.concentration = wc_lang.Concentration(value=rna.concentration, units='M')
 
