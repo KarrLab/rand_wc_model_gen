@@ -1,2 +1,3 @@
 abduct
 git+https://github.com/KarrLab/obj_model.git#egg=obj_model-0.0.5
+git+https://github.com/KarrLab/wc_test.git#egg=wc_test-0.0.1

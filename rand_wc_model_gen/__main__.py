@@ -9,6 +9,8 @@
 
 from cement.core.foundation import CementApp
 from cement.core.controller import CementBaseController, expose
+import glob
+import os
 import rand_wc_model_gen
 import rand_wc_model_gen.config
 import rand_wc_model_gen.kb_gen
@@ -33,20 +35,18 @@ class BaseController(CementBaseController):
         self.app.args.print_help()
 
 
-class GenController(CementBaseController):
-    """ Generate random whole-cell model """
+class GenerateController(CementBaseController):
+    """ Generate a random whole-cell knowledge base and a random whole-cell model """
 
     class Meta:
-        label = 'gen'
+        label = 'generate'
         stacked_on = 'base'
         stacked_type = 'nested'
-        description = "Generate random whole-cell model"
+        description = "Generate a random whole-cell knowledge base and a random whole-cell model"
         arguments = [
-            (['kb_core_path'], dict(type=str, help='Path to save knowledge base core (.csv, .tsv, .xlsx)')),
-            (['kb_seq_path'], dict(type=str, help='Path to save knowledge base sequence (.fna)')),
-            (['model_path'], dict(type=str, help='Path to save model (.csv, .tsv, .xlsx)')),
-            (['--config-path'], dict(type=str, default=None, help='Path to configuration file')),
-            (['--set-repo-metadata-from-path'], dict(type=str, default=None, help='Path to configuration file')),
+            (['--config-path'], dict(type=str,
+                                     default=None,
+                                     help='Path to configuration file')),
         ]
 
     @expose(hide=True)
@@ -55,21 +55,31 @@ class GenController(CementBaseController):
         config = rand_wc_model_gen.config.get_config(extra_path=args.config_path)['rand_wc_model_gen']
         kb = rand_wc_model_gen.kb_gen.KbGenerator(options=config['kb_gen']).run()
         model = rand_wc_model_gen.model_gen.ModelGenerator(kb, options=config['model_gen']).run()
-        wc_kb.io.Writer().run(kb, args.kb_core_path, args.kb_seq_path, set_repo_metadata_from_path=args.set_repo_metadata_from_path)
-        wc_lang.io.Writer().run(model, args.model_path, set_repo_metadata_from_path=args.set_repo_metadata_from_path)
+
+        if not os.path.isdir(os.path.dirname(config['kb']['path']['core'])):
+            os.makedirs(os.path.dirname(config['kb']['path']['core']))
+        if not os.path.isdir(os.path.dirname(config['kb']['path']['seq'])):
+            os.makedirs(os.path.dirname(config['kb']['path']['seq']))
+        wc_kb.io.Writer().run(kb,
+                              config['kb']['path']['core'], config['kb']['path']['seq'],
+                              set_repo_metadata_from_path=config['kb_gen']['set_repo_metadata_from_path'])
+
+        if not os.path.isdir(os.path.dirname(config['model']['path'])):
+            os.makedirs(os.path.dirname(config['model']['path']))
+        wc_lang.io.Writer().run(model,
+                                config['model']['path'],
+                                set_repo_metadata_from_path=config['model_gen']['set_repo_metadata_from_path'])
 
 
-class SimController(CementBaseController):
-    """ Simulate random whole-cell model """
+class SimulateController(CementBaseController):
+    """ Simulate a random whole-cell model """
 
     class Meta:
-        label = 'sim'
+        label = 'simulate'
         stacked_on = 'base'
         stacked_type = 'nested'
-        description = "Simulate random whole-cell model"
+        description = "Simulate a random whole-cell model"
         arguments = [
-            (['model_path'], dict(type=str, help='Path to model (.csv, .tsv, .xlsx)')),
-            (['sim_results_path'], dict(type=str, help='Path to save simulation results in HDF5 format')),
             (['--config-path'], dict(type=str, default=None, help='Path to configuration file')),
         ]
 
@@ -77,15 +87,38 @@ class SimController(CementBaseController):
     def default(self):
         args = self.app.pargs
         config = rand_wc_model_gen.config.get_config(extra_path=args.config_path)['rand_wc_model_gen']
-        model = wc_lang.io.Reader().run(args.model_path)
+        model = wc_lang.io.Reader().run(config['model']['path'])
         simulation = wc_sim.multialgorithm.simulation.Simulation(model)
         num_events, sim_results_path = simulation.run(end_time=config['sim']['end_time'],
-                                                      checkpoint_period=config['sim']['checkpoint_period'],
-                                                      results_dir=args.sim_results_path)
+                                                      checkpoint_period=config['sim_results']['checkpoint_period'],
+                                                      results_dir=config['sim_results']['path'])
         self.app.results = {
             'num_events': num_events,
             'sim_results_path': sim_results_path,
         }
+
+
+class AnalyzeController(CementBaseController):
+    """ Analyze a random whole-cell knowledge base, model, and their simulations """
+
+    class Meta:
+        label = 'analyze'
+        stacked_on = 'base'
+        stacked_type = 'nested'
+        description = "Analyze a random whole-cell model and simulations"
+        arguments = [
+            (['--config-path'], dict(type=str, default=None, help='Path to configuration file')),
+        ]
+
+    @expose(hide=True)
+    def default(self):
+        args = self.app.pargs
+        config = rand_wc_model_gen.config.get_config(extra_path=args.config_path)['rand_wc_model_gen']
+        kb = wc_kb.io.Reader().run(config['kb']['path']['core'], config['kb']['path']['seq'])
+        model = wc_lang.io.Reader().run(config['model']['path'])
+
+        for sim_results_path in glob.glob(os.path.join(config['sim_results']['path'], '**', 'run_results.h5')):
+            pass
 
 
 class App(CementApp):
@@ -99,8 +132,9 @@ class App(CementApp):
         base_controller = 'base'
         handlers = [
             BaseController,
-            GenController,
-            SimController,
+            GenerateController,
+            SimulateController,
+            AnalyzeController,
         ]
 
     def __init__(self, label=None, **kw):
