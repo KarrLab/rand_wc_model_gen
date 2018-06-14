@@ -13,10 +13,10 @@ import numpy as np
 from rand_wc_model_gen.kb_gen import genome
 from Bio.Seq import Seq
 
-GEN_LEN = 10
-INTER_LEN = 10
-GEN_NUM = 20
-TRANSLATION_TABLE = 1
+GEN_LEN = 200  # the average number of codons in each gene
+INTER_LEN = 100  # the average number of codons between genes
+GEN_NUM = 1000  # the exact number of genes present
+TRANSLATION_TABLE = 1  # the codon table to use
 
 
 class TestGenomeGenerator(unittest.TestCase):
@@ -57,6 +57,10 @@ class TestGenomeGenerator(unittest.TestCase):
 
     def test_run(self):
         self.assertIsInstance(self.seq, Seq)
+
+    def test_number_of_genes(self):
+        self.assertEqual(len(self.genes), GEN_NUM)
+        self.assertEqual(len(self.intergenes), GEN_NUM - 1)
 
     def test_length(self):
 
