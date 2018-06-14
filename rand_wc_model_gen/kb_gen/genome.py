@@ -25,12 +25,12 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
         options = self.options
 
-        gen_len = int(options.get('gen_len', 1000))  # for prokaryote (~924 bp)
+        gen_len = int(options.get('gen_len', 300))  # for prokaryote (~924 bp)
         assert(gen_len > 0)
         options['gen_len'] = gen_len
 
         # for prokaryote (~100 bp)
-        inter_len = int(options.get('inter_len', 100))
+        inter_len = int(options.get('inter_len', 30))
         assert(gen_len > 0)
         options['inter_len'] = inter_len
 
@@ -77,12 +77,12 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         Returns:
             :obj:`list`: list of tuples of start and end positions of each gene on chromosome
         """
-        gene_dist = np.random.normal(gen_len, math.sqrt(gen_len/gen_num), gen_num).tolist(
+        gene_dist = np.random.normal(gen_len, math.sqrt(gen_len), gen_num).tolist(
         )  # takes random samples out of Gaussian distribution with mean of average gene length
         gene_dist = [round(x) for x in gene_dist]
         # takes random samples out of Gaussian distribution with mean of average intergenic length
         inter_dist = np.random.normal(inter_len, math.sqrt(
-            inter_len/gen_num), gen_num).tolist()
+            inter_len), gen_num).tolist()
         inter_dist = [round(x) for x in inter_dist]
         chromosome = wc_kb.DnaSpeciesType()
         seq = ''
