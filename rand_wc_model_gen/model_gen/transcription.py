@@ -30,42 +30,19 @@ class TranscriptionSubmodelGenerator(wc_model_gen.SubmodelGenerator):
         cytosol = model.compartments.get(id='c')[0]
 
         # get or create metabolite species
-        kb_atp = cell.species_types.get_one(id='atp')
-        kb_ctp = cell.species_types.get_one(id='ctp')
-        kb_gtp = cell.species_types.get_one(id='gtp')
-        kb_utp = cell.species_types.get_one(id='utp')
-        kb_ppi = cell.species_types.get_one(id='ppi')
-        kb_h2o = cell.species_types.get_one(id='h2o')
-        kb_h = cell.species_types.get_one(id='h')
-
-        model_atp = model.species_types.get_or_create(id='atp')
-        model_ctp = model.species_types.get_or_create(id='ctp')
-        model_gtp = model.species_types.get_or_create(id='gtp')
-        model_utp = model.species_types.get_or_create(id='utp')
-        model_ppi = model.species_types.get_or_create(id='ppi')
-        model_h2o = model.species_types.get_or_create(id='h2o')
-        model_h = model.species_types.get_or_create(id='h')
-
-        model_atp_c = model_atp.species.get_or_create(compartment=cytosol)
-        model_ctp_c = model_ctp.species.get_or_create(compartment=cytosol)
-        model_gtp_c = model_gtp.species.get_or_create(compartment=cytosol)
-        model_utp_c = model_utp.species.get_or_create(compartment=cytosol)
-        model_ppi_c = model_ppi.species.get_or_create(compartment=cytosol)
-        model_h2o_c = model_h2o.species.get_or_create(compartment=cytosol)
-        model_h_c = model_h.species.get_or_create(compartment=cytosol)
-
-        model_atp_c.concentration = wc_lang.Concentration(value=kb_atp.concentration, units='M')
-        model_ctp_c.concentration = wc_lang.Concentration(value=kb_ctp.concentration, units='M')
-        model_gtp_c.concentration = wc_lang.Concentration(value=kb_gtp.concentration, units='M')
-        model_utp_c.concentration = wc_lang.Concentration(value=kb_utp.concentration, units='M')
-        model_ppi_c.concentration = wc_lang.Concentration(value=kb_ppi.concentration, units='M')
-        model_h2o_c.concentration = wc_lang.Concentration(value=kb_h2o.concentration, units='M')
-        model_h_c.concentration = wc_lang.Concentration(value=kb_h.concentration, units='M')
+        ids = ['atp', 'ctp', 'gtp', 'utp', 'ppi', 'h2o', 'h']
+        for id in ids:
+            kb_met = cell.species_types.get_one(id=id)
+            model_met = model.species_types.get_or_create(id=id)
+            model_met.molecular_weight = kb_met.get_mol_wt()
+            model_met_c = model_met.species.get_or_create(compartment=cytosol)            
+            model_met_c.concentration = wc_lang.Concentration(value=kb_met.concentration, units='M')
 
         # get or create RNA species
         rnas = cell.species_types.get(__type=wc_kb.RnaSpeciesType)
         for rna in rnas:
             species_type = model.species_types.get_or_create(id=rna.id)
+            species_type.molecular_weight = rna.get_mol_wt()
             species = species_type.species.get_or_create(compartment=cytosol)
             species.concentration = wc_lang.Concentration(value=rna.concentration, units='M')
 

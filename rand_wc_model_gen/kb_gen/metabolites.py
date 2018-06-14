@@ -6,46 +6,44 @@
 :License: MIT
 """
 
-import numpy
+import csv
+import os
+import pkg_resources
 import wc_kb
 import wc_kb_gen
 
 
 class MetabolitesGenerator(wc_kb_gen.KbComponentGenerator):
     """ Generator for metabolites for random in silico organisms
+
+    Options:
+
+    * data_path: path to CSV file with metabolite ids, name, InChI-encoded structures, and intracellular concentrations
     """
 
     def clean_and_validate_options(self):
         """ Apply default options and validate options """
         options = self.options
+        data_path = options.get('data_path', pkg_resources.resource_filename('rand_wc_model_gen', os.path.join('data', 'metabolites.csv')))
+        assert(os.path.isfile(data_path))
+        options['data_path'] = data_path
 
-        mean_ntp_conc = float(options.get('mean_ntp_conc', 1.5e-3))  # DOI: 10.1038/srep06522
-        assert(mean_ntp_conc > 0)
-        options['mean_ntp_conc'] = mean_ntp_conc
-
-        mean_h2o_conc = float(options.get('mean_h2o_conc', 55.))  # DOI: 10.1073/pnas.0308747101
-        assert(mean_h2o_conc > 0)
-        options['mean_h2o_conc'] = mean_h2o_conc
-
-        mean_ph = float(options.get('mean_ph', 7.5))  # DOI: 10.1128/JB.00615-07
-        assert(mean_ph > 0)
-        options['mean_ph'] = mean_ph
+    def get_data(self):
+        data_path = self.options.get('data_path')
+        with open(data_path, 'r') as file:
+            self.data = []
+            for met in csv.DictReader(file):
+                met['Intracellular concentration (M)'] = float(met['Intracellular concentration (M)'])
+                self.data.append(met)
 
     def gen_components(self):
         """ Construct knowledge base components """
         cell = self.knowledge_base.cell
 
-        # get options
-        options = self.options
-        mean_ntp_conc = options.get('mean_ntp_conc')
-        mean_h2o_conc = options.get('mean_h2o_conc')
-        mean_ph = options.get('mean_ph')
-
         # generate metabolites
-        cell.species_types.get_or_create(__type=wc_kb.MetaboliteSpeciesType, id='atp', name='ATP', concentration=mean_ntp_conc)
-        cell.species_types.get_or_create(__type=wc_kb.MetaboliteSpeciesType, id='ctp', name='CTP', concentration=mean_ntp_conc)
-        cell.species_types.get_or_create(__type=wc_kb.MetaboliteSpeciesType, id='gtp', name='GTP', concentration=mean_ntp_conc)
-        cell.species_types.get_or_create(__type=wc_kb.MetaboliteSpeciesType, id='utp', name='UTP', concentration=mean_ntp_conc)
-        cell.species_types.get_or_create(__type=wc_kb.MetaboliteSpeciesType, id='ppi', name='PPI', concentration=mean_ntp_conc)
-        cell.species_types.get_or_create(__type=wc_kb.MetaboliteSpeciesType, id='h2o', name='H2O', concentration=mean_h2o_conc)
-        cell.species_types.get_or_create(__type=wc_kb.MetaboliteSpeciesType, id='h', name='H', concentration=numpy.power(10, -mean_ph))
+        for met in self.data:
+            cell.species_types.get_or_create(
+                __type=wc_kb.MetaboliteSpeciesType,
+                id=met['Id'], name=met['Name'],
+                structure=met['Structure (InChI)'],
+                concentration=met['Intracellular concentration (M)'])

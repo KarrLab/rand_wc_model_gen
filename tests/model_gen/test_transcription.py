@@ -29,9 +29,6 @@ class TranscriptionSubmodelGeneratorTestCase(unittest.TestCase):
                     'mean_gene_len': 100.,
                 },
                 'MetabolitesGenerator': {
-                    'mean_ntp_conc': 1e-3,
-                    'mean_h2O_conc': 55.,
-                    'mean_ph': 7.
                 },
                 'RnaGenerator': {
                     'mean_copy_number': 10.,
@@ -55,7 +52,6 @@ class TranscriptionSubmodelGeneratorTestCase(unittest.TestCase):
         # check species types and species generated
         atp = model.species_types.get_one(id='atp')
         atp_cytosol = atp.species.get_one(compartment=cytosol)
-        self.assertEqual(atp_cytosol.concentration.value, 1e-3)
         self.assertEqual(atp_cytosol.concentration.units, 'M')
 
         concs = []

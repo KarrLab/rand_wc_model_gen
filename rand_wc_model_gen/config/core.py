@@ -37,6 +37,7 @@ def get_config(extra_path=None, extra_vals=None):
         paths.user.insert(0, extra_path)
 
     context = {
+        'package_path': pkg_resources.resource_filename('rand_wc_model_gen', ''),
         'version': rand_wc_model_gen.__version__,
     }
     return wc_utils.config.core.ConfigManager(paths).get_config(extra=extra_vals, context=context)
