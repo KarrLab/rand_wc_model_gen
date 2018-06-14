@@ -7,8 +7,10 @@
 """
 
 from rand_wc_model_gen import kb_gen
+import obj_model
 import unittest
 import wc_kb
+import wc_utils.util.string
 
 
 class KbGeneratorTestCase(unittest.TestCase):
@@ -24,6 +26,9 @@ class KbGeneratorTestCase(unittest.TestCase):
 
         kb = gen.run()
         self.assertEqual(len(kb.cell.species_types.get(__type=wc_kb.DnaSpeciesType)), 10)
+
+        errors = obj_model.Validator().run(kb, get_related=True)
+        self.assertEqual(errors, None, msg=wc_utils.util.string.indent_forest(errors))
 
     def test_clean_and_validate_options(self):
         gen = kb_gen.KbGenerator()
