@@ -25,12 +25,12 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
         options = self.options
 
-        gen_len = int(options.get('gen_len', 1000))  # for prokaryote (~924 bp)
+        gen_len = int(options.get('gen_len', 300))  # for prokaryote (~924 bp)
         assert(gen_len > 0)
         options['gen_len'] = gen_len
 
         # for prokaryote (~100 bp)
-        inter_len = int(options.get('inter_len', 100))
+        inter_len = int(options.get('inter_len', 30))
         assert(gen_len > 0)
         options['inter_len'] = inter_len
 
@@ -53,10 +53,16 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         gen_num = options.get('gen_num')
         translation_table = options.get('translation_table')
 
+        # create codon list
+        # TODO enable use of translation table
+        self.START_CODONS = ['ATG']  # start codon
+        self.STOP_CODONS = ['TAG', 'TAA', 'TGA']  # stop codons
+
         # indexList of start/end positions of each gene, creates 'synthetic' chromosome
-        indexList = self.gen_genome(gen_len, inter_len, gen_num)
+        self.indexList = self.gen_genome(
+            gen_len, inter_len, gen_num, translation_table)
         # creates RNA and protein objects corresponding to the genes on chromosome
-        self.gen_rnas_proteins(gen_num, indexList)
+        self.gen_rnas_proteins(gen_num, self.indexList)
 
     def gen_genome(self, gen_len, inter_len, gen_num, translation_table):
         """ Creates 'synthetic' chromsome with randomized genes/intergenic regions
@@ -71,18 +77,16 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         Returns:
             :obj:`list`: list of tuples of start and end positions of each gene on chromosome
         """
-        gene_dist = np.random.normal(gen_len, math.sqrt(gen_len/gen_num), gen_num).tolist(
+        gene_dist = np.random.normal(gen_len, math.sqrt(gen_len), gen_num).tolist(
         )  # takes random samples out of Gaussian distribution with mean of average gene length
         gene_dist = [round(x) for x in gene_dist]
         # takes random samples out of Gaussian distribution with mean of average intergenic length
         inter_dist = np.random.normal(inter_len, math.sqrt(
-            inter_len/gen_num), gen_num).tolist()
+            inter_len), gen_num).tolist()
         inter_dist = [round(x) for x in inter_dist]
         chromosome = wc_kb.DnaSpeciesType()
         seq = ''
         arr = ['A', 'G', 'C', 'T']
-        START_CODON = 'ATG'  # start codon
-        STOP_CODONS = ['TAG', 'TAA', 'TGA']  # stop codons
         indexList = []
         index = 1
         for i in range(2 * gen_num):
@@ -90,16 +94,16 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                 gene = ''
                 gen_length = gene_dist.pop()
                 indexList.append((index, index + (gen_length * 3) - 1))
-                gene += START_CODON  # add start codon
+                gene += random.choice(self.START_CODONS)  # add start codon
                 for k in range(gen_length - 2):
-                    codon = 'TAG'
+                    codon = self.STOP_CODONS[0]
                     # to make sure random codon is not stop codon (premature termination)
-                    while codon in STOP_CODONS:
+                    while codon in self.STOP_CODONS:
                         # create random codon
                         codon = random.choice(
                             arr) + random.choice(arr) + random.choice(arr)
                     gene += codon  # add randomly chosen codon
-                gene += random.choice(STOP_CODONS)  # add stop codon
+                gene += random.choice(self.STOP_CODONS)  # add stop codon
                 index += gen_length * 3
                 seq += gene
 
@@ -114,7 +118,10 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         # associate the random chromosome sequence with the DnaSpeciesType object
         chromosome.seq = Seq(seq)
         # add chromosome to kb.cell speciestypes list
-        self.knowledge_base.cell.species_types.append(chromosome)
+        try:
+            self.knowledge_base.cell.species_types[0] = chromosome
+        except IndexError:
+            self.knowledge_base.cell.species_types.append(chromosome)
 
         return indexList
 
