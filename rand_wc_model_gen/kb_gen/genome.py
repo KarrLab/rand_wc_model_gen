@@ -155,7 +155,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             indexList (:obj: 'list'): list of tuples of start and end positions of each gene on chromosome
 
         """
-        #TODO ASHWIN work on TUs rather than genes 
+        #TODO ASHWIN work on TUs rather than genes
                 
 
         chromosome = self.knowledge_base.cell.species_types[0]
