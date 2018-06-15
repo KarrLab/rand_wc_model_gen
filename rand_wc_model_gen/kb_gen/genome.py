@@ -59,10 +59,10 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
         self.knowledge_base.translation_table = translation_table
 
-        # indexList of start/end positions of each gene, creates 'synthetic' chromosome
-        self.indexList = self.gen_genome()
+        # index_list of start/end positions of each gene, creates 'synthetic' chromosome
+        index_list = self.gen_genome()
         # creates RNA and protein objects corresponding to the genes on chromosome
-        self.gen_rnas_proteins(gen_num, self.indexList)
+        self.gen_rnas_proteins(gen_num, index_list)
 
     def gen_genome(self):
         """ Creates 'synthetic' chromsome with randomized genes/intergenic regions
@@ -92,7 +92,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         chromosome = wc_kb.DnaSpeciesType()
         seq = ''
         arr = ['A', 'G', 'C', 'T']
-        indexList = []
+        index_list = []
         index = 1
 
         num_genes = self.rand(gen_num)[0]
@@ -100,16 +100,13 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         intergene_lens = self.rand(gen_len / mean_coding_frac * (1 - mean_coding_frac), count=num_genes)
 
         seq_len = numpy.sum(gene_lens) + numpy.sum(intergene_lens)
-        seq = Seq(''.join(random.choice(('A', 'C', 'G', 'T'),
-                                        p=((1 - mean_gc_frac) / 2, mean_gc_frac / 2, mean_gc_frac / 2, (1 - mean_gc_frac) / 2),
-                                        size=(seq_len, ))),
-                  Alphabet.DNAAlphabet())
+        seq = ''
 
         for i in range(2 * gen_num):
             if i % 2 == 0:  # if i is even, region is a gene
                 gene = ''
                 gen_length = gene_dist.pop()
-                indexList.append((index, index + (gen_length * 3) - 1))
+                index_list.append((index, index + (gen_length * 3) - 1))
                 gene += random.choice(self.START_CODONS)  # add start codon
                 for k in range(gen_length - 2):
                     codon = self.STOP_CODONS[0]
@@ -132,19 +129,19 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         random.choice(arr) + random.choice(arr)
 
         # associate the random chromosome sequence with the DnaSpeciesType object
-        chromosome.seq = seq
+        chromosome.seq = Seq(seq, Alphabet.DNAAlphabet())
         # add chromosome to kb.cell speciestypes list
 
         self.knowledge_base.cell.species_types.append(chromosome)
 
-        return indexList
+        return index_list
 
-    def gen_rnas_proteins(self, gen_num, indexList):
+    def gen_rnas_proteins(self, gen_num, index_list):
         """ Creates RNA and protein objects corresponding to genes on chromosome
 
         Args:
             gen_num (:obj:`int`): number of genes on chromosome
-            indexList (:obj: 'list'): list of tuples of start and end positions of each gene on chromosome
+            index_list (:obj: 'list'): list of tuples of start and end positions of each gene on chromosome
 
         """
         # TODO ASHWIN work on TUs rather than genes
@@ -156,8 +153,9 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             rna = wc_kb.RnaSpeciesType()
             # GeneLocus object for gene sequence, attribute of ProteinSpeciesType object
             gene = wc_kb.GeneLocus()
-            gene.start = indexList[i][0]
-            gene.end = indexList[i][1]
+            gene.start = index_list[i][0]
+            gene.end = index_list[i][1]
+            gene.strand = wc_kb.PolymerStrand.positive
             gene.polymer = chromosome
             gene.cell = self.knowledge_base.cell
             # TranscriptionUnitLocus object - attribute of RnaSpeciesType object, associated with gene sequence
