@@ -25,7 +25,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         """ Apply default options and validate options """
 
         # TODO: ASHWIN validate all new options
-
         options = self.options
 
         gen_len = options.get('gen_len', 300)  # for prokaryote (~924 bp)
@@ -48,12 +47,13 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
     def gen_components(self):
         '''Construct knowledge base components'''
+        # get options
         options = self.options
         gen_num = options.get('gen_num')
         translation_table = options.get('translation_table')
 
         # create codon list
-        # TODO BILAL enable use of translation table
+        # TODO enable use of translation table
         self.START_CODONS = ['ATG']  # start codon
         self.STOP_CODONS = ['TAG', 'TAA', 'TGA']  # stop codons
 
@@ -70,7 +70,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         Returns:
             :obj:`list`: list of tuples of start and end positions of each gene on chromosome
         """
-
         # get options
         options = self.options
         gen_len = options.get('gen_len')
@@ -102,9 +101,9 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
         seq_len = numpy.sum(gene_lens) + numpy.sum(intergene_lens)
         seq = Seq(''.join(random.choice(('A', 'C', 'G', 'T'),
-                                            p=((1 - mean_gc_frac) / 2, mean_gc_frac / 2, mean_gc_frac / 2, (1 - mean_gc_frac) / 2),
-                                            size=(seq_len, ))),
-                      Alphabet.DNAAlphabet())
+                                        p=((1 - mean_gc_frac) / 2, mean_gc_frac / 2, mean_gc_frac / 2, (1 - mean_gc_frac) / 2),
+                                        size=(seq_len, ))),
+                  Alphabet.DNAAlphabet())
 
         for i in range(2 * gen_num):
             if i % 2 == 0:  # if i is even, region is a gene
