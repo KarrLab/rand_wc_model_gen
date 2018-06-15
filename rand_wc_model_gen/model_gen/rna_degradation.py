@@ -42,7 +42,7 @@ class RnaDegradationSubmodelGenerator(wc_model_gen.SubmodelGenerator):
                 species_type.molecular_weight = kb_met.get_mol_wt()
                 species_type.charge = kb_met.get_charge()
                 species_type_c = species_type.species.get_or_create(compartment=cytosol)
-                species_type_c.concentration = wc_lang.Concentration(value=kb_met.concentration, units='M')
+                species_type_c.concentration = wc_lang.Concentration(value=kb_met.concentration, units=wc_lang.ConcentrationUnit.M)
 
         # get or create RNA species
         rnas = cell.species_types.get(__type=wc_kb.RnaSpeciesType)
@@ -56,7 +56,7 @@ class RnaDegradationSubmodelGenerator(wc_model_gen.SubmodelGenerator):
                 species_type.molecular_weight = rna.get_mol_wt()
                 species_type.charge = rna.get_charge()
                 species = species_type.species.get_or_create(compartment=cytosol)
-                species.concentration = wc_lang.Concentration(value=rna.concentration, units='M')
+                species.concentration = wc_lang.Concentration(value=rna.concentration, units=wc_lang.ConcentrationUnit.M)
 
     def gen_reactions(self):
         """ Generate reactions associated with submodel """

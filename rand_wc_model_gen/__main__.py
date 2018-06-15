@@ -12,11 +12,13 @@ from cement.core.controller import CementBaseController, expose
 import glob
 import os
 import rand_wc_model_gen
+import rand_wc_model_gen.analysis
 import rand_wc_model_gen.config
 import rand_wc_model_gen.kb_gen
 import rand_wc_model_gen.model_gen
 import wc_kb.io
 import wc_lang.io
+import wc_sim.multialgorithm.run_results
 import wc_sim.multialgorithm.simulation
 
 
@@ -116,9 +118,10 @@ class AnalyzeController(CementBaseController):
         config = rand_wc_model_gen.config.get_config(extra_path=args.config_path)['rand_wc_model_gen']
         kb = wc_kb.io.Reader().run(config['kb']['path']['core'], config['kb']['path']['seq'])
         model = wc_lang.io.Reader().run(config['model']['path'])
-
-        for sim_results_path in glob.glob(os.path.join(config['sim_results']['path'], '**', 'run_results.h5')):
-            pass
+        runner = rand_wc_model_gen.analysis.AnalysisRunner(kb, model, config['sim_results']['path'],
+                                                           out_path=config['analysis']['path'],
+                                                           options=config['analysis'])
+        runner.run()
 
 
 class App(CementApp):

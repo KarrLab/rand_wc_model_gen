@@ -13,6 +13,7 @@ import os
 import rand_wc_model_gen
 import shutil
 import tempfile
+import time
 import unittest
 import wc_kb
 import wc_lang
@@ -26,6 +27,7 @@ class CliTestCase(unittest.TestCase):
         self.kb_seq_path = os.path.join(self.temp_dir, 'kb', 'seq', 'seq.fna')
         self.model_path = os.path.join(self.temp_dir, 'model', 'model.xlsx')
         self.sim_results_path = os.path.join(self.temp_dir, 'sim_results')
+        self.analysis_path = os.path.join(self.temp_dir, 'analysis')
         self.config_path = os.path.join(self.temp_dir, 'rand_wc_model_gen.cfg')
 
         # write configuration file
@@ -36,8 +38,8 @@ class CliTestCase(unittest.TestCase):
             file.write('        [[[component]]]\n')
             file.write('            [[[[ChromosomesGenesTusGenerator]]]]\n')
             file.write('                num_chromosomes = 1\n')
-            file.write('                mean_num_genes = 100\n')
-            file.write('                mean_gene_len = 10\n')
+            file.write('                mean_num_genes = 10.\n')
+            file.write('                mean_gene_len = 10.\n')
             file.write('    [[kb]]\n')
             file.write('        [[[path]]]\n')
             file.write('            core = {}\n'.format(self.kb_core_path))
@@ -47,10 +49,12 @@ class CliTestCase(unittest.TestCase):
             file.write('    [[model]]\n')
             file.write('        path = {}\n'.format(self.model_path))
             file.write('    [[sim]]\n')
-            file.write('        end_time = 10\n')
+            file.write('        end_time = 5.\n')
             file.write('    [[sim_results]]\n')
-            file.write('        checkpoint_period = 1\n')
+            file.write('        checkpoint_period = 1.\n')
             file.write('        path = {}\n'.format(self.sim_results_path))
+            file.write('    [[analysis]]\n')
+            file.write('        path = {}\n'.format(self.analysis_path))
 
     def tearDown(self):
         shutil.rmtree(self.temp_dir)
@@ -105,6 +109,18 @@ class CliTestCase(unittest.TestCase):
         # assert
         self.assertTrue(os.path.isfile(os.path.join(app.results['sim_results_path'], 'run_results.h5')))
 
-    @unittest.skip('Implement')
     def test_analyze(self):
-        pass
+        # generate model
+        with __main__.App(argv=['generate', '--config-path', self.config_path]) as app:
+            app.run()
+
+        # simulate model
+        for i_sim in range(3):
+            # todo: seed simulation
+            with __main__.App(argv=['simulate', '--config-path', self.config_path]) as app:                
+                app.run()
+            time.sleep(1.)  # todo: remove after results directory naming is fixed
+
+        # analyze simulation results
+        with __main__.App(argv=['analyze', '--config-path', self.config_path]) as app:
+            app.run()

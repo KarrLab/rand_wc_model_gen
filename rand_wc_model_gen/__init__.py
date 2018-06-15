@@ -5,7 +5,7 @@ with open(pkg_resources.resource_filename('rand_wc_model_gen', 'VERSION'), 'r') 
     __version__ = file.read().strip()
 
 # API
+from . import analysis
 from . import config
 from . import kb_gen
 from . import model_gen
-from . import analysis

@@ -52,14 +52,14 @@ class TranscriptionSubmodelGeneratorTestCase(unittest.TestCase):
         # check species types and species generated
         atp = model.species_types.get_one(id='atp')
         atp_cytosol = atp.species.get_one(compartment=cytosol)
-        self.assertEqual(atp_cytosol.concentration.units, 'M')
+        self.assertEqual(atp_cytosol.concentration.units, wc_lang.ConcentrationUnit.M)
 
         concs = []
         for species_type in model.species_types:
             if species_type.id.startswith('rna_'):
                 species = species_type.species.get_one(compartment=cytosol)
                 concs.append(species.concentration.value)
-                self.assertEqual(species.concentration.units, 'M')
+                self.assertEqual(species.concentration.units, wc_lang.ConcentrationUnit.M)
         numpy.testing.assert_almost_equal(numpy.mean(concs), 10. / scipy.constants.Avogadro / 1e-15, decimal=2)
 
         # check reactions generated
@@ -95,7 +95,7 @@ class TranscriptionSubmodelGeneratorTestCase(unittest.TestCase):
             self.assertEqual(rl.equation.expression, 'k_cat')
             self.assertEqual(rl.equation.modifiers, [])
             self.assertEqual(rl.equation.parameters, [])            
-            self.assertEqual(rl.k_m, None)
+            numpy.testing.assert_equal(rl.k_m, float('nan'))
 
         k_cats = [rxn.rate_laws[0].k_cat for rxn in submodel.reactions]
         numpy.testing.assert_almost_equal(numpy.mean(k_cats), 10. * numpy.log(2.) * (1. / 120.), decimal=2)

@@ -1,5 +1,6 @@
 cement
 configobj
+matplotlib
 numpy
 scipy
 setuptools
