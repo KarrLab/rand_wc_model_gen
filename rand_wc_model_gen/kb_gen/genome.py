@@ -23,6 +23,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
     def clean_and_validate_options(self):
         """ Apply default options and validate options """
 
+        #TODO: ASHWIN validate all new options
+
         options = self.options
 
         gen_len = int(options.get('gen_len', 300))  # for prokaryote (~924 bp)
@@ -44,17 +46,11 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         options['translation_table'] = translation_table
 
     def gen_components(self):
-        '''Construct knowledge base components'''
-
-        # get options
-        options = self.options
-        gen_len = options.get('gen_len')
-        inter_len = options.get('inter_len')
-        gen_num = options.get('gen_num')
-        translation_table = options.get('translation_table')
+        '''Construct knowledge base components'''   
+         
 
         # create codon list
-        # TODO enable use of translation table
+        # TODO BILAL enable use of translation table
         self.START_CODONS = ['ATG']  # start codon
         self.STOP_CODONS = ['TAG', 'TAA', 'TGA']  # stop codons
 
@@ -66,7 +62,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         # creates RNA and protein objects corresponding to the genes on chromosome
         self.gen_rnas_proteins(gen_num, self.indexList)
 
-    def gen_genome(self, gen_len, inter_len, gen_num):
+    def gen_genome(self):
         """ Creates 'synthetic' chromsome with randomized genes/intergenic regions
 
         Args:
@@ -78,6 +74,21 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         Returns:
             :obj:`list`: list of tuples of start and end positions of each gene on chromosome
         """
+
+         # get options
+        options = self.options
+        gen_len = options.get('gen_len')
+        gen_num = options.get('gen_num')
+        translation_table = options.get('translation_table')
+        mean_gc_frac = options.get('mean_gc_frac')
+        mean_coding_frac = options.get('mean_coding_frac')
+        num_chromosomes = options.get('num_chromosomes')
+
+
+
+        #TODO BILAL Incorporate other generation function and account start/stop
+
+        
         gene_dist = np.random.normal(gen_len, math.sqrt(gen_len), gen_num).tolist(
         )  # takes random samples out of Gaussian distribution with mean of average gene length
         gene_dist = [round(x) for x in gene_dist]
@@ -90,6 +101,18 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         arr = ['A', 'G', 'C', 'T']
         indexList = []
         index = 1
+
+        num_genes = self.rand(mean_num_genes / num_chromosomes)[0]
+        gene_lens = self.rand(mean_gene_len, count=num_genes)
+        intergene_lens = self.rand(mean_gene_len / mean_coding_frac * (1 - mean_coding_frac), count=num_genes)
+
+        seq_len = numpy.sum(gene_lens) + numpy.sum(intergene_lens)
+        seq = Seq.Seq(''.join(random.choice(('A', 'C', 'G', 'T'),
+                                            p=((1 - mean_gc_frac) / 2, mean_gc_frac / 2, mean_gc_frac / 2, (1 - mean_gc_frac) / 2),
+                                            size=(seq_len, ))),
+                      Alphabet.DNAAlphabet())
+
+
         for i in range(2 * gen_num):
             if i % 2 == 0:  # if i is even, region is a gene
                 gene = ''
@@ -132,6 +155,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             indexList (:obj: 'list'): list of tuples of start and end positions of each gene on chromosome
 
         """
+        #TODO ASHWIN work on TUs rather than genes
+                
 
         chromosome = self.knowledge_base.cell.species_types[0]
 

@@ -42,7 +42,7 @@ class ChromosomesGenesTusGenerator(wc_kb_gen.KbComponentGenerator):
         assert(mean_gc_frac >= 0 and mean_gc_frac <= 1)
         options['mean_gc_frac'] = mean_gc_frac
 
-        mean_num_genes = options.get('mean_num_genes', 2000)
+        mean_num_genes = options.get('mean_num_genes', 4400)
         assert(mean_num_genes >= 1)
         options['mean_num_genes'] = mean_num_genes
 
@@ -53,6 +53,10 @@ class ChromosomesGenesTusGenerator(wc_kb_gen.KbComponentGenerator):
         mean_coding_frac = options.get('mean_coding_frac', 0.88)  # DOI: 10.1007/s10142-015-0433-4
         assert(mean_coding_frac > 0 and mean_coding_frac < 1)
         options['mean_coding_frac'] = mean_coding_frac
+
+        translation_table = int(options.get('translation_table', 1))
+        assert(translation_table in range (1,32))
+        options['translation_table'] = translation_table
 
     def gen_components(self):
         """ Construct knowledge base components """
