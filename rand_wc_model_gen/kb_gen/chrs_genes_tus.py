@@ -120,3 +120,4 @@ class ChromosomesGenesTusGenerator(wc_kb_gen.KbComponentGenerator):
             :obj:`int` or :obj:`numpy.ndarray` of :obj:`int`: random normally distributed integer(s)
         """
         return numpy.int64(numpy.round(random.normal(mean, numpy.sqrt(mean), (count, ))))
+ 

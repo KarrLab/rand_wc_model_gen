@@ -84,9 +84,14 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         mean_coding_frac = options.get('mean_coding_frac')
         num_chromosomes = options.get('num_chromosomes')
 
+#TODO BILAL Incorporate other generation function and account start/stop
+
+        cell= self.knowledge_base.cell
+
+        for i_chr in range (num_chromosomes)
 
 
-        #TODO BILAL Incorporate other generation function and account start/stop
+
 
         
         gene_dist = np.random.normal(gen_len, math.sqrt(gen_len), gen_num).tolist(
@@ -101,7 +106,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         arr = ['A', 'G', 'C', 'T']
         indexList = []
         index = 1
-
+p
         num_genes = self.rand(mean_num_genes / num_chromosomes)[0]
         gene_lens = self.rand(mean_gene_len, count=num_genes)
         intergene_lens = self.rand(mean_gene_len / mean_coding_frac * (1 - mean_coding_frac), count=num_genes)
@@ -190,3 +195,17 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
             # adds ProteinSpeciesType object to kb.cell speciestypes list
             self.knowledge_base.cell.species_types.append(prot)
+
+    def rand(self, mean, count=1):
+        """ Generated 1 or more random normally distributed integer(s) with standard deviation equal
+        to the square root of the mean value.
+
+        Args:
+            mean (:obj:`float`): mean value
+            count (:obj:`int`): number of random numbers to generate
+
+        Returns:
+            :obj:`int` or :obj:`numpy.ndarray` of :obj:`int`: random normally distributed integer(s)
+        """
+        return numpy.int64(numpy.round(random.normal(mean, numpy.sqrt(mean), (count, ))))
+ 
