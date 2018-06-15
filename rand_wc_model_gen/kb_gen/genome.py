@@ -40,7 +40,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         options['gen_num'] = gen_num
 
         translation_table = int(options.get('translation_table', 1))
-        assert(translation_table > 0)
+        assert(translation_table in [1])
         options['translation_table'] = translation_table
 
     def gen_components(self):
@@ -58,20 +58,21 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         self.START_CODONS = ['ATG']  # start codon
         self.STOP_CODONS = ['TAG', 'TAA', 'TGA']  # stop codons
 
+        self.knowledge_base.translation_table = translation_table
+
         # indexList of start/end positions of each gene, creates 'synthetic' chromosome
         self.indexList = self.gen_genome(
-            gen_len, inter_len, gen_num, translation_table)
+            gen_len, inter_len, gen_num)
         # creates RNA and protein objects corresponding to the genes on chromosome
         self.gen_rnas_proteins(gen_num, self.indexList)
 
-    def gen_genome(self, gen_len, inter_len, gen_num, translation_table):
+    def gen_genome(self, gen_len, inter_len, gen_num):
         """ Creates 'synthetic' chromsome with randomized genes/intergenic regions
 
         Args:
             gen_len (:obj:`int`): average gene length
             inter_len (:obj:`int`): average intergenic region length
             gen_num (:obj:`int`): number of genes on chromosome
-            translation_table (:obj:`int`): translation table
 
 
         Returns:
@@ -118,10 +119,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         # associate the random chromosome sequence with the DnaSpeciesType object
         chromosome.seq = Seq(seq)
         # add chromosome to kb.cell speciestypes list
-        try:
-            self.knowledge_base.cell.species_types[0] = chromosome
-        except IndexError:
-            self.knowledge_base.cell.species_types.append(chromosome)
+
+        self.knowledge_base.cell.species_types.append(chromosome)
 
         return indexList
 
@@ -159,6 +158,9 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             # creates ProteinSpeciesType object for corresponding protein sequence
             prot = wc_kb.ProteinSpeciesType()
 
+            prot.cell = self.knowledge_base.cell
+            prot.cell.knowledge_base = self.knowledge_base
+            
             prot.gene = gene  # associates protein with GeneLocus object for corresponding gene
 
             # adds ProteinSpeciesType object to kb.cell speciestypes list
