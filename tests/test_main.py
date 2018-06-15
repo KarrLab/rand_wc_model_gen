@@ -117,7 +117,7 @@ class CliTestCase(unittest.TestCase):
 
         # simulate model
         for i_sim in range(3):            
-            with __main__.App(argv=['simulate', '--config-path', self.config_path, '--seed', i_sim]) as app:
+            with __main__.App(argv=['simulate', '--config-path', self.config_path, '--seed', str(i_sim)]) as app:
                 app.run()
             time.sleep(1.)  # todo: remove after results directory naming is fixed
 

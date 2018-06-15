@@ -89,13 +89,13 @@ class SimulateController(CementBaseController):
     @expose(hide=True)
     def default(self):
         args = self.app.pargs
-        config_path = args.config_path
+        config = rand_wc_model_gen.config.get_config(extra_path=args.config_path)['rand_wc_model_gen']
+
+        model = wc_lang.io.Reader().run(config['model']['path'])
+
         seed = args.seed
         if seed is None:
             seed = config['sim']['seed']
-
-        config = rand_wc_model_gen.config.get_config(extra_path=config_path)['rand_wc_model_gen']
-        model = wc_lang.io.Reader().run(config['model']['path'])
         simulation = wc_sim.multialgorithm.simulation.Simulation(model)
         num_events, sim_results_path = simulation.run(end_time=config['sim']['end_time'],
                                                       seed=seed,
