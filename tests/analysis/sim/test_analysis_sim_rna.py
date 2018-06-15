@@ -43,11 +43,9 @@ class RnaSimulationAnalysisTestCase(unittest.TestCase):
         # run simulations
         sim_results_path = os.path.join(self.temp_dir, 'sim_results')
         for i_sim in range(3):
-            # todo: use simulation configuration to seed simulation
-            rand.RandomStateManager.initialize(seed=i_sim)
-
             sim = wc_sim.multialgorithm.simulation.Simulation(model)
             sim.run(end_time=10.,
+                    seed=i_sim,
                     checkpoint_period=1.,
                     results_dir=sim_results_path)
             time.sleep(1.0)  # todo: remove after results directory naming is fixed

@@ -116,11 +116,8 @@ class CliTestCase(unittest.TestCase):
             app.run()
 
         # simulate model
-        for i_sim in range(3):
-            # todo: use simulation configuration to seed simulation
-            rand.RandomStateManager.initialize(seed=i_sim)
-
-            with __main__.App(argv=['simulate', '--config-path', self.config_path]) as app:
+        for i_sim in range(3):            
+            with __main__.App(argv=['simulate', '--config-path', self.config_path, '--seed', i_sim]) as app:
                 app.run()
             time.sleep(1.)  # todo: remove after results directory naming is fixed
 
