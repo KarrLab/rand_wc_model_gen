@@ -18,31 +18,69 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
     Creates synthetic chromosome with randomized genes/intergenic regions. Creates RNA and protein objects corresponding to the genes on this chromosome. Associates the chromosome, RNAs, proteins
     with a knowledge base object (and its Cell attribute)
 
+    Options:
+
+    * num_chromosomes (:obj:`int`): number of chromosomes
+    * mean_gc_frac (:obj:`float`): fraction of chromosomes which are G or C
+    * mean_num_genes (:obj:`float`): mean number of genes
+    * mean_gene_len (:obj:`float`): mean length of a gene
+    * mean_coding_frac (:obj:`float`): mean coding fraction of the genome
+    * translation_table (:obj: 'int'): The NCBI standard genetic code used
+
+
     """
 
     def clean_and_validate_options(self):
         """ Apply default options and validate options """
 
-        # TODO: ASHWIN validate all new options
+        # Default options are loosely  based on Escherichia coli K-12
+        # Nucleic Acids Research 41:D605-12 2013
 
         options = self.options
 
-        gen_len = int(options.get('gen_len', 300))  # for prokaryote (~924 bp)
-        assert(gen_len > 0)
-        options['gen_len'] = gen_len
+        num_chromosomes = options.get('num_chromosomes', 1)
+        assert(num_chromosomes >= 1 and int(
+            num_chromosomes) == num_chromosomes)
+        options['num_chromosomes'] = num_chromosomes
 
-        # for prokaryote (~100 bp)
-        inter_len = int(options.get('inter_len', 30))
-        assert(gen_len > 0)
-        options['inter_len'] = inter_len
+        chromosome_topology = options.get('chromosome_topology', 'circular')
+        assert(chromosome_topology in ['circular', 'linear'])
+        options['chromosome_topology'] = chromosome_topology
 
-        # for E. coli (~4400); number of genes varies widely among prokaryotes
-        gen_num = int(options.get('gen_num', 4400))
-        assert(gen_num > 0)
-        options['gen_num'] = gen_num
+        mean_gc_frac = options.get('mean_gc_frac', 0.58)
+        assert(mean_gc_frac >= 0 and mean_gc_frac <= 1)
+        options['mean_gc_frac'] = mean_gc_frac
+
+        mean_num_genes = options.get('mean_num_genes', 4500)
+        assert(mean_num_genes >= 1)
+        options['mean_num_genes'] = mean_num_genes
+
+        mean_num_ncRNA = options.get('mean_num_ncRNA', 65)
+        assert(mean_num_ncRNA >= 0)
+        options['mean_num_ncRNA'] = mean_num_ncRNA
+
+        mean_num_rRNA = options.get('mean_num_rRNA', 25)
+        assert(mean_num_rRNA >= 0)
+        options['mean_num_ncRNA'] = mean_num_rRNA
+
+        mean_num_tRNA = options.get('mean_num_tRNA', 90)
+        assert(mean_num_tRNA >= 0)
+        options['mean_num_tRNA'] = mean_num_tRNA
+
+        assert((mean_num_ncRNA + mean_num_rRNA + mean_num_tRNA) < mean_num_genes)
+
+        # DOI: 10.1093/molbev/msk019
+        mean_gene_len = options.get('mean_gene_len', 924)
+        assert(mean_gene_len >= 1)
+        options['mean_gene_len'] = mean_gene_len
+
+        # DOI: 10.1007/s10142-015-0433-4
+        mean_coding_frac = options.get('mean_coding_frac', 0.88)
+        assert(mean_coding_frac > 0 and mean_coding_frac < 1)
+        options['mean_coding_frac'] = mean_coding_frac
 
         translation_table = int(options.get('translation_table', 1))
-        assert(translation_table in [1])
+        assert(translation_table in range(1, 32))
         options['translation_table'] = translation_table
 
     def gen_components(self):
@@ -52,14 +90,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         # TODO BILAL enable use of translation table
         self.START_CODONS = ['ATG']  # start codon
         self.STOP_CODONS = ['TAG', 'TAA', 'TGA']  # stop codons
-
         self.knowledge_base.translation_table = translation_table
-
-        # indexList of start/end positions of each gene, creates 'synthetic' chromosome
-        self.indexList = self.gen_genome(
-            gen_len, inter_len, gen_num)
-        # creates RNA and protein objects corresponding to the genes on chromosome
-        self.gen_rnas_proteins(gen_num, self.indexList)
+        cell = self.knowledge_base.cell
 
     def gen_genome(self):
         """ Creates 'synthetic' chromsome with randomized genes/intergenic regions
@@ -85,8 +117,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
 # TODO BILAL Incorporate other generation function and account start/stop
 
-        cell = self.knowledge_base.cell
-
         for i_chr in range(num_chromosomes):
             num_genes = self.rand(gen_num / num_chromosomes)[0]
             gene_lens = self.rand(gen_num, count=num_genes)
@@ -111,6 +141,10 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             chr.circular = chromosome_topology == 'circular'
             chr.double_stranded = True
             chr.seq = seq
+
+            gene_starts = numpy.int64(numpy.cumsum(numpy.concatenate(([0], gene_lens[0:-1])) +
+                                                   numpy.concatenate((numpy.round(intergene_lens[0:1] / 2), intergene_lens[1:]))))
+
             self.knowledge_base.cell.species_types.append(chr)
 
     def gen_rnas_proteins(self, gen_num, indexList):
