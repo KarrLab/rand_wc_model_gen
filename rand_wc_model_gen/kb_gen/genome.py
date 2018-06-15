@@ -23,7 +23,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
     def clean_and_validate_options(self):
         """ Apply default options and validate options """
 
-        #TODO: ASHWIN validate all new options
+        # TODO: ASHWIN validate all new options
 
         options = self.options
 
@@ -46,8 +46,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         options['translation_table'] = translation_table
 
     def gen_components(self):
-        '''Construct knowledge base components'''   
-         
+        '''Construct knowledge base components'''
 
         # create codon list
         # TODO BILAL enable use of translation table
@@ -75,7 +74,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             :obj:`list`: list of tuples of start and end positions of each gene on chromosome
         """
 
-         # get options
+        # get options
         options = self.options
         gen_len = options.get('gen_len')
         gen_num = options.get('gen_num')
@@ -84,73 +83,35 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         mean_coding_frac = options.get('mean_coding_frac')
         num_chromosomes = options.get('num_chromosomes')
 
-#TODO BILAL Incorporate other generation function and account start/stop
+# TODO BILAL Incorporate other generation function and account start/stop
 
-        cell= self.knowledge_base.cell
+        cell = self.knowledge_base.cell
 
-        for i_chr in range (num_chromosomes)
+        for i_chr in range(num_chromosomes):
+            num_genes = self.rand(gen_num / num_chromosomes)[0]
+            gene_lens = self.rand(gen_num, count=num_genes)
+            intergene_lens = self.rand(
+                mean_gene_len / mean_coding_frac * (1 - mean_coding_frac), count=num_genes)
+            seq_len = numpy.sum(gene_lens) + numpy.sum(intergene_lens)
 
+            seq_str = ""
 
+            for i in range(0, len(seq), 3):
+                codon = self.STOP_CODONS[0]
+                while codon in self.STOP_CODONS or codon in self.START_CODONS:
+                    codon = random.choice(('A', 'C', 'G', 'T'),
+                                          p=((1 - mean_gc_frac) / 2, mean_gc_frac / 2, mean_gc_frac / 2,
+                                             (1 - mean_gc_frac) / 2), size=(3, ))
+                seq_str.append(codon)
+            seq = Seq.SEQ(seq_str, ALlphabet.DNAAlphabet)
 
-
-        
-        gene_dist = np.random.normal(gen_len, math.sqrt(gen_len), gen_num).tolist(
-        )  # takes random samples out of Gaussian distribution with mean of average gene length
-        gene_dist = [round(x) for x in gene_dist]
-        # takes random samples out of Gaussian distribution with mean of average intergenic length
-        inter_dist = np.random.normal(inter_len, math.sqrt(
-            inter_len), gen_num).tolist()
-        inter_dist = [round(x) for x in inter_dist]
-        chromosome = wc_kb.DnaSpeciesType()
-        seq = ''
-        arr = ['A', 'G', 'C', 'T']
-        indexList = []
-        index = 1
-p
-        num_genes = self.rand(mean_num_genes / num_chromosomes)[0]
-        gene_lens = self.rand(mean_gene_len, count=num_genes)
-        intergene_lens = self.rand(mean_gene_len / mean_coding_frac * (1 - mean_coding_frac), count=num_genes)
-
-        seq_len = numpy.sum(gene_lens) + numpy.sum(intergene_lens)
-        seq = Seq.Seq(''.join(random.choice(('A', 'C', 'G', 'T'),
-                                            p=((1 - mean_gc_frac) / 2, mean_gc_frac / 2, mean_gc_frac / 2, (1 - mean_gc_frac) / 2),
-                                            size=(seq_len, ))),
-                      Alphabet.DNAAlphabet())
-
-
-        for i in range(2 * gen_num):
-            if i % 2 == 0:  # if i is even, region is a gene
-                gene = ''
-                gen_length = gene_dist.pop()
-                indexList.append((index, index + (gen_length * 3) - 1))
-                gene += random.choice(self.START_CODONS)  # add start codon
-                for k in range(gen_length - 2):
-                    codon = self.STOP_CODONS[0]
-                    # to make sure random codon is not stop codon (premature termination)
-                    while codon in self.STOP_CODONS:
-                        # create random codon
-                        codon = random.choice(
-                            arr) + random.choice(arr) + random.choice(arr)
-                    gene += codon  # add randomly chosen codon
-                gene += random.choice(self.STOP_CODONS)  # add stop codon
-                index += gen_length * 3
-                seq += gene
-
-            else:  # if i is odd, region is intergenic
-                inter_length = inter_dist.pop()
-                index += inter_length * 3
-                for k in range(inter_length):
-                    # add randomly chosen base triple
-                    seq += random.choice(arr) + \
-                        random.choice(arr) + random.choice(arr)
-
-        # associate the random chromosome sequence with the DnaSpeciesType object
-        chromosome.seq = Seq(seq)
-        # add chromosome to kb.cell speciestypes list
-
-        self.knowledge_base.cell.species_types.append(chromosome)
-
-        return indexList
+            chr = cell.species_types.get_or_create(
+                id='chr_{}'.format(i_chr + 1), __type=wc_kb.DnaSpeciesType)
+            chr.name = 'Chromosome {}'.format(i_chr + 1)
+            chr.circular = chromosome_topology == 'circular'
+            chr.double_stranded = True
+            chr.seq = seq
+            self.knowledge_base.cell.species_types.append(chr)
 
     def gen_rnas_proteins(self, gen_num, indexList):
         """ Creates RNA and protein objects corresponding to genes on chromosome
@@ -160,8 +121,7 @@ p
             indexList (:obj: 'list'): list of tuples of start and end positions of each gene on chromosome
 
         """
-        #TODO ASHWIN work on TUs rather than genes 
-                
+        # TODO ASHWIN work on TUs rather than genes
 
         chromosome = self.knowledge_base.cell.species_types[0]
 
@@ -190,7 +150,7 @@ p
 
             prot.cell = self.knowledge_base.cell
             prot.cell.knowledge_base = self.knowledge_base
-            
+
             prot.gene = gene  # associates protein with GeneLocus object for corresponding gene
 
             # adds ProteinSpeciesType object to kb.cell speciestypes list
@@ -208,4 +168,3 @@ p
             :obj:`int` or :obj:`numpy.ndarray` of :obj:`int`: random normally distributed integer(s)
         """
         return numpy.int64(numpy.round(random.normal(mean, numpy.sqrt(mean), (count, ))))
- 
