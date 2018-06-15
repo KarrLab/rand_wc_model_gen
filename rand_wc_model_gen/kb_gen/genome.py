@@ -5,12 +5,13 @@
 :Copyright: 2018, Karr Lab
 :License: MIT
 """
+import math
+import numpy
 import wc_kb
 import wc_kb_gen
-import math
-import numpy as np
-import random
+from Bio import Alphabet
 from Bio.Seq import Seq
+from numpy import random
 
 
 class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
@@ -23,31 +24,33 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
     def clean_and_validate_options(self):
         """ Apply default options and validate options """
 
-        #TODO: ASHWIN validate all new options
+        # TODO: ASHWIN validate all new options
 
         options = self.options
 
-        gen_len = int(options.get('gen_len', 300))  # for prokaryote (~924 bp)
+        gen_len = options.get('gen_len', 300)  # for prokaryote (~924 bp)
         assert(gen_len > 0)
         options['gen_len'] = gen_len
 
         # for prokaryote (~100 bp)
-        inter_len = int(options.get('inter_len', 30))
+        inter_len = options.get('inter_len', 30)
         assert(gen_len > 0)
         options['inter_len'] = inter_len
 
         # for E. coli (~4400); number of genes varies widely among prokaryotes
-        gen_num = int(options.get('gen_num', 4400))
+        gen_num = options.get('gen_num', 4400)
         assert(gen_num > 0)
         options['gen_num'] = gen_num
 
-        translation_table = int(options.get('translation_table', 1))
+        translation_table = options.get('translation_table', 1)
         assert(translation_table in [1])
         options['translation_table'] = translation_table
 
     def gen_components(self):
-        '''Construct knowledge base components'''   
-         
+        '''Construct knowledge base components'''
+        options = self.options
+        gen_num = options.get('gen_num')
+        translation_table = options.get('translation_table')
 
         # create codon list
         # TODO BILAL enable use of translation table
@@ -57,43 +60,34 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         self.knowledge_base.translation_table = translation_table
 
         # indexList of start/end positions of each gene, creates 'synthetic' chromosome
-        self.indexList = self.gen_genome(
-            gen_len, inter_len, gen_num)
+        self.indexList = self.gen_genome()
         # creates RNA and protein objects corresponding to the genes on chromosome
         self.gen_rnas_proteins(gen_num, self.indexList)
 
     def gen_genome(self):
         """ Creates 'synthetic' chromsome with randomized genes/intergenic regions
 
-        Args:
-            gen_len (:obj:`int`): average gene length
-            inter_len (:obj:`int`): average intergenic region length
-            gen_num (:obj:`int`): number of genes on chromosome
-
-
         Returns:
             :obj:`list`: list of tuples of start and end positions of each gene on chromosome
         """
 
-         # get options
+        # get options
         options = self.options
         gen_len = options.get('gen_len')
+        inter_len = options.get('inter_len')
         gen_num = options.get('gen_num')
         translation_table = options.get('translation_table')
-        mean_gc_frac = options.get('mean_gc_frac')
-        mean_coding_frac = options.get('mean_coding_frac')
-        num_chromosomes = options.get('num_chromosomes')
+        mean_gc_frac = 0.5
+        mean_coding_frac = 0.88
+        num_chromosomes = 1
 
+        # TODO BILAL Incorporate other generation function and account start/stop
 
-
-        #TODO BILAL Incorporate other generation function and account start/stop
-
-        
-        gene_dist = np.random.normal(gen_len, math.sqrt(gen_len), gen_num).tolist(
+        gene_dist = random.normal(gen_len, math.sqrt(gen_len), gen_num).tolist(
         )  # takes random samples out of Gaussian distribution with mean of average gene length
         gene_dist = [round(x) for x in gene_dist]
         # takes random samples out of Gaussian distribution with mean of average intergenic length
-        inter_dist = np.random.normal(inter_len, math.sqrt(
+        inter_dist = random.normal(inter_len, math.sqrt(
             inter_len), gen_num).tolist()
         inter_dist = [round(x) for x in inter_dist]
         chromosome = wc_kb.DnaSpeciesType()
@@ -102,16 +96,15 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         indexList = []
         index = 1
 
-        num_genes = self.rand(mean_num_genes / num_chromosomes)[0]
-        gene_lens = self.rand(mean_gene_len, count=num_genes)
-        intergene_lens = self.rand(mean_gene_len / mean_coding_frac * (1 - mean_coding_frac), count=num_genes)
+        num_genes = self.rand(gen_num)[0]
+        gene_lens = self.rand(gen_len, count=num_genes)
+        intergene_lens = self.rand(gen_len / mean_coding_frac * (1 - mean_coding_frac), count=num_genes)
 
         seq_len = numpy.sum(gene_lens) + numpy.sum(intergene_lens)
-        seq = Seq.Seq(''.join(random.choice(('A', 'C', 'G', 'T'),
+        seq = Seq(''.join(random.choice(('A', 'C', 'G', 'T'),
                                             p=((1 - mean_gc_frac) / 2, mean_gc_frac / 2, mean_gc_frac / 2, (1 - mean_gc_frac) / 2),
                                             size=(seq_len, ))),
                       Alphabet.DNAAlphabet())
-
 
         for i in range(2 * gen_num):
             if i % 2 == 0:  # if i is even, region is a gene
@@ -140,7 +133,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         random.choice(arr) + random.choice(arr)
 
         # associate the random chromosome sequence with the DnaSpeciesType object
-        chromosome.seq = Seq(seq)
+        chromosome.seq = seq
         # add chromosome to kb.cell speciestypes list
 
         self.knowledge_base.cell.species_types.append(chromosome)
@@ -155,8 +148,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             indexList (:obj: 'list'): list of tuples of start and end positions of each gene on chromosome
 
         """
-        #TODO ASHWIN work on TUs rather than genes 
-                
+        # TODO ASHWIN work on TUs rather than genes
 
         chromosome = self.knowledge_base.cell.species_types[0]
 
@@ -185,8 +177,21 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
             prot.cell = self.knowledge_base.cell
             prot.cell.knowledge_base = self.knowledge_base
-            
+
             prot.gene = gene  # associates protein with GeneLocus object for corresponding gene
 
             # adds ProteinSpeciesType object to kb.cell speciestypes list
             self.knowledge_base.cell.species_types.append(prot)
+
+    def rand(self, mean, count=1):
+        """ Generated 1 or more random normally distributed integer(s) with standard deviation equal
+        to the square root of the mean value.
+
+        Args:
+            mean (:obj:`float`): mean value
+            count (:obj:`int`): number of random numbers to generate
+
+        Returns:
+            :obj:`int` or :obj:`numpy.ndarray` of :obj:`int`: random normally distributed integer(s)
+        """
+        return numpy.int64(numpy.round(random.normal(mean, numpy.sqrt(mean), (count, ))))
