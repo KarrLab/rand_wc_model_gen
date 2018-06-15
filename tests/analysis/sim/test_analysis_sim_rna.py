@@ -43,7 +43,12 @@ class RnaSimulationAnalysisTestCase(unittest.TestCase):
         # run simulations
         sim_results_path = os.path.join(self.temp_dir, 'sim_results')
         for i_sim in range(3):
-            # todo: seed simulation
+            # todo: use simulation configuration to seed simulation
+            with open('wc_utils.cfg', 'w') as file:
+                file.write('[wc_utils]\n')
+                file.write('    [[random]]\n')
+                file.write('        seed = {}\n'.format(i_sim))
+                
             sim = wc_sim.multialgorithm.simulation.Simulation(model)
             sim.run(end_time=10.,
                     checkpoint_period=1.,
