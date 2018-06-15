@@ -11,6 +11,7 @@ import math
 import numpy as np
 import random
 from Bio.Seq import Seq
+from Bio.Data import CodonTable
 
 
 class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
@@ -21,13 +22,14 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
     Options:
 
     * num_chromosomes (:obj:`int`): number of chromosomes
-    * mean_gc_frac (:obj:`float`): fraction of chromosomes which are G or C
+    * mean_gc_frac (:obj:`float`): fraction of nucleotides which are G or C
     * mean_num_genes (:obj:`float`): mean number of genes
     * mean_gene_len (:obj:`float`): mean length of a gene
     * mean_coding_frac (:obj:`float`): mean coding fraction of the genome
     * translation_table (:obj: 'int'): The NCBI standard genetic code used
-
-
+    * mean_num_ncRNA (:obj: 'int'): The number of non coding RNAs
+    * mean_num_rRNA  (:obj: 'int'): The number of ribosomal RNAs
+    * mean_num_tRNA (:obj: 'int'): The number of transfer RNAs
     """
 
     def clean_and_validate_options(self):
@@ -88,10 +90,12 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
         # create codon list
         # TODO BILAL enable use of translation table
-        self.START_CODONS = ['ATG']  # start codon
-        self.STOP_CODONS = ['TAG', 'TAA', 'TGA']  # stop codons
-        self.knowledge_base.translation_table = translation_table
+        codon_table = self.knowledge_base.translation_table = CodonTable.unambigious_dna_by_id[
+            translation_table]
+        self.START_CODONS = codon_table.start_codons  # start codons from NCBI list
+        self.STOP_CODONS = codon_table.stop_codons  # stop codons from NCBI list
         cell = self.knowledge_base.cell
+        gen_genome()
 
     def gen_genome(self):
         """ Creates 'synthetic' chromsome with randomized genes/intergenic regions
@@ -114,8 +118,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         mean_gc_frac = options.get('mean_gc_frac')
         mean_coding_frac = options.get('mean_coding_frac')
         num_chromosomes = options.get('num_chromosomes')
-
-# TODO BILAL Incorporate other generation function and account start/stop
 
         for i_chr in range(num_chromosomes):
             num_genes = self.rand(gen_num / num_chromosomes)[0]
@@ -145,6 +147,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             gene_starts = numpy.int64(numpy.cumsum(numpy.concatenate(([0], gene_lens[0:-1])) +
                                                    numpy.concatenate((numpy.round(intergene_lens[0:1] / 2), intergene_lens[1:]))))
 
+# TODO: BILAL label gene loci and create objects. Determine how to pass this information to TU generation method
             self.knowledge_base.cell.species_types.append(chr)
 
     def gen_rnas_proteins(self, gen_num, indexList):
