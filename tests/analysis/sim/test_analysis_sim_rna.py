@@ -6,10 +6,10 @@
 :License: MIT
 """
 
-from numpy import random
 from rand_wc_model_gen import analysis
 from rand_wc_model_gen import kb_gen
 from rand_wc_model_gen import model_gen
+from wc_utils.util import rand
 import os
 import shutil
 import tempfile
@@ -44,11 +44,8 @@ class RnaSimulationAnalysisTestCase(unittest.TestCase):
         sim_results_path = os.path.join(self.temp_dir, 'sim_results')
         for i_sim in range(3):
             # todo: use simulation configuration to seed simulation
-            with open('wc_utils.cfg', 'w') as file:
-                file.write('[wc_utils]\n')
-                file.write('    [[random]]\n')
-                file.write('        seed = {}\n'.format(i_sim))
-                
+            rand.RandomStateManager.initialize(seed=i_sim)
+
             sim = wc_sim.multialgorithm.simulation.Simulation(model)
             sim.run(end_time=10.,
                     checkpoint_period=1.,
