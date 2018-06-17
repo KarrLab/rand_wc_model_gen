@@ -7,11 +7,9 @@
 """
 import wc_kb
 import wc_kb_gen
-import math
-import numpy as np
-import random
-from Bio.Seq import Seq
-from Bio.Data import CodonTable
+import numpy
+from numpy import random
+from Bio.Seq import Seq, CodonTable, Alphabet
 
 
 class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
@@ -86,56 +84,46 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         options['translation_table'] = translation_table
 
     def gen_components(self):
-        '''Construct knowledge base components'''
-
-        # create codon list
-        # TODO BILAL enable use of translation table
-        codon_table = self.knowledge_base.translation_table = CodonTable.unambigious_dna_by_id[
-            translation_table]
-        self.START_CODONS = codon_table.start_codons  # start codons from NCBI list
-        self.STOP_CODONS = codon_table.stop_codons  # stop codons from NCBI list
-        cell = self.knowledge_base.cell
-        gen_genome()
-
-    def gen_genome(self):
-        """ Creates 'synthetic' chromsome with randomized genes/intergenic regions
-
-        Args:
-            gen_len (:obj:`int`): average gene length
-            inter_len (:obj:`int`): average intergenic region length
-            gen_num (:obj:`int`): number of genes on chromosome
-
-
-        Returns:
-            :obj:`list`: list of tuples of start and end positions of each gene on chromosome
-        """
+        '''Construct knowledge base components and generate the DNA sequence'''
 
         # get options
         options = self.options
-        gen_len = options.get('gen_len')
-        gen_num = options.get('gen_num')
-        translation_table = options.get('translation_table')
-        mean_gc_frac = options.get('mean_gc_frac')
-        mean_coding_frac = options.get('mean_coding_frac')
         num_chromosomes = options.get('num_chromosomes')
+        mean_gene_len = options.get('mean_gene_len')
+        translation_table = options.get('translation_table')
+        mean_num_genes = options.get('mean_num_genes')
+        mean_coding_frac = options.get('mean_coding_frac')
+        mean_gc_frac = options.get('mean_gc_frac')
+        chromosome_topology = options.get('chromosome_topology')
+
+        cell = self.knowledge_base.cell
+
+        codon_table = self.knowledge_base.translation_table = CodonTable.unambigious_dna_by_id[
+            translation_table]
+
+        # start codons from NCBI list
+        self.START_CODONS = codon_table.start_codons
+
+        # stop codons from NCBI list
+        self.STOP_CODONS = codon_table.stop_codons
 
         for i_chr in range(num_chromosomes):
-            num_genes = self.rand(gen_num / num_chromosomes)[0]
-            gene_lens = self.rand(gen_num, count=num_genes)
+            num_genes = self.rand(mean_num_genes / num_chromosomes)[0]
+            gene_lens = self.rand(mean_num_genes, count=num_genes)
             intergene_lens = self.rand(
                 mean_gene_len / mean_coding_frac * (1 - mean_coding_frac), count=num_genes)
             seq_len = numpy.sum(gene_lens) + numpy.sum(intergene_lens)
 
             seq_str = ""
 
-            for i in range(0, len(seq), 3):
+            for i in range(0, seq_len, 3):
                 codon = self.STOP_CODONS[0]
                 while codon in self.STOP_CODONS or codon in self.START_CODONS:
                     codon = random.choice(('A', 'C', 'G', 'T'),
                                           p=((1 - mean_gc_frac) / 2, mean_gc_frac / 2, mean_gc_frac / 2,
-                                             (1 - mean_gc_frac) / 2), size=(3, ))
+                                             (1 - mean_gc_frac) / 2), size=(3,))
                 seq_str.append(codon)
-            seq = Seq.SEQ(seq_str, ALlphabet.DNAAlphabet)
+            seq = Seq.Seq(seq_str, Alphabet.DNAAlphabet)
 
             chr = cell.species_types.get_or_create(
                 id='chr_{}'.format(i_chr + 1), __type=wc_kb.DnaSpeciesType)
@@ -147,7 +135,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             gene_starts = numpy.int64(numpy.cumsum(numpy.concatenate(([0], gene_lens[0:-1])) +
                                                    numpy.concatenate((numpy.round(intergene_lens[0:1] / 2), intergene_lens[1:]))))
 
-# TODO: BILAL label gene loci and create objects. Determine how to pass this information to TU generation method
+            # TODO: BILAL label gene loci and create objects. Determine how to pass this information to TU generation method
             self.knowledge_base.cell.species_types.append(chr)
 
     def gen_rnas_proteins(self, gen_num, indexList):
