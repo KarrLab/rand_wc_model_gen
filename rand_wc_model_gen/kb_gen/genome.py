@@ -9,7 +9,8 @@ import wc_kb
 import wc_kb_gen
 import numpy
 from numpy import random
-from Bio.Seq import Seq, CodonTable, Alphabet
+from Bio.Seq import Seq, Alphabet
+from Bio.Data import CodonTable
 
 
 class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
@@ -98,32 +99,44 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
         cell = self.knowledge_base.cell
 
-        codon_table = self.knowledge_base.translation_table = CodonTable.unambigious_dna_by_id[
+        codon_table = self.knowledge_base.translation_table = CodonTable.unambiguous_dna_by_id[
             translation_table]
 
         # start codons from NCBI list
-        self.START_CODONS = codon_table.start_codons
+        START_CODONS = codon_table.start_codons
 
         # stop codons from NCBI list
-        self.STOP_CODONS = codon_table.stop_codons
+        STOP_CODONS = codon_table.stop_codons
 
+        BASES = ['A', 'C', 'G', 'T']  # The DNA Bases
+
+        # The probability of each base being selected randomly
+        PROB_BASES = [(1 - mean_gc_frac) / 2, mean_gc_frac /
+                      2, mean_gc_frac/2, (1-mean_gc_frac)/2]
+
+        # Create a chromosome n times
         for i_chr in range(num_chromosomes):
             num_genes = self.rand(mean_num_genes / num_chromosomes)[0]
             gene_lens = self.rand(mean_num_genes, count=num_genes)
+
             intergene_lens = self.rand(
                 mean_gene_len / mean_coding_frac * (1 - mean_coding_frac), count=num_genes)
+
             seq_len = numpy.sum(gene_lens) + numpy.sum(intergene_lens)
 
-            seq_str = ""
+            seq_str = []
 
             for i in range(0, seq_len, 3):
-                codon = self.STOP_CODONS[0]
-                while codon in self.STOP_CODONS or codon in self.START_CODONS:
-                    codon = random.choice(('A', 'C', 'G', 'T'),
-                                          p=((1 - mean_gc_frac) / 2, mean_gc_frac / 2, mean_gc_frac / 2,
-                                             (1 - mean_gc_frac) / 2), size=(3,))
-                seq_str.append(codon)
-            seq = Seq.Seq(seq_str, Alphabet.DNAAlphabet)
+                codon_i = STOP_CODONS[0]
+
+                while(codon_i in STOP_CODONS):
+                    codon_i = "".join(random.choice(
+                        BASES, p=PROB_BASES, size=(3,)))
+
+                seq_str.append(codon_i)
+
+            seq_str = "".join(seq_str)
+            seq = Seq(seq_str, Alphabet.DNAAlphabet)
 
             chr = cell.species_types.get_or_create(
                 id='chr_{}'.format(i_chr + 1), __type=wc_kb.DnaSpeciesType)
