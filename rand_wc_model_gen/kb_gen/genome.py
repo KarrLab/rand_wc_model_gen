@@ -147,7 +147,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
         return indexList
 
-    def gen_rnas_proteins(self, gen_num, indexList):
+    def gen_rnas_proteins(self, chromosomes):
         """ Creates RNA and protein objects corresponding to genes on chromosome
 
         Args:
@@ -155,38 +155,112 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             indexList (:obj: 'list'): list of tuples of start and end positions of each gene on chromosome
 
         """
-        #TODO ASHWIN work on TUs rather than genes 
-                
+        for chromosome in chromosomes:
+            for locus in chromosome.loci:
+                if type(locus) == wc_kb.TranscriptionUnitLocus():
+                    # creates RnaSpeciesType for RNA sequence corresponding to gene
+                    rna = wc_kb.RnaSpeciesType()
+                    # GeneLocus object for gene sequence, attribute of ProteinSpeciesType object
+                    tu = locus
+                    
+                    rna.type = tu.genes[0].type
 
-        chromosome = self.knowledge_base.cell.species_types[0]
+                    rna.transcription_units.append(tu)
 
-        for i in range(gen_num):
-            # creates RnaSpeciesType for RNA sequence corresponding to gene
-            rna = wc_kb.RnaSpeciesType()
-            # GeneLocus object for gene sequence, attribute of ProteinSpeciesType object
-            gene = wc_kb.GeneLocus()
-            gene.start = indexList[i][0]
-            gene.end = indexList[i][1]
-            gene.polymer = chromosome
-            gene.cell = self.knowledge_base.cell
-            # TranscriptionUnitLocus object - attribute of RnaSpeciesType object, associated with gene sequence
-            transcription_locus = wc_kb.TranscriptionUnitLocus()
-            transcription_locus.polymer = chromosome
-            transcription_locus.start = gene.start
-            transcription_locus.end = gene.end
+                    # adds corresponding mRNA sequence to speciestypes list of kb.cell
+                    self.knowledge_base.cell.species_types.append(rna)
+                    if rna.type == wc_kb.RnaType.mRna:
+                        for gene in tu.genes:
+                            # creates ProteinSpeciesType object for corresponding protein sequence(s)
+                            prot = wc_kb.ProteinSpeciesType()
 
-            rna.transcription_units.append(transcription_locus)
+                            prot.cell = self.knowledge_base.cell
+                            prot.cell.knowledge_base = self.knowledge_base
+                            
+                            prot.gene = gene  # associates protein with GeneLocus object for corresponding gene
+                            prot.rna = rna
 
-            # adds corresponding mRNA sequence to speciestypes list of kb.cell
-            self.knowledge_base.cell.species_types.append(rna)
+                            # adds ProteinSpeciesType object to kb.cell speciestypes list
+                            self.knowledge_base.cell.species_types.append(prot)
 
-            # creates ProteinSpeciesType object for corresponding protein sequence
-            prot = wc_kb.ProteinSpeciesType()
 
-            prot.cell = self.knowledge_base.cell
-            prot.cell.knowledge_base = self.knowledge_base
-            
-            prot.gene = gene  # associates protein with GeneLocus object for corresponding gene
 
-            # adds ProteinSpeciesType object to kb.cell speciestypes list
-            self.knowledge_base.cell.species_types.append(prot)
+    def make_tus(self, chromosomes):
+
+        #TranscriptionUnitLocus: entire transcription unit
+        #GeneLocus: part of transcription unit that is translated in the end
+
+        #validate these options in the options method
+        options = self.options
+        five_prime_len = options.get('five_prime_len') #7 bp default (E. coli, wikipedia)
+        three_prime_len = options.get('three_prime_len') #5 bp default guess
+        operon_prop = options.get('operon_prop') #0.2 default guess 
+        operon_gen_num = options.get('operon_gen_num') #3 genes default (https://academic.oup.com/gbe/article/5/11/2242/653613)
+        
+        for chromosome in chromosomes:
+            seq = chromosome.seq
+            i = 0
+            while i < len(chromosome.loci): #PolymerSpeciesType also has loci list
+                gene = chromosome.loci[i]
+                if gene.type == wc_kb.GeneType.mRna:
+                    #polycistronic mRNA (multiple GeneLocus objects per TranscriptionUnitLocus)
+
+                    five_prime = round(np.random.normal(five_prime_len, math.sqrt(five_prime_len), 1).tolist()[0])
+                    three_prime = round(np.random.normal(three_prime_len, math.sqrt(three_prime_len), 1).tolist()[0])
+
+                    operon_prob = random.random()
+
+                    if operon_prob <= operon_prop: #make an operon (polycistronic mRNA, put multiple genes in one TransUnitLocus)
+                        operon_genes = round(np.random.normal(operon_gen_num, math.sqrt(operon_gen_num), 1).tolist()[0])
+                        #add 3', 5' UTRs to the ends of the transcription unit (upstream of first gene, downstream of last gene)
+                        tu = wc_kb.TranscriptionUnitLocus()
+                        five_prime_start = gene.start - five_prime
+                        if five_prime_start < 0:
+                            five_prime_start = 0
+                        tu.genes.append(gene)
+                        tu.start = five_prime_start
+                        tu.polymer = gene.polymer
+                        for k in range(operon_genes-1):
+                            i += 1
+                            if i < len(chromosome.loci):
+                                if (chromosome.loci[i]).type == wc_kb.GeneType.mRna:
+                                    gene = chromosome.loci[i]
+                                    tu.genes.append(gene)
+
+                                else:
+                                    break
+                                
+                            else:
+                                break
+
+                        three_prime_end = gene.end + three_prime
+                        if three_prime_end >= len(seq):
+                            three_prime_end = len(seq) - 1
+                        tu.end = three_prime_end
+                            
+
+                    else: #make an individual transcription unit for the gene
+                        five_prime_start = gene.start - five_prime
+                        three_prime_end = gene.end + three_prime
+                        if five_prime_start < 0:
+                            five_prime_start = 0
+                        if three_prime_end >= len(seq):
+                            three_prime_end = len(seq) - 1
+                        tu = wc_kb.TranscriptionUnitLocus()
+                        tu.start = five_prime_start
+                        tu.end = three_prime_end
+                        tu.polymer = gene.polymer
+                        tu.genes.append(gene)
+                        chromosome.loci.append(tu)
+                    
+                else:
+                    tu = wc_kb.TranscriptionUnitLocus()
+                    tu.start = gene.start
+                    tu.end = gene.end
+                    tu.polymer = gene.polymer
+                    tu.genes.append(gene)
+                    chromosome.loci.append(tu)
+
+                i += 1
+
+        
