@@ -8,7 +8,6 @@
 import wc_kb
 import wc_kb_gen
 import numpy
-import random
 import math
 from numpy import random
 from Bio.Seq import Seq, Alphabet
@@ -28,9 +27,9 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
     * mean_gene_len (:obj:`float`): mean length of a gene
     * mean_coding_frac (:obj:`float`): mean coding fraction of the genome
     * translation_table (:obj: 'int'): The NCBI standard genetic code used
-    * mean_num_ncRNA (:obj: 'int'): The number of non coding RNAs
-    * mean_num_rRNA  (:obj: 'int'): The number of ribosomal RNAs
-    * mean_num_tRNA (:obj: 'int'): The number of transfer RNAs
+    * ncRNA_prop (:obj: 'float'): The proportion of non coding RNAs
+    * rRNA_prop  (:obj: 'float'): The proportion of ribosomal RNAs
+    * tRNA_prop (:obj: 'float'): The proportion of transfer RNAs
     * five_prime_len (:obj: 'int'): Average 5' UTR length for transcription units
     * three_prime_len (:obj: 'int'): Average 3' UTR length for transcription units
     * operon_prop (:obj: 'float'): Proportion of genes that should be in an operon (polycistronic mRNA)
@@ -59,23 +58,23 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(mean_gc_frac >= 0 and mean_gc_frac <= 1)
         options['mean_gc_frac'] = mean_gc_frac
 
-        mean_num_genes = options.get('mean_num_genes', 4500)
+        mean_num_genes = options.get('mean_num_genes', 1000)
         assert(mean_num_genes >= 1)
         options['mean_num_genes'] = mean_num_genes
 
-        mean_num_ncRNA = options.get('mean_num_ncRNA', 65)
-        assert(mean_num_ncRNA >= 0)
-        options['mean_num_ncRNA'] = mean_num_ncRNA
+        ncRNA_prop = options.get('ncRNA_prop', 0.014)
+        assert(ncRNA_prop >= 0 and ncRNA_prop <= 1)
+        options['ncRNA_prop'] = ncRNA_prop
 
-        mean_num_rRNA = options.get('mean_num_rRNA', 25)
-        assert(mean_num_rRNA >= 0)
-        options['mean_num_ncRNA'] = mean_num_rRNA
+        rRNA_prop = options.get('rRNA_prop', 0.0056)
+        assert(rRNA_prop >= and rRNA_prop <= 1)
+        options['rRNA_prop'] = rRNA_prop
 
-        mean_num_tRNA = options.get('mean_num_tRNA', 90)
-        assert(mean_num_tRNA >= 0)
-        options['mean_num_tRNA'] = mean_num_tRNA
+        tRNA_prop = options.get('tRNA_prop', 0.02)
+        assert(tRNA_prop >= 0 and tRNA_prop <= 1)
+        options['tRNA_prop'] = tRNA_prop
 
-        assert((mean_num_ncRNA + mean_num_rRNA + mean_num_tRNA) < mean_num_genes)
+        assert((ncRNA_prop + rRNA_prop + tRNA_prop) < 1)
 
         # DOI: 10.1093/molbev/msk019
         mean_gene_len = options.get('mean_gene_len', 924)
@@ -95,11 +94,11 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(five_prime_len >= 0)
         options['five_prime_len'] = five_prime_len
 
-        three_prime_len = int(options.get('three_prime_len', 5))
+        three_prime_len = int(options.get('three_prime_len', 5)) #guess
         assert(three_prime_len >= 0)
         options['three_prime_len'] = three_prime_len
 
-        operon_prop = int(options.get('operon_prop', 0.2))
+        operon_prop = int(options.get('operon_prop', 0.2)) #guess
         assert(operon_prop >= 0 and operon_prop <= 1)
         options['operon_prop'] = operon_prop
 
@@ -121,7 +120,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         mean_gc_frac = options.get('mean_gc_frac')
         chromosome_topology = options.get('chromosome_topology')
 
-        cell = self.knowledge_base.cell
+        cell = wc_kb.Cell()
+        self.knowledge_base.cell = cell
 
         codon_table = self.knowledge_base.translation_table = CodonTable.unambiguous_dna_by_id[
             translation_table]
@@ -172,7 +172,19 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             gene_starts = numpy.int64(numpy.cumsum(numpy.concatenate(([0], gene_lens[0:-1])) +
                                                    numpy.concatenate((numpy.round(intergene_lens[0:1] / 2), intergene_lens[1:]))))
 
-            # TODO: BILAL label gene loci and create objects. Determine how to pass this information to TU generation method
+            for i in range(len(gene_starts)):
+                gene = wc_kb.GeneLocus()
+                start = gene_starts[i]
+                gene.start = start
+                gene.polymer = chro
+                gene.end = start + gene_lens[i]
+                rna_prob = random.random()
+                typeList = [wc_kb.GeneType.mRna, wc_kb.GeneType.rRna, wc_kb.GeneType.sRna, wc_kb.GeneType.tRna]
+                prob_rna = [1 - ncRNA_prop - tRNA_prop - rRNA_prop, rRNA_prop, ncRNA_prop, tRNA_prop]
+                gene.type = random.choice(typeList, p=prob_rna)
+                chro.loci.append(gene)
+
+                
             self.knowledge_base.cell.species_types.append(chro)
 
     def gen_rnas_proteins(self):
@@ -209,7 +221,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
 
 
-    def make_tus(self, chromosomes):
+    def make_tus(self):
 
         """ Creates transcription units with 5'/3' UTRs, polycistronic mRNAs, and other types of RNA (tRNA, rRNA, sRNA)
 
