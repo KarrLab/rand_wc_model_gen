@@ -58,7 +58,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(mean_gc_frac >= 0 and mean_gc_frac <= 1)
         options['mean_gc_frac'] = mean_gc_frac
 
-        mean_num_genes = options.get('mean_num_genes', 4500)
+        mean_num_genes = options.get('mean_num_genes', 50)
         assert(mean_num_genes >= 1)
         options['mean_num_genes'] = mean_num_genes
 
@@ -67,7 +67,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         options['ncRNA_prop'] = ncRNA_prop
 
         rRNA_prop = options.get('rRNA_prop', 0.0056)
-        assert(rRNA_prop >= and rRNA_prop <= 1)
+        assert(rRNA_prop >= 0 and rRNA_prop <= 1)
         options['rRNA_prop'] = rRNA_prop
 
         tRNA_prop = options.get('tRNA_prop', 0.02)
@@ -119,6 +119,10 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         mean_coding_frac = options.get('mean_coding_frac')
         mean_gc_frac = options.get('mean_gc_frac')
         chromosome_topology = options.get('chromosome_topology')
+        ncRNA_prop = options.get('ncRNA_prop')
+        rRNA_prop = options.get('rRNA_prop')
+        tRNA_prop = options.get('tRNA_prop')
+        
 
         cell = wc_kb.Cell()
         self.knowledge_base.cell = cell
@@ -184,6 +188,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                 prob_rna = [1 - ncRNA_prop - tRNA_prop - rRNA_prop, rRNA_prop, ncRNA_prop, tRNA_prop]
                 gene.type = random.choice(typeList, p=prob_rna)
                 chro.loci.append(gene)
+                cell.loci.append(gene)
 
                 
             self.knowledge_base.cell.species_types.append(chro)
@@ -275,7 +280,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         if three_prime_end >= len(seq):
                             three_prime_end = len(seq) - 1
                         tu.end = three_prime_end
-                            
+                        chromosome.loci.append(tu)
+                        cell.loci.append(tu)
 
                     else: #make an individual transcription unit for the gene
                         five_prime_start = gene.start - five_prime
@@ -290,6 +296,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         tu.polymer = gene.polymer
                         tu.genes.append(gene)
                         chromosome.loci.append(tu)
+                        cell.loci.append(tu)
                     
                 else: #make a transcription unit that transcribes other types of RNA (tRNA, rRNA, sRNA)
                     tu = wc_kb.TranscriptionUnitLocus()
@@ -298,6 +305,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                     tu.polymer = gene.polymer
                     tu.genes.append(gene)
                     chromosome.loci.append(tu)
+                    cell.loci.append(tu)
 
                 i += 1
 
