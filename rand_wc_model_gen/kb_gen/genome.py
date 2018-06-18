@@ -8,6 +8,8 @@
 import wc_kb
 import wc_kb_gen
 import numpy
+import random
+import math
 from numpy import random
 from Bio.Seq import Seq, Alphabet
 from Bio.Data import CodonTable
@@ -29,6 +31,11 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
     * mean_num_ncRNA (:obj: 'int'): The number of non coding RNAs
     * mean_num_rRNA  (:obj: 'int'): The number of ribosomal RNAs
     * mean_num_tRNA (:obj: 'int'): The number of transfer RNAs
+    * five_prime_len (:obj: 'int'): Average 5' UTR length for transcription units
+    * three_prime_len (:obj: 'int'): Average 3' UTR length for transcription units
+    * operon_prop (:obj: 'float'): Proportion of genes that should be in an operon (polycistronic mRNA)
+    * operon_gen_num (:obj: 'int'): Average number of genes in an operon
+    
     """
 
     def clean_and_validate_options(self):
@@ -84,6 +91,23 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(translation_table in range(1, 32))
         options['translation_table'] = translation_table
 
+        five_prime_len = int(options.get('five_prime_len', 7))
+        assert(five_prime_len >= 0)
+        options['five_prime_len'] = five_prime_len
+
+        three_prime_len = int(options.get('three_prime_len', 5))
+        assert(three_prime_len >= 0)
+        options['three_prime_len'] = three_prime_len
+
+        operon_prop = int(options.get('operon_prop', 0.2))
+        assert(operon_prop >= 0 and operon_prop <= 1)
+        options['operon_prop'] = operon_prop
+
+        operon_gen_num = int(options.get('operon_gen_num', 3))
+        assert(operon_gen_num >= 2)
+        options['operon_gen_num'] = operon_gen_num
+
+
     def gen_components(self):
         '''Construct knowledge base components and generate the DNA sequence'''
 
@@ -138,29 +162,24 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             seq_str = "".join(seq_str)
             seq = Seq(seq_str, Alphabet.DNAAlphabet)
 
-            chr = cell.species_types.get_or_create(
+            chro = cell.species_types.get_or_create(
                 id='chr_{}'.format(i_chr + 1), __type=wc_kb.DnaSpeciesType)
-            chr.name = 'Chromosome {}'.format(i_chr + 1)
-            chr.circular = chromosome_topology == 'circular'
-            chr.double_stranded = True
-            chr.seq = seq
+            chro.name = 'Chromosome {}'.format(i_chr + 1)
+            chro.circular = chromosome_topology == 'circular'
+            chro.double_stranded = True
+            chro.seq = seq
 
             gene_starts = numpy.int64(numpy.cumsum(numpy.concatenate(([0], gene_lens[0:-1])) +
                                                    numpy.concatenate((numpy.round(intergene_lens[0:1] / 2), intergene_lens[1:]))))
 
             # TODO: BILAL label gene loci and create objects. Determine how to pass this information to TU generation method
-            self.knowledge_base.cell.species_types.append(chr)
+            self.knowledge_base.cell.species_types.append(chro)
 
-    def gen_rnas_proteins(self, chromosomes):
+    def gen_rnas_proteins(self):
         """ Creates RNA and protein objects corresponding to genes on chromosome
 
-        Args:
-            gen_num (:obj:`int`): number of genes on chromosome
-            indexList (:obj: 'list'): list of tuples of start and end positions of each gene on chromosome
-
         """
-<<<<<<< HEAD
-        for chromosome in chromosomes:
+        for chromosome in self.knowledge_base.cell.species_types.get(__type=wc_kb.core.DnaSpeciesType):
             for locus in chromosome.loci:
                 if type(locus) == wc_kb.TranscriptionUnitLocus():
                     # creates RnaSpeciesType for RNA sequence corresponding to gene
@@ -192,8 +211,9 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
     def make_tus(self, chromosomes):
 
-        #TranscriptionUnitLocus: entire transcription unit
-        #GeneLocus: part of transcription unit that is translated in the end
+        """ Creates transcription units with 5'/3' UTRs, polycistronic mRNAs, and other types of RNA (tRNA, rRNA, sRNA)
+
+        """
 
         #validate these options in the options method
         options = self.options
@@ -202,10 +222,10 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         operon_prop = options.get('operon_prop') #0.2 default guess 
         operon_gen_num = options.get('operon_gen_num') #3 genes default (https://academic.oup.com/gbe/article/5/11/2242/653613)
         
-        for chromosome in chromosomes:
+        for chromosome in self.knowledge_base.cell.species_types.get(__type=wc_kb.core.DnaSpeciesType):
             seq = chromosome.seq
             i = 0
-            while i < len(chromosome.loci): #PolymerSpeciesType also has loci list
+            while i < len(chromosome.loci): 
                 gene = chromosome.loci[i]
                 if gene.type == wc_kb.GeneType.mRna:
                     #polycistronic mRNA (multiple GeneLocus objects per TranscriptionUnitLocus)
@@ -258,7 +278,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         tu.genes.append(gene)
                         chromosome.loci.append(tu)
                     
-                else:
+                else: #make a transcription unit that transcribes other types of RNA (tRNA, rRNA, sRNA)
                     tu = wc_kb.TranscriptionUnitLocus()
                     tu.start = gene.start
                     tu.end = gene.end
@@ -268,42 +288,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
                 i += 1
 
-        
-=======
-        # TODO ASHWIN work on TUs rather than genes
-
-        chromosome = self.knowledge_base.cell.species_types[0]
-
-        for i in range(gen_num):
-            # creates RnaSpeciesType for RNA sequence corresponding to gene
-            rna = wc_kb.RnaSpeciesType()
-            # GeneLocus object for gene sequence, attribute of ProteinSpeciesType object
-            gene = wc_kb.GeneLocus()
-            gene.start = indexList[i][0]
-            gene.end = indexList[i][1]
-            gene.polymer = chromosome
-            gene.cell = self.knowledge_base.cell
-            # TranscriptionUnitLocus object - attribute of RnaSpeciesType object, associated with gene sequence
-            transcription_locus = wc_kb.TranscriptionUnitLocus()
-            transcription_locus.polymer = chromosome
-            transcription_locus.start = gene.start
-            transcription_locus.end = gene.end
-
-            rna.transcription_units.append(transcription_locus)
-
-            # adds corresponding mRNA sequence to speciestypes list of kb.cell
-            self.knowledge_base.cell.species_types.append(rna)
-
-            # creates ProteinSpeciesType object for corresponding protein sequence
-            prot = wc_kb.ProteinSpeciesType()
-
-            prot.cell = self.knowledge_base.cell
-            prot.cell.knowledge_base = self.knowledge_base
-
-            prot.gene = gene  # associates protein with GeneLocus object for corresponding gene
-
-            # adds ProteinSpeciesType object to kb.cell speciestypes list
-            self.knowledge_base.cell.species_types.append(prot)
 
     def rand(self, mean, count=1):
         """ Generated 1 or more random normally distributed integer(s) with standard deviation equal
@@ -317,4 +301,3 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             :obj:`int` or :obj:`numpy.ndarray` of :obj:`int`: random normally distributed integer(s)
         """
         return numpy.int64(numpy.round(random.normal(mean, numpy.sqrt(mean), (count, ))))
->>>>>>> 7bd9bd54edc9f6331818f2e2d44906abb16ab193
