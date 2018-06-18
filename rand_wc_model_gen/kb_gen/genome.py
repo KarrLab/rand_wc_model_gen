@@ -58,7 +58,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(mean_gc_frac >= 0 and mean_gc_frac <= 1)
         options['mean_gc_frac'] = mean_gc_frac
 
-        mean_num_genes = options.get('mean_num_genes', 1000)
+        mean_num_genes = options.get('mean_num_genes', 4500)
         assert(mean_num_genes >= 1)
         options['mean_num_genes'] = mean_num_genes
 
