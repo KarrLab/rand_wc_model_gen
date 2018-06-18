@@ -149,7 +149,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             seq_len = numpy.sum(gene_lens) + numpy.sum(intergene_lens)
 
             seq_str = []
-
+            #generates seq based on random codons
             for i in range(0, seq_len, 3):
                 codon_i = STOP_CODONS[0]
 
@@ -172,6 +172,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             gene_starts = numpy.int64(numpy.cumsum(numpy.concatenate(([0], gene_lens[0:-1])) +
                                                    numpy.concatenate((numpy.round(intergene_lens[0:1] / 2), intergene_lens[1:]))))
 
+            #creates GeneLocus objects for the genes and labels their GeneType (which type of RNA they transcribe)
             for i in range(len(gene_starts)):
                 gene = wc_kb.GeneLocus()
                 start = gene_starts[i]
