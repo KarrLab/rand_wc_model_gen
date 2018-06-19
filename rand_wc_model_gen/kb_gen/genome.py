@@ -24,7 +24,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
     * num_chromosomes (:obj:`int`): number of chromosomes
     * mean_gc_frac (:obj:`float`): fraction of nucleotides which are G or C
     * mean_num_genes (:obj:`float`): mean number of genes
-    * mean_gene_len (:obj:`float`): mean length of a gene
+    * mean_gene_len (:obj:`float`): mean codon length of a gene
     * mean_coding_frac (:obj:`float`): mean coding fraction of the genome
     * translation_table (:obj: 'int'): The NCBI standard genetic code used
     * ncRNA_prop (:obj: 'float'): The proportion of non coding RNAs
@@ -58,7 +58,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(mean_gc_frac >= 0 and mean_gc_frac <= 1)
         options['mean_gc_frac'] = mean_gc_frac
 
-        mean_num_genes = options.get('mean_num_genes', 50)
+        mean_num_genes = options.get('mean_num_genes', 50) #for convenience sake (default should be 4500)
         assert(mean_num_genes >= 1)
         options['mean_num_genes'] = mean_num_genes
 
@@ -77,7 +77,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert((ncRNA_prop + rRNA_prop + tRNA_prop) < 1)
 
         # DOI: 10.1093/molbev/msk019
-        mean_gene_len = options.get('mean_gene_len', 924)
+        mean_gene_len = options.get('mean_gene_len', 308) #codon length (924 bp)
         assert(mean_gene_len >= 1)
         options['mean_gene_len'] = mean_gene_len
 
@@ -123,12 +123,10 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         rRNA_prop = options.get('rRNA_prop')
         tRNA_prop = options.get('tRNA_prop')
         
-
         cell = wc_kb.Cell()
         self.knowledge_base.cell = cell
 
-        codon_table = self.knowledge_base.translation_table = CodonTable.unambiguous_dna_by_id[
-            translation_table]
+        codon_table = self.knowledge_base.translation_table = CodonTable.unambiguous_dna_by_id[translation_table]
 
         # start codons from NCBI list
         START_CODONS = codon_table.start_codons
@@ -144,27 +142,27 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
         # Create a chromosome n times
         for i_chr in range(num_chromosomes):
-            num_genes = self.rand(mean_num_genes / num_chromosomes)[0]
-            gene_lens = self.rand(mean_num_genes, count=num_genes)
+            num_genes = self.rand(mean_num_genes / num_chromosomes)[0] #number of genes in the chromosome
+            gene_lens = 3 * self.rand(mean_gene_len, count=num_genes) #list of gene lengths (generated randomly) on chromosome
 
-            intergene_lens = self.rand(
-                mean_gene_len / mean_coding_frac * (1 - mean_coding_frac), count=num_genes)
+            intergene_lens = 3 * self.rand(
+                mean_gene_len / mean_coding_frac * (1 - mean_coding_frac), count=num_genes) 
 
-            seq_len = numpy.sum(gene_lens) + numpy.sum(intergene_lens)
+            seq_len = numpy.sum(gene_lens) + numpy.sum(intergene_lens) #sequence base triple length
 
             seq_str = []
-            #generates seq based on random codons
+            #generates seq based on random codons (NOT start/stop codons)
             for i in range(0, seq_len, 3):
                 codon_i = STOP_CODONS[0]
 
-                while(codon_i in STOP_CODONS):
+                while(codon_i in (STOP_CODONS or START_CODONS)):
                     codon_i = "".join(random.choice(
                         BASES, p=PROB_BASES, size=(3,)))
 
                 seq_str.append(codon_i)
 
             seq_str = "".join(seq_str)
-            seq = Seq(seq_str, Alphabet.DNAAlphabet)
+            seq = Seq(seq_str, Alphabet.DNAAlphabet())
 
             chro = cell.species_types.get_or_create(
                 id='chr_{}'.format(i_chr + 1), __type=wc_kb.DnaSpeciesType)
@@ -187,11 +185,16 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                 typeList = [wc_kb.GeneType.mRna, wc_kb.GeneType.rRna, wc_kb.GeneType.sRna, wc_kb.GeneType.tRna]
                 prob_rna = [1 - ncRNA_prop - tRNA_prop - rRNA_prop, rRNA_prop, ncRNA_prop, tRNA_prop]
                 gene.type = random.choice(typeList, p=prob_rna)
+                if gene.type == wc_kb.core.GeneType.mRna: #if mRNA, then set up start/stop codons in the gene
+                    start_codon = random.choice(START_CODONS)
+                    stop_codon = random.choice(STOP_CODONS)
+                    seq_str = str(chro.seq)
+                    seq_str = seq_str[ : gene.start] + start_codon + seq_str[gene.start+3 : gene.end-2] + stop_codon + seq_str[gene.end+1 :]
+                    chro.seq = Seq(seq_str, Alphabet.DNAAlphabet())
                 chro.loci.append(gene)
-                cell.loci.append(gene)
+                self.knowledge_base.cell.loci.append(gene)
 
                 
-            self.knowledge_base.cell.species_types.append(chro)
 
     def gen_rnas_proteins(self):
         """ Creates RNA and protein objects corresponding to genes on chromosome
@@ -243,18 +246,21 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         for chromosome in self.knowledge_base.cell.species_types.get(__type=wc_kb.core.DnaSpeciesType):
             seq = chromosome.seq
             i = 0
-            while i < len(chromosome.loci): 
+            while i < len(chromosome.loci) and type(chromosome.loci[i]) == wc_kb.core.GeneLocus:
                 gene = chromosome.loci[i]
                 if gene.type == wc_kb.GeneType.mRna:
                     #polycistronic mRNA (multiple GeneLocus objects per TranscriptionUnitLocus)
 
-                    five_prime = round(np.random.normal(five_prime_len, math.sqrt(five_prime_len), 1).tolist()[0])
-                    three_prime = round(np.random.normal(three_prime_len, math.sqrt(three_prime_len), 1).tolist()[0])
+                    five_prime = round(random.normal(five_prime_len, math.sqrt(five_prime_len), 1).tolist()[0])
+                    three_prime = round(random.normal(three_prime_len, math.sqrt(three_prime_len), 1).tolist()[0])
 
                     operon_prob = random.random()
 
                     if operon_prob <= operon_prop: #make an operon (polycistronic mRNA, put multiple genes in one TransUnitLocus)
-                        operon_genes = round(np.random.normal(operon_gen_num, math.sqrt(operon_gen_num), 1).tolist()[0])
+                        operon_genes = round(random.normal(operon_gen_num, math.sqrt(operon_gen_num), 1).tolist()[0])
+                        while operon_genes <= 1:
+                            operon_genes = round(random.normal(operon_gen_num, math.sqrt(operon_gen_num), 1).tolist()[0])
+
                         #add 3', 5' UTRs to the ends of the transcription unit (upstream of first gene, downstream of last gene)
                         tu = wc_kb.TranscriptionUnitLocus()
                         five_prime_start = gene.start - five_prime
@@ -281,7 +287,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                             three_prime_end = len(seq) - 1
                         tu.end = three_prime_end
                         chromosome.loci.append(tu)
-                        cell.loci.append(tu)
+                        self.knowledge_base.cell.loci.append(tu)
 
                     else: #make an individual transcription unit for the gene
                         five_prime_start = gene.start - five_prime
@@ -296,7 +302,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         tu.polymer = gene.polymer
                         tu.genes.append(gene)
                         chromosome.loci.append(tu)
-                        cell.loci.append(tu)
+                        self.knowledge_base.cell.loci.append(tu)
                     
                 else: #make a transcription unit that transcribes other types of RNA (tRNA, rRNA, sRNA)
                     tu = wc_kb.TranscriptionUnitLocus()
@@ -305,7 +311,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                     tu.polymer = gene.polymer
                     tu.genes.append(gene)
                     chromosome.loci.append(tu)
-                    cell.loci.append(tu)
+                    self.knowledge_base.cell.loci.append(tu)
 
                 i += 1
 
