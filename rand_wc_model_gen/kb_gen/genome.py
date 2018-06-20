@@ -74,7 +74,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(tRNA_prop >= 0 and tRNA_prop <= 1)
         options['tRNA_prop'] = tRNA_prop
 
-        assert((ncRNA_prop + rRNA_prop + tRNA_prop) < 1)
+        assert((ncRNA_prop + rRNA_prop + tRNA_prop) <= 1)
 
         # DOI: 10.1093/molbev/msk019
         mean_gene_len = options.get('mean_gene_len', 308) #codon length (924 bp)
@@ -201,7 +201,9 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         """
         for chromosome in self.knowledge_base.cell.species_types.get(__type=wc_kb.core.DnaSpeciesType):
             for locus in chromosome.loci:
-                if type(locus) == wc_kb.TranscriptionUnitLocus():
+                if type(locus) == wc_kb.TranscriptionUnitLocus:
+
+                    #print('here')
                     # creates RnaSpeciesType for RNA sequence corresponding to gene
                     rna = wc_kb.RnaSpeciesType()
                     # GeneLocus object for gene sequence, attribute of ProteinSpeciesType object
