@@ -31,7 +31,8 @@ class ChromosomesGenesTusGenerator(wc_kb_gen.KbComponentGenerator):
         options = self.options
 
         num_chromosomes = options.get('num_chromosomes', 1)
-        assert(num_chromosomes >= 1 and int(num_chromosomes) == num_chromosomes)
+        assert(num_chromosomes >= 1 and int(
+            num_chromosomes) == num_chromosomes)
         options['num_chromosomes'] = num_chromosomes
 
         chromosome_topology = options.get('chromosome_topology', 'circular')
@@ -46,15 +47,17 @@ class ChromosomesGenesTusGenerator(wc_kb_gen.KbComponentGenerator):
         assert(mean_num_genes >= 1)
         options['mean_num_genes'] = mean_num_genes
 
-        mean_gene_len = options.get('mean_gene_len', 924)  # DOI: 10.1093/molbev/msk019
+        # DOI: 10.1093/molbev/msk019
+        mean_gene_len = options.get('mean_gene_len', 924)
         assert(mean_gene_len >= 1)
         options['mean_gene_len'] = mean_gene_len
 
-        mean_coding_frac = options.get('mean_coding_frac', 0.88)  # DOI: 10.1007/s10142-015-0433-4
+        # DOI: 10.1007/s10142-015-0433-4
+        mean_coding_frac = options.get('mean_coding_frac', 0.88)
         assert(mean_coding_frac > 0 and mean_coding_frac < 1)
         options['mean_coding_frac'] = mean_coding_frac
 
-    def gen_components(self):
+   def gen_components(self):
         """ Construct knowledge base components """
 
         # get options
@@ -71,15 +74,15 @@ class ChromosomesGenesTusGenerator(wc_kb_gen.KbComponentGenerator):
         for i_chr in range(num_chromosomes):
             num_genes = self.rand(mean_num_genes / num_chromosomes)[0]
             gene_lens = self.rand(mean_gene_len, count=num_genes)
-            intergene_lens = self.rand(mean_gene_len / mean_coding_frac * (1 - mean_coding_frac), count=num_genes)
+            intergene_lens = self.rand(
+                mean_gene_len / mean_coding_frac * (1 - mean_coding_frac), count=num_genes)
 
             seq_len = numpy.sum(gene_lens) + numpy.sum(intergene_lens)
-            seq = Seq.Seq(''.join(random.choice(('A', 'C', 'G', 'T'),
-                                                p=((1 - mean_gc_frac) / 2, mean_gc_frac / 2, mean_gc_frac / 2, (1 - mean_gc_frac) / 2),
-                                                size=(seq_len, ))),
-                          Alphabet.DNAAlphabet())
+            seq = Seq.Seq(''.join(random.choice(('A', 'C', 'G', 'T'), p=((1 - mean_gc_frac) / 2, mean_gc_frac /
+                                                                         2, mean_gc_frac / 2, (1 - mean_gc_frac) / 2), size=(seq_len, ))), Alphabet.DNAAlphabet())
 
-            chr = cell.species_types.get_or_create(id='chr_{}'.format(i_chr + 1), __type=wc_kb.DnaSpeciesType)
+            chr = cell.species_types.get_or_create(
+                id='chr_{}'.format(i_chr + 1), __type=wc_kb.DnaSpeciesType)
             chr.name = 'Chromosome {}'.format(i_chr + 1)
             chr.circular = chromosome_topology == 'circular'
             chr.double_stranded = True
@@ -88,14 +91,18 @@ class ChromosomesGenesTusGenerator(wc_kb_gen.KbComponentGenerator):
             gene_starts = numpy.int64(numpy.cumsum(numpy.concatenate(([0], gene_lens[0:-1])) +
                                                    numpy.concatenate((numpy.round(intergene_lens[0:1] / 2), intergene_lens[1:]))))
             for i_gene in range(num_genes):
-                tu = cell.loci.get_or_create(id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.TranscriptionUnitLocus)
+                tu = cell.loci.get_or_create(id='tu_{}_{}'.format(
+                    i_chr + 1, i_gene + 1), __type=wc_kb.TranscriptionUnitLocus)
                 tu.polymer = chr
-                tu.name = 'Transcription unit {}-{}'.format(i_chr + 1, i_gene + 1)
+                tu.name = 'Transcription unit {}-{}'.format(
+                    i_chr + 1, i_gene + 1)
                 tu.start = gene_starts[i_gene]
                 tu.end = gene_starts[i_gene] + gene_lens[i_gene] - 1
-                tu.strand = random.choice((wc_kb.PolymerStrand.positive, wc_kb.PolymerStrand.negative))
+                tu.strand = random.choice(
+                    (wc_kb.PolymerStrand.positive, wc_kb.PolymerStrand.negative))
 
-                gene = cell.loci.get_or_create(id='gene_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.GeneLocus)
+                gene = cell.loci.get_or_create(id='gene_{}_{}'.format(
+                    i_chr + 1, i_gene + 1), __type=wc_kb.GeneLocus)
                 gene.polymer = chr
                 gene.transcription_units.append(tu)
                 gene.name = 'Gene {}-{}'.format(i_chr + 1, i_gene + 1)
