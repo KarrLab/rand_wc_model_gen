@@ -16,6 +16,7 @@ class TestGenomeGenerator(unittest.TestCase):
     def setUp(self):
         # The knowledge base that is needed for the KBComponentGenerator
         kb = wc_kb.KnowledgeBase()
+        kb.cell = wc_kb.Cell()
         # Creates the GenomeGenerator object and sets the parameters as given
         options = {
             'mean_num_genes': 1000}
