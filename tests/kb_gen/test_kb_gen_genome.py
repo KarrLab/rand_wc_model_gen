@@ -23,6 +23,9 @@ class TestGenomeGenerator(unittest.TestCase):
         self.gen = genome.GenomeGenerator(kb, options)
         self.gen.run()
 
+    def test_init(self):
+        self.assertEqual(type(self.gen), genome.GenomeGenerator)
+
     def test_num_chromosomes(self):
         chromosomes = self.gen.knowledge_base.cell.species_types.get(
             __type=wc_kb.core.DnaSpeciesType)
@@ -145,7 +148,7 @@ class TestGenomeGenerator(unittest.TestCase):
         tus = self.gen.knowledge_base.cell.loci.get(
             __type=wc_kb.core.TranscriptionUnitLocus)
         gene_sum = 0
-        operonCount = 1
+        operonCount = 0
         for tu in tus:
             if len(tu.genes) > 1:  # if operon
                 operonCount += 1
@@ -165,8 +168,8 @@ class TestGenomeGenerator(unittest.TestCase):
         operon_prop = self.gen.options.get('operon_prop')
 
         self.assertAlmostEqual(avg_in_operon, operon_prop,
-                               delta=3 * math.sqrt(operon_prop))
 
+                               delta=3 * math.sqrt(operon_prop))
         self.assertAlmostEqual(
             avg_operon_gen, operon_gen_num, delta=3 * math.sqrt(operon_gen_num))
 
