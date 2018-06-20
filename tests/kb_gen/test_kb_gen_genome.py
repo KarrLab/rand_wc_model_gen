@@ -9,7 +9,6 @@ import math
 import wc_kb
 import unittest
 from rand_wc_model_gen.kb_gen import genome
-from Bio.Seq import Seq
 
 
 class TestGenomeGenerator(unittest.TestCase):
@@ -20,12 +19,9 @@ class TestGenomeGenerator(unittest.TestCase):
 
         # Creates the GenomeGenerator object and sets the parameters as given
         options = {
-            'mean_num_genes': 50}
+            'mean_num_genes': 1000}
         self.gen = genome.GenomeGenerator(kb, options)
         self.gen.run()
-
-        self.gen.make_tus()
-        self.gen.gen_rnas_proteins()
 
     def test_num_chromosomes(self):
         chromosomes = self.gen.knowledge_base.cell.species_types.get(
@@ -149,7 +145,7 @@ class TestGenomeGenerator(unittest.TestCase):
         tus = self.gen.knowledge_base.cell.loci.get(
             __type=wc_kb.core.TranscriptionUnitLocus)
         gene_sum = 0
-        operonCount = 0
+        operonCount = 1
         for tu in tus:
             if len(tu.genes) > 1:  # if operon
                 operonCount += 1
@@ -169,10 +165,10 @@ class TestGenomeGenerator(unittest.TestCase):
         operon_prop = self.gen.options.get('operon_prop')
 
         self.assertAlmostEqual(avg_in_operon, operon_prop,
-                               3 * math.sqrt(operon_prop))
+                               delta=3 * math.sqrt(operon_prop))
 
         self.assertAlmostEqual(
-            avg_operon_gen, operon_gen_num, 3 * math.sqrt(operon_gen_num))
+            avg_operon_gen, operon_gen_num, delta=3 * math.sqrt(operon_gen_num))
 
     '''def test_protein_start_codon(self):
         for protein in self.gen.knowledge_base.cell.species_types.get(__type=wc_kb.core.ProteinSpeciesType):
