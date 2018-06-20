@@ -132,8 +132,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         rRNA_prop = options.get('rRNA_prop')
         tRNA_prop = options.get('tRNA_prop')
 
-        cell = wc_kb.Cell()
-        self.knowledge_base.cell = cell
+        cell = self.knowledge_base.cell
 
         codon_table = self.knowledge_base.translation_table = CodonTable.unambiguous_dna_by_id[
             translation_table]
@@ -188,12 +187,11 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                                                    numpy.concatenate((numpy.round(intergene_lens[0:1] / 2), intergene_lens[1:]))))
 
             # creates GeneLocus objects for the genes and labels their GeneType (which type of RNA they transcribe)
-            for i in range(len(gene_starts)):
-                gene = wc_kb.GeneLocus()
-                start = gene_starts[i]
-                gene.start = start  # 1-indexed
+            for i_gene, gene_start in enumerate(gene_starts):
+                gene = self.knowledge_base.cell.loci.get_or_create(id='gene_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.GeneLocus)
+                gene.start = gene_start  # 1-indexed
                 gene.polymer = chro
-                gene.end = start + gene_lens[i]  # 1-indexed
+                gene.end = gene_start + gene_lens[i_gene]  # 1-indexed
                 typeList = [wc_kb.GeneType.mRna, wc_kb.GeneType.rRna,
                             wc_kb.GeneType.sRna, wc_kb.GeneType.tRna]
                 prob_rna = [1 - ncRNA_prop - tRNA_prop -
@@ -203,12 +201,11 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                     start_codon = random.choice(START_CODONS)
                     stop_codon = random.choice(STOP_CODONS)
                     seq_str = str(chro.seq)
-                    seq_str = seq_str[: gene.start-1] + start_codon + \
-                        seq_str[gene.start+2: gene.end-3] + \
+                    seq_str = seq_str[: gene_start-1] + start_codon + \
+                        seq_str[gene_start+2: gene.end-3] + \
                         stop_codon + seq_str[gene.end:]
                     chro.seq = Seq(seq_str, Alphabet.DNAAlphabet())
-                chro.loci.append(gene)
-                self.knowledge_base.cell.loci.append(gene)
+                chro.loci.append(gene)                
 
     def gen_rnas_proteins(self):
         """ Creates RNA and protein objects corresponding to genes on chromosome
