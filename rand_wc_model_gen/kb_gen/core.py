@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from .chrs_genes_tus import ChromosomesGenesTusGenerator
+from .genome import GenomeGenerator
 from .metabolites import MetabolitesGenerator
 from .properties import PropertiesGenerator
 from .rna import RnaGenerator
@@ -27,7 +27,7 @@ class KbGenerator(wc_kb_gen.KbGenerator):
     * version
     * component
 
-        * ChromosomesGenesTusGenerator
+        * GenomeGenerator
         * MetabolitesGenerator
         * PropertiesGenerator
         * RnaGenerator
@@ -35,7 +35,7 @@ class KbGenerator(wc_kb_gen.KbGenerator):
 
     DEFAULT_COMPONENT_GENERATORS = (
         PropertiesGenerator,
-        ChromosomesGenesTusGenerator,
+        GenomeGenerator,
         MetabolitesGenerator,
         RnaGenerator,
     )
@@ -71,5 +71,6 @@ class KbGenerator(wc_kb_gen.KbGenerator):
             try:
                 int(seed)
             except ValueError:
-                raise ValueError('`seed` option must be convertible to a 32 bit unsigned integer or `None`')
+                raise ValueError(
+                    '`seed` option must be convertible to a 32 bit unsigned integer or `None`')
         options['seed'] = seed
