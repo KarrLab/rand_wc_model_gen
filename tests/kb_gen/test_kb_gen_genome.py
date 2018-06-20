@@ -20,7 +20,7 @@ class TestGenomeGenerator(unittest.TestCase):
 
         # Creates the GenomeGenerator object and sets the parameters as given
         options = {
-            'mean_num_genes': 1000}
+            'mean_num_genes': 50}
         self.gen = genome.GenomeGenerator(kb, options)
         self.gen.run()
 
@@ -141,9 +141,9 @@ class TestGenomeGenerator(unittest.TestCase):
         three_prime_len = self.gen.options.get('three_prime_len')
 
         self.assertAlmostEqual(sum_five_prime/mRnaCount,
-                               five_prime_len, 3 * math.sqrt(five_prime_len))
+                               five_prime_len, delta=3 * math.sqrt(five_prime_len))
         self.assertAlmostEqual(sum_three_prime/mRnaCount,
-                               three_prime_len, 3 * math.sqrt(three_prime_len))
+                               three_prime_len, delta=3 * math.sqrt(three_prime_len))
 
     def test_operons(self):
         tus = self.gen.knowledge_base.cell.loci.get(
