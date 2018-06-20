@@ -16,7 +16,6 @@ from Bio.Seq import Seq, Alphabet
 from Bio.Data import CodonTable
 
 
-
 class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
     """
     Creates synthetic chromosome with randomized genes/intergenic regions. Creates RNA and protein objects corresponding to the genes on this chromosome. Associates the chromosome, RNAs, proteins
@@ -78,7 +77,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         options['tRNA_prop'] = tRNA_prop
 
         assert((ncRNA_prop + rRNA_prop + tRNA_prop) <= 1)
-
 
         # DOI: 10.1093/molbev/msk019
         mean_gene_len = options.get(
@@ -188,7 +186,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
             # creates GeneLocus objects for the genes and labels their GeneType (which type of RNA they transcribe)
             for i_gene, gene_start in enumerate(gene_starts):
-                gene = self.knowledge_base.cell.loci.get_or_create(id='gene_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.GeneLocus)
+                gene = self.knowledge_base.cell.loci.get_or_create(
+                    id='gene_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.GeneLocus)
                 gene.start = gene_start  # 1-indexed
                 gene.polymer = chro
                 gene.end = gene_start + gene_lens[i_gene]  # 1-indexed
@@ -205,7 +204,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         seq_str[gene_start+2: gene.end-3] + \
                         stop_codon + seq_str[gene.end:]
                     chro.seq = Seq(seq_str, Alphabet.DNAAlphabet())
-                chro.loci.append(gene)                
 
     def gen_rnas_proteins(self):
         """ Creates RNA and protein objects corresponding to genes on chromosome
@@ -240,6 +238,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                     if rna.type == wc_kb.RnaType.mRna:
                         for gene in tu.genes:
                             # creates ProteinSpeciesType object for corresponding protein sequence(s)
+
                             prot = wc_kb.ProteinSpeciesType()
 
                             prot.cell = self.knowledge_base.cell
@@ -265,15 +264,16 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         # 3 genes default (https://academic.oup.com/gbe/article/5/11/2242/653613)
         operon_gen_num = options.get('operon_gen_num')
 
-        for chromosome in self.knowledge_base.cell.species_types.get(__type=wc_kb.core.DnaSpeciesType):
+        for i_chr, chromosome in enumerate(self.knowledge_base.cell.species_types.get(__type=wc_kb.core.DnaSpeciesType)):
             seq = chromosome.seq
-            i = 0
+            i_gene = 0
             transcription_loci = []
             # print(chromosome.loci)
             # print(len(chromosome.loci))
-            while i < len(chromosome.loci):
+            # Todo make this into a proper for loop that deals with repeats/additional loci
+            while i_gene < len(chromosome.loci):
 
-                gene = chromosome.loci[i]
+                gene = chromosome.loci[i_gene]
 
                 if gene.type == wc_kb.GeneType.mRna:
                     # polycistronic mRNA (multiple GeneLocus objects per TranscriptionUnitLocus)
@@ -291,25 +291,27 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                             operon_genes = self.rand(operon_gen_num)[0]
 
                         # add 3', 5' UTRs to the ends of the transcription unit (upstream of first gene, downstream of last gene)
-                        tu = wc_kb.TranscriptionUnitLocus()
+                        tu = self.knowledge_base.cell.loci.get_or_create(
+                            id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.TranscriptionUnitLocus)
+
                         five_prime_start = gene.start - five_prime
                         if five_prime_start < 0:
                             2
                             five_prime_start = 0
                         tu.genes.append(gene)
                         tu.start = five_prime_start
-                       # tu.polymer = gene.polymer
+
                        # print(chromosome.loci)
                         # print(operon_genes)
                         for k in range(operon_genes-1):
 
-                            i += 1
+                            i_gene += 1
 
-                            if i >= len(chromosome.loci):
+                            if i_gene >= len(chromosome.loci):
                                 break
 
-                            if (chromosome.loci[i]).type == wc_kb.GeneType.mRna:
-                                gene = chromosome.loci[i]
+                            if (chromosome.loci[i_gene]).type == wc_kb.GeneType.mRna:
+                                gene = chromosome.loci[i_gene]
                                 tu.genes.append(gene)
 
                             else:
@@ -321,8 +323,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         tu.end = three_prime_end
                         transcription_loci.append(tu)
 
-                        self.knowledge_base.cell.loci.append(tu)
-
                     else:  # make an individual transcription unit for the gene
                         # print("single")
                         five_prime_start = gene.start - five_prime
@@ -331,7 +331,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                             five_prime_start = 0
                         if three_prime_end >= len(seq):
                             three_prime_end = len(seq) - 1
-                        tu = wc_kb.TranscriptionUnitLocus()
+                        tu = self.knowledge_base.cell.loci.get_or_create(
+                            id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.TranscriptionUnitLocus)
                         tu.start = five_prime_start
                         tu.end = three_prime_end
                        # tu.polymer = gene.polymer
@@ -342,7 +343,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                 # make a transcription unit that transcribes other types of RNA (tRNA, rRNA, sRNA)
                 else:
                    # print("not mrna")
-                    tu = wc_kb.TranscriptionUnitLocus()
+                    tu = self.knowledge_base.cell.loci.get_or_create(
+                        id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.TranscriptionUnitLocus)
                     tu.start = gene.start
                     tu.end = gene.end
                    # tu.polymer = gene.polymer
@@ -350,7 +352,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                     transcription_loci.append(tu)
                     self.knowledge_base.cell.loci.append(tu)
 
-                i += 1
+                i_gene += 1
             for locus in transcription_loci:
                 chromosome.loci.append(locus)
                 locus.polymer = chromosome
