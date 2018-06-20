@@ -57,7 +57,7 @@ class ChromosomesGenesTusGenerator(wc_kb_gen.KbComponentGenerator):
         assert(mean_coding_frac > 0 and mean_coding_frac < 1)
         options['mean_coding_frac'] = mean_coding_frac
 
-   def gen_components(self):
+    def gen_components(self):
         """ Construct knowledge base components """
 
         # get options
