@@ -58,7 +58,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(mean_gc_frac >= 0 and mean_gc_frac <= 1)
         options['mean_gc_frac'] = mean_gc_frac
 
-        mean_num_genes = options.get('mean_num_genes', 50) #for convenience sake (default should be 4500)
+        mean_num_genes = options.get('mean_num_genes', 4500) 
         assert(mean_num_genes >= 1)
         options['mean_num_genes'] = mean_num_genes
 
@@ -208,8 +208,18 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                     rna = wc_kb.RnaSpeciesType()
                     # GeneLocus object for gene sequence, attribute of ProteinSpeciesType object
                     tu = locus
+
+                    if tu.genes[0].type == wc_kb.GeneType.mRna:
+                        rna.type = wc_kb.RnaType.mRna
+                    if tu.genes[0].type == wc_kb.GeneType.rRna:
+                        rna.type = wc_kb.RnaType.rRna
+                    if tu.genes[0].type == wc_kb.GeneType.tRna:
+                        rna.type = wc_kb.RnaType.tRna
+                    if tu.genes[0].type == wc_kb.GeneType.sRna:
+                        rna.type = wc_kb.RnaType.sRna
                     
-                    rna.type = tu.genes[0].type
+
+                    #print(rna.type)
 
                     rna.transcription_units.append(tu)
 

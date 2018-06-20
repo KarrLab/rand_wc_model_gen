@@ -20,7 +20,7 @@ class TestGenomeGenerator(unittest.TestCase):
 
         # Creates the GenomeGenerator object and sets the parameters as given
         options = {
-            'mean_gene_len': 1000}
+            'mean_num_genes': 1000}
         self.gen = genome.GenomeGenerator(kb, options)
         self.gen.run()
 
