@@ -19,7 +19,7 @@ class TestGenomeGenerator(unittest.TestCase):
         kb.cell = wc_kb.Cell()
         # Creates the GenomeGenerator object and sets the parameters as given
         options = {
-            'mean_num_genes': 1000}
+            'mean_num_genes': 100}
         self.gen = genome.GenomeGenerator(kb, options)
         self.gen.run()
 
@@ -112,7 +112,6 @@ class TestGenomeGenerator(unittest.TestCase):
 
         genes = self.gen.knowledge_base.cell.loci.get(__type=wc_kb.GeneLocus)
 
-
         sum_len = 0
         for gene in genes:
             sum_len += gene.get_len()
@@ -184,7 +183,6 @@ class TestGenomeGenerator(unittest.TestCase):
         for protein in self.gen.knowledge_base.cell.species_types.get(__type=wc_kb.core.ProteinSpeciesType):
             seq = str(protein.get_seq())
             self.assertEqual(seq[-1], '*')'''
-
 
     def tearDown(self):
         pass
