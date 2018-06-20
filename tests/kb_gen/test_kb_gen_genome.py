@@ -40,7 +40,6 @@ class TestGenomeGenerator(unittest.TestCase):
         sRna = 0
         rnas = self.gen.knowledge_base.cell.species_types.get(
             __type=wc_kb.core.RnaSpeciesType)
-        rnas = self.gen.knowledge_base.cell.species_types.get(__type=wc_kb.core.RnaSpeciesType)
         #print(rnas)
         for rna in rnas:
             if rna.type == wc_kb.RnaType.rRna:
@@ -62,7 +61,7 @@ class TestGenomeGenerator(unittest.TestCase):
 
         real_rRna = self.gen.options.get('rRNA_prop')
         real_tRna = self.gen.options.get('tRNA_prop')
-        real_sRna = self.gen.options.get('sRna_prop')
+        real_sRna = self.gen.options.get('ncRNA_prop')
         
         
         self.assertAlmostEqual(
