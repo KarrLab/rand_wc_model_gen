@@ -79,13 +79,13 @@ class RnaDegradationSubmodelGenerator(wc_model_gen.SubmodelGenerator):
             model_rna = model.species_types.get_one(id=kb_rna.id).species.get_one(compartment=cytosol)
             seq = kb_rna.get_seq()
             rxn.participants = []
-            rxn.participants.create(species=model_rna, coefficient=-1)
-            rxn.participants.create(species=h2o, coefficient=-(kb_rna.get_len() - 1))
-            rxn.participants.create(species=amp, coefficient=seq.count('A'))
-            rxn.participants.create(species=cmp, coefficient=seq.count('C'))
-            rxn.participants.create(species=gmp, coefficient=seq.count('G'))
-            rxn.participants.create(species=ump, coefficient=seq.count('U'))
-            rxn.participants.create(species=h, coefficient=kb_rna.get_len() - 1)
+            rxn.participants.add(model_rna.species_coefficients.get_or_create(coefficient=-1))
+            rxn.participants.add(h2o.species_coefficients.get_or_create(coefficient=-(kb_rna.get_len() - 1)))
+            rxn.participants.add(amp.species_coefficients.get_or_create(coefficient=seq.count('A')))
+            rxn.participants.add(cmp.species_coefficients.get_or_create(coefficient=seq.count('C')))
+            rxn.participants.add(gmp.species_coefficients.get_or_create(coefficient=seq.count('G')))
+            rxn.participants.add(ump.species_coefficients.get_or_create(coefficient=seq.count('U')))
+            rxn.participants.add(h.species_coefficients.get_or_create(coefficient=kb_rna.get_len() - 1))
 
     def gen_rate_laws(self):
         """ Generate rate laws associated with submodel """
