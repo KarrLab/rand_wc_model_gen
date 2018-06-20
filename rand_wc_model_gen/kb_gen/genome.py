@@ -178,18 +178,17 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             for i in range(len(gene_starts)):
                 gene = wc_kb.GeneLocus()
                 start = gene_starts[i]
-                gene.start = start
+                gene.start = start #1-indexed
                 gene.polymer = chro
-                gene.end = start + gene_lens[i]
-                rna_prob = random.random()
+                gene.end = start + gene_lens[i] #1-indexed
                 typeList = [wc_kb.GeneType.mRna, wc_kb.GeneType.rRna, wc_kb.GeneType.sRna, wc_kb.GeneType.tRna]
                 prob_rna = [1 - ncRNA_prop - tRNA_prop - rRNA_prop, rRNA_prop, ncRNA_prop, tRNA_prop]
                 gene.type = random.choice(typeList, p=prob_rna)
-                if gene.type == wc_kb.core.GeneType.mRna: #if mRNA, then set up start/stop codons in the gene
+                if gene.type == wc_kb.GeneType.mRna: #if mRNA, then set up start/stop codons in the gene
                     start_codon = random.choice(START_CODONS)
                     stop_codon = random.choice(STOP_CODONS)
                     seq_str = str(chro.seq)
-                    seq_str = seq_str[ : gene.start] + start_codon + seq_str[gene.start+3 : gene.end-2] + stop_codon + seq_str[gene.end+1 :]
+                    seq_str = seq_str[ : gene.start-1] + start_codon + seq_str[gene.start+2 : gene.end-3] + stop_codon + seq_str[gene.end :]
                     chro.seq = Seq(seq_str, Alphabet.DNAAlphabet())
                 chro.loci.append(gene)
                 self.knowledge_base.cell.loci.append(gene)
