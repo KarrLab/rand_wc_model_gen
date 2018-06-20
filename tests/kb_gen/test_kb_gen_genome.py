@@ -19,9 +19,14 @@ class TestGenomeGenerator(unittest.TestCase):
         kb = wc_kb.KnowledgeBase()
 
         # Creates the GenomeGenerator object and sets the parameters as given
-        options = {}
+        options = {
+            'mean_gene_len': 1000}
         self.gen = genome.GenomeGenerator(kb, options)
         self.gen.run()
+
+        self.gen.make_tus()
+        self.gen.gen_rnas_proteins()
+
 
     def test_num_chromosomes(self):
         chromosomes = self.gen.knowledge_base.cell.species_types.get(
@@ -35,26 +40,37 @@ class TestGenomeGenerator(unittest.TestCase):
         sRna = 0
         rnas = self.gen.knowledge_base.cell.species_types.get(
             __type=wc_kb.core.RnaSpeciesType)
+        rnas = self.gen.knowledge_base.cell.species_types.get(__type=wc_kb.core.RnaSpeciesType)
+        #print(rnas)
         for rna in rnas:
             if rna.type == wc_kb.RnaType.rRna:
                 rRna += 1
             elif rna.type == wc_kb.RnaType.tRna:
                 tRna += 1
-            else:
+            elif rna.type == wc_kb.RnaType.sRna:
                 sRna += 1
 
         total = len(rnas)
+
+        #print(rRna)
+        #print(tRna)
+        #print(sRna)
 
         rRna_prop = rRna / total
         tRna_prop = tRna / total
         sRna_prop = sRna / total
 
+        real_rRna = self.gen.options.get('rRNA_prop')
+        real_tRna = self.gen.options.get('tRNA_prop')
+        real_sRna = self.gen.options.get('sRna_prop')
+        
+        
         self.assertAlmostEqual(
-            rRna_prop, self.gen.options.get('rRna_prop'), delta=3 * math.sqrt(rRna_prop))
+            rRna_prop, real_rRna, delta=3 * math.sqrt(real_rRna))
         self.assertAlmostEqual(
-            tRna_prop, self.gen.options.get('tRna_prop'), delta=3 * math.sqrt(tRna_prop))
+            tRna_prop, real_tRna, delta=3 * math.sqrt(real_tRna))
         self.assertAlmostEqual(
-            sRna_prop, self.gen.options.get('sRna_prop'), delta=3 * math.sqrt(sRna_prop))
+            sRna_prop, real_sRna, delta=3 * math.sqrt(real_sRna))
 
     # test total number of RNAs (should match number of transcription units)
     # test total number of proteins (should match number of GeneLocus objects with mRNA)
@@ -83,6 +99,7 @@ class TestGenomeGenerator(unittest.TestCase):
         genes = self.gen.knowledge_base.cell.loci.get(__type=wc_kb.GeneLocus)
         for gene in genes:
             if gene.type == wc_kb.GeneType.mRna:
+                
                 self.assertIn(gene.get_seq()[0:3], START_CODONS)
 
     def test_stop_codon(self):
