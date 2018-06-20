@@ -27,7 +27,6 @@ class TestGenomeGenerator(unittest.TestCase):
         self.gen.make_tus()
         self.gen.gen_rnas_proteins()
 
-
     def test_num_chromosomes(self):
         chromosomes = self.gen.knowledge_base.cell.species_types.get(
             __type=wc_kb.core.DnaSpeciesType)
@@ -40,7 +39,7 @@ class TestGenomeGenerator(unittest.TestCase):
         sRna = 0
         rnas = self.gen.knowledge_base.cell.species_types.get(
             __type=wc_kb.core.RnaSpeciesType)
-        #print(rnas)
+
         for rna in rnas:
             if rna.type == wc_kb.RnaType.rRna:
                 rRna += 1
@@ -51,10 +50,6 @@ class TestGenomeGenerator(unittest.TestCase):
 
         total = len(rnas)
 
-        #print(rRna)
-        #print(tRna)
-        #print(sRna)
-
         rRna_prop = rRna / total
         tRna_prop = tRna / total
         sRna_prop = sRna / total
@@ -62,8 +57,7 @@ class TestGenomeGenerator(unittest.TestCase):
         real_rRna = self.gen.options.get('rRNA_prop')
         real_tRna = self.gen.options.get('tRNA_prop')
         real_sRna = self.gen.options.get('ncRNA_prop')
-        
-        
+
         self.assertAlmostEqual(
             rRna_prop, real_rRna, delta=3 * math.sqrt(real_rRna))
         self.assertAlmostEqual(
@@ -98,7 +92,7 @@ class TestGenomeGenerator(unittest.TestCase):
         genes = self.gen.knowledge_base.cell.loci.get(__type=wc_kb.GeneLocus)
         for gene in genes:
             if gene.type == wc_kb.GeneType.mRna:
-                
+
                 self.assertIn(gene.get_seq()[0:3], START_CODONS)
 
     def test_stop_codon(self):
@@ -128,7 +122,8 @@ class TestGenomeGenerator(unittest.TestCase):
         self.assertAlmostEqual(
             avg_len, mean_gen_len, delta=3 * math.sqrt(mean_gen_len))
 
-    def test_utrs(self):  # checks average lengths of 5'/3' UTRs on transcription units with mRna
+        # checks average lengths of 5'/3' UTRs on transcription units with mRna
+    def test_utrs(self):
         tus = self.gen.knowledge_base.cell.loci.get(
             __type=wc_kb.core.TranscriptionUnitLocus)
         sum_five_prime = 0
