@@ -83,15 +83,22 @@ class SimulateController(CementBaseController):
         description = "Simulate a random whole-cell model"
         arguments = [
             (['--config-path'], dict(type=str, default=None, help='Path to configuration file')),
+            (['--seed'], dict(type=int, default=None, help='Random number generator seed')),
         ]
 
     @expose(hide=True)
     def default(self):
         args = self.app.pargs
         config = rand_wc_model_gen.config.get_config(extra_path=args.config_path)['rand_wc_model_gen']
+
         model = wc_lang.io.Reader().run(config['model']['path'])
+
+        seed = args.seed
+        if seed is None:
+            seed = config['sim']['seed']
         simulation = wc_sim.multialgorithm.simulation.Simulation(model)
         num_events, sim_results_path = simulation.run(end_time=config['sim']['end_time'],
+                                                      seed=seed,
                                                       checkpoint_period=config['sim_results']['checkpoint_period'],
                                                       results_dir=config['sim_results']['path'])
         self.app.results = {
