@@ -210,15 +210,17 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         """
 
         for chromosome in self.knowledge_base.cell.species_types.get(__type=wc_kb.core.DnaSpeciesType):
-            for locus in chromosome.loci:
+            for i in range (len(chromosome.loci)):
+
+                locus = chromosome.loci[i]
 
                 if type(locus) == wc_kb.TranscriptionUnitLocus:
-
-                    # creates RnaSpeciesType for RNA sequence corresponding to gene
-                    rna = wc_kb.RnaSpeciesType()
-                    # GeneLocus object for gene sequence, attribute of ProteinSpeciesType object
                     tu = locus
 
+                    # creates RnaSpeciesType for RNA sequence corresponding to gene
+                    rna = self.knowledge_base.cell.species_types.get_or_create(
+                id='rna_{}'.format(tu.id), __type=wc_kb.RnaSpeciesType)
+                    # GeneLocus object for gene sequence, attribute of ProteinSpeciesType object
                     if tu.genes[0].type == wc_kb.GeneType.mRna:
                         rna.type = wc_kb.RnaType.mRna
                     elif tu.genes[0].type == wc_kb.GeneType.rRna:
@@ -232,22 +234,18 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
                     rna.transcription_units.append(tu)
 
-                    # adds corresponding mRNA sequence to speciestypes list of kb.cell
-                    self.knowledge_base.cell.species_types.append(rna)
                     if rna.type == wc_kb.RnaType.mRna:
                         for gene in tu.genes:
                             # creates ProteinSpeciesType object for corresponding protein sequence(s)
 
-                            prot = wc_kb.ProteinSpeciesType()
+                            prot = self.knowledge_base.cell.species_types.get_or_create(
+                id='prot_{}'.format(gene.id), __type=wc_kb.ProteinSpeciesType)
 
                             prot.cell = self.knowledge_base.cell
                             prot.cell.knowledge_base = self.knowledge_base
 
                             prot.gene = gene  # associates protein with GeneLocus object for corresponding gene
                             prot.rna = rna
-
-                            # adds ProteinSpeciesType object to kb.cell speciestypes list
-                            self.knowledge_base.cell.species_types.append(prot)
 
     def gen_tus(self):
         """ Creates transcription units with 5'/3' UTRs, polycistronic mRNAs, and other types of RNA (tRNA, rRNA, sRNA)
