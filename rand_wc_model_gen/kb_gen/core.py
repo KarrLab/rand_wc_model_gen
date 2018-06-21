@@ -27,7 +27,7 @@ class KbGenerator(wc_kb_gen.KbGenerator):
     * version
     * component
 
-        * ChromosomesGenesTusGenerator
+        * GenomeGenerator
         * MetabolitesGenerator
         * PropertiesGenerator
         * RnaGenerator
@@ -35,7 +35,7 @@ class KbGenerator(wc_kb_gen.KbGenerator):
 
     DEFAULT_COMPONENT_GENERATORS = (
         PropertiesGenerator,
-        ChromosomesGenesTusGenerator,
+        GenomeGenerator,
         MetabolitesGenerator,
         RnaGenerator,
     )

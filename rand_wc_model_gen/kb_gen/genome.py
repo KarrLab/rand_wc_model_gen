@@ -190,6 +190,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                 gene.start = gene_start  # 1-indexed
                 gene.polymer = chro
                 gene.end = gene_start + gene_lens[i_gene]  # 1-indexed
+                gene.name = 'gene {} {}'.format(i_chr+1, i_gene+1)
                 typeList = [wc_kb.GeneType.mRna, wc_kb.GeneType.rRna,
                             wc_kb.GeneType.sRna, wc_kb.GeneType.tRna]
                 prob_rna = [1 - ncRNA_prop - tRNA_prop -
@@ -220,6 +221,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                     # creates RnaSpeciesType for RNA sequence corresponding to gene
                     rna = self.knowledge_base.cell.species_types.get_or_create(
                 id='rna_{}'.format(tu.id), __type=wc_kb.RnaSpeciesType)
+                    rna.name = 'rna {}'.format(tu.id)
                     # GeneLocus object for gene sequence, attribute of ProteinSpeciesType object
                     if tu.genes[0].type == wc_kb.GeneType.mRna:
                         rna.type = wc_kb.RnaType.mRna
@@ -240,6 +242,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
                             prot = self.knowledge_base.cell.species_types.get_or_create(
                 id='prot_{}'.format(gene.id), __type=wc_kb.ProteinSpeciesType)
+                            prot.name = 'prot {}'.format(gene.id)
 
                             prot.cell = self.knowledge_base.cell
                             prot.cell.knowledge_base = self.knowledge_base
@@ -290,6 +293,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         # add 3', 5' UTRs to the ends of the transcription unit (upstream of first gene, downstream of last gene)
                         tu = self.knowledge_base.cell.loci.get_or_create(
                             id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.TranscriptionUnitLocus)
+                        tu.name = 'tu {} {}'.format(i_chr+1, i_gene+1)
 
                         five_prime_start = gene.start - five_prime
                         if five_prime_start < 0:
@@ -331,6 +335,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                             id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.TranscriptionUnitLocus)
                         tu.start = five_prime_start
                         tu.end = three_prime_end
+                        tu.name = 'tu {} {}'.format(i_chr+1, i_gene+1)
                         tu.genes.append(gene)
                         transcription_loci.append(tu)
 
@@ -339,6 +344,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                    # print("not mrna")
                     tu = self.knowledge_base.cell.loci.get_or_create(
                         id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.TranscriptionUnitLocus)
+                    tu.name = 'tu {} {}'.format(i_chr+1, i_gene+1)
                     tu.start = gene.start
                     tu.end = gene.end
                     tu.genes.append(gene)
