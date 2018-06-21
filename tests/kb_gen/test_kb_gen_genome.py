@@ -19,7 +19,7 @@ class TestGenomeGenerator(unittest.TestCase):
         kb.cell = wc_kb.Cell()
         # Creates the GenomeGenerator object and sets the parameters as given
         options = {
-            'mean_num_genes': 100}
+            'mean_num_genes': 1000}
         self.gen = genome.GenomeGenerator(kb, options)
         self.gen.run()
 

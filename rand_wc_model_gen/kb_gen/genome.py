@@ -236,7 +236,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
                     if rna.type == wc_kb.RnaType.mRna:
                         for gene in tu.genes:
-                            # creates ProteinSpeciesType object for corresponding protein sequence(s)
+                            # creates ProteinSpecipe object for corresponding protein sequence(s)
 
                             prot = self.knowledge_base.cell.species_types.get_or_create(
                 id='prot_{}'.format(gene.id), __type=wc_kb.ProteinSpeciesType)
@@ -293,7 +293,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
                         five_prime_start = gene.start - five_prime
                         if five_prime_start < 0:
-                            2
                             five_prime_start = 0
                         tu.genes.append(gene)
                         tu.start = five_prime_start
