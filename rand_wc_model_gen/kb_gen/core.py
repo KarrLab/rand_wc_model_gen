@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from .genome import GenomeGenerator
+from .chrs_genes_tus import ChromosomesGenesTusGenerator
 from .metabolites import MetabolitesGenerator
 from .properties import PropertiesGenerator
 from .rna import RnaGenerator
@@ -27,7 +27,7 @@ class KbGenerator(wc_kb_gen.KbGenerator):
     * version
     * component
 
-        * GenomeGenerator
+        * ChromosomesGenesTusGenerator
         * MetabolitesGenerator
         * PropertiesGenerator
         * RnaGenerator
@@ -35,7 +35,7 @@ class KbGenerator(wc_kb_gen.KbGenerator):
 
     DEFAULT_COMPONENT_GENERATORS = (
         PropertiesGenerator,
-        GenomeGenerator,
+        ChromosomesGenesTusGenerator,
         MetabolitesGenerator,
         RnaGenerator,
     )
