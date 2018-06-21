@@ -320,6 +320,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         if three_prime_end >= len(seq):
                             three_prime_end = len(seq) - 1
                         tu.end = three_prime_end
+                        transcription_loci.append(tu)
                         
                     else:  # make an individual transcription unit for the gene
                         # print("single")
@@ -333,10 +334,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                             id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.TranscriptionUnitLocus)
                         tu.start = five_prime_start
                         tu.end = three_prime_end
-                       # tu.polymer = gene.polymer
                         tu.genes.append(gene)
                         transcription_loci.append(tu)
-                        self.knowledge_base.cell.loci.append(tu)
 
                 # make a transcription unit that transcribes other types of RNA (tRNA, rRNA, sRNA)
                 else:
@@ -345,14 +344,11 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.TranscriptionUnitLocus)
                     tu.start = gene.start
                     tu.end = gene.end
-                   # tu.polymer = gene.polymer
                     tu.genes.append(gene)
                     transcription_loci.append(tu)
-                    self.knowledge_base.cell.loci.append(tu)
 
                 i_gene += 1
             for locus in transcription_loci:
-                chromosome.loci.append(locus)
                 locus.polymer = chromosome
 
     def rand(self, mean, count=1):
@@ -362,10 +358,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         Args:
             mean (:obj:`float`): mean value
             count (:obj:`int`): number of random numbers to generate
-<<<<<<< HEAD
-=======
->>>>>>> origin/Combining
->>>>>>> 3e54f6d21c1cc79b2d8c3c7de04a8a8303234da8
 
         Returns:
             :obj:`int` or :obj:`numpy.ndarray` of :obj:`int`: random normally distributed integer(s)
