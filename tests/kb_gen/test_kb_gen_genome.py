@@ -9,7 +9,7 @@ import math
 import wc_kb
 import unittest
 from rand_wc_model_gen.kb_gen import genome
-from Biopython.Data import CodonTable
+from Bio.Data import CodonTable
 
 
 class TestGenomeGenerator(unittest.TestCase):
