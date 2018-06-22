@@ -1,5 +1,5 @@
 from .core import KbGenerator
-from .chrs_genes_tus import ChromosomesGenesTusGenerator
+from .genome import GenomeGenerator
 from .metabolites import MetabolitesGenerator
 from .properties import PropertiesGenerator
 from .rna import RnaGenerator

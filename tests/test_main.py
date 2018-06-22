@@ -37,7 +37,7 @@ class CliTestCase(unittest.TestCase):
             file.write('    [[kb_gen]]\n')
             file.write('        set_repo_metadata_from_path = false\n')
             file.write('        [[[component]]]\n')
-            file.write('            [[[[ChromosomesGenesTusGenerator]]]]\n')
+            file.write('            [[[[GenomeGenerator]]]]\n')
             file.write('                num_chromosomes = 1\n')
             file.write('                mean_num_genes = 10.\n')
             file.write('                mean_gene_len = 10.\n')
