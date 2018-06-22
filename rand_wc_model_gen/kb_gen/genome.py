@@ -131,7 +131,9 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
         cell = self.knowledge_base.cell
 
-        codon_table = self.knowledge_base.translation_table = CodonTable.unambiguous_dna_by_id[
+        self.knowledge_base.translation_table = translation_table
+
+        codon_table = CodonTable.unambiguous_dna_by_id[
             translation_table]
 
         # start codons from NCBI list
@@ -211,7 +213,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         """
 
         for chromosome in self.knowledge_base.cell.species_types.get(__type=wc_kb.core.DnaSpeciesType):
-            for i in range (len(chromosome.loci)):
+            for i in range(len(chromosome.loci)):
 
                 locus = chromosome.loci[i]
 
@@ -220,7 +222,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
                     # creates RnaSpeciesType for RNA sequence corresponding to gene
                     rna = self.knowledge_base.cell.species_types.get_or_create(
-                id='rna_{}'.format(tu.id), __type=wc_kb.RnaSpeciesType)
+                        id='rna_{}'.format(tu.id), __type=wc_kb.RnaSpeciesType)
                     rna.name = 'rna {}'.format(tu.id)
                     # GeneLocus object for gene sequence, attribute of ProteinSpeciesType object
                     if tu.genes[0].type == wc_kb.GeneType.mRna:
@@ -241,7 +243,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                             # creates ProteinSpecipe object for corresponding protein sequence(s)
 
                             prot = self.knowledge_base.cell.species_types.get_or_create(
-                id='prot_{}'.format(gene.id), __type=wc_kb.ProteinSpeciesType)
+                                id='prot_{}'.format(gene.id), __type=wc_kb.ProteinSpeciesType)
                             prot.name = 'prot {}'.format(gene.id)
 
                             prot.cell = self.knowledge_base.cell
@@ -322,7 +324,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                             three_prime_end = len(seq) - 1
                         tu.end = three_prime_end
                         transcription_loci.append(tu)
-                        
+
                     else:  # make an individual transcription unit for the gene
                         # print("single")
                         five_prime_start = gene.start - five_prime
