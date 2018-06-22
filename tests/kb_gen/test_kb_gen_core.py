@@ -17,7 +17,7 @@ class KbGeneratorTestCase(unittest.TestCase):
     def test(self):
         gen = kb_gen.KbGenerator(options={
             'component': {
-                'ChromosomesGenesTusGenerator': {
+                'GenomeGenerator': {
                     'num_chromosomes': 10,
                     'mean_num_genes': 100,
                 }
