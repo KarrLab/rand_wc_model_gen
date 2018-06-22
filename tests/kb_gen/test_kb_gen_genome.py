@@ -9,6 +9,7 @@ import math
 import wc_kb
 import unittest
 from rand_wc_model_gen.kb_gen import genome
+from Biopython.Data import CodonTable
 
 
 class TestGenomeGenerator(unittest.TestCase):
@@ -86,8 +87,8 @@ class TestGenomeGenerator(unittest.TestCase):
 
     def test_start_codon(self):
         trans_table = self.gen.knowledge_base.translation_table
-        START_CODONS = trans_table.start_codons
-        STOP_CODONS = trans_table.stop_codons
+        START_CODONS = CodonTable.unambiguous_dna_by_id[trans_table.start_codons]
+
         genes = self.gen.knowledge_base.cell.loci.get(__type=wc_kb.GeneLocus)
         for gene in genes:
             if gene.type == wc_kb.GeneType.mRna:
@@ -97,8 +98,7 @@ class TestGenomeGenerator(unittest.TestCase):
     def test_stop_codon(self):
         trans_table = self.gen.knowledge_base.translation_table
         genes = self.gen.knowledge_base.cell.loci.get(__type=wc_kb.GeneLocus)
-        START_CODONS = trans_table.start_codons
-        STOP_CODONS = trans_table.stop_codons
+        STOP_CODONS = CodonTable.unambiguous_dna_by_id[trans_table.stop_codons]
         for gene in genes:
             if gene.type == wc_kb.GeneType.mRna:
                 self.assertIn(gene.get_seq()[-3:], STOP_CODONS)
