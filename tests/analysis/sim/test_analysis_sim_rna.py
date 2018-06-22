@@ -29,7 +29,7 @@ class RnaSimulationAnalysisTestCase(unittest.TestCase):
         # generate kb
         kb = kb_gen.KbGenerator(options={
             'component': {
-                'ChromosomesGenesTusGenerator': {
+                'GenomeGenerator': {
                     'num_chromosomes': 1,
                     'mean_num_genes': 10.,
                     'mean_gene_len': 100.,
@@ -48,11 +48,15 @@ class RnaSimulationAnalysisTestCase(unittest.TestCase):
                     seed=i_sim,
                     checkpoint_period=1.,
                     results_dir=sim_results_path)
-            time.sleep(1.0)  # todo: remove after results directory naming is fixed
+            # todo: remove after results directory naming is fixed
+            time.sleep(1.0)
 
         # analyze simulation results
         analysis_results_path = os.path.join(self.temp_dir, 'analysis')
-        analysis.sim.rna.RnaSimulationAnalysis(kb, model, sim_results_path, out_path=analysis_results_path).run()
+        analysis.sim.rna.RnaSimulationAnalysis(
+            kb, model, sim_results_path, out_path=analysis_results_path).run()
 
-        self.assertTrue(os.path.isfile(os.path.join(analysis_results_path, 'Individual RNA (simulation 1).pdf')))
-        self.assertTrue(os.path.isfile(os.path.join(analysis_results_path, 'Total RNA (all simulations).pdf')))
+        self.assertTrue(os.path.isfile(os.path.join(
+            analysis_results_path, 'Individual RNA (simulation 1).pdf')))
+        self.assertTrue(os.path.isfile(os.path.join(
+            analysis_results_path, 'Total RNA (all simulations).pdf')))
