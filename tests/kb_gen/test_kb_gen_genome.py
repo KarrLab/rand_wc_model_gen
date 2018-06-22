@@ -87,7 +87,7 @@ class TestGenomeGenerator(unittest.TestCase):
 
     def test_start_codon(self):
         trans_table = self.gen.knowledge_base.translation_table
-        START_CODONS = CodonTable.unambiguous_dna_by_id[trans_table.start_codons]
+        START_CODONS = CodonTable.unambiguous_dna_by_id[trans_table]
 
         genes = self.gen.knowledge_base.cell.loci.get(__type=wc_kb.GeneLocus)
         for gene in genes:
@@ -98,7 +98,7 @@ class TestGenomeGenerator(unittest.TestCase):
     def test_stop_codon(self):
         trans_table = self.gen.knowledge_base.translation_table
         genes = self.gen.knowledge_base.cell.loci.get(__type=wc_kb.GeneLocus)
-        STOP_CODONS = CodonTable.unambiguous_dna_by_id[trans_table.stop_codons]
+        STOP_CODONS = CodonTable.unambiguous_dna_by_id[trans_table]
         for gene in genes:
             if gene.type == wc_kb.GeneType.mRna:
                 self.assertIn(gene.get_seq()[-3:], STOP_CODONS)
