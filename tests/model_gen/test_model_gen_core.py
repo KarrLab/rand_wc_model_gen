@@ -18,7 +18,7 @@ class ModelGeneratorTestCase(unittest.TestCase):
     def test(self):
         kb = kb_gen.KbGenerator(options={
             'component': {
-                'ChromosomesGenesTusGenerator': {
+                'GenomeGenerator': {
                     'num_chromosomes': 1,
                     'mean_num_genes': 100,
                     'mean_gene_len': 100,
@@ -27,7 +27,9 @@ class ModelGeneratorTestCase(unittest.TestCase):
         }).run()
         model = model_gen.ModelGenerator(kb).run()
 
-        self.assertIsInstance(model.submodels.get_one(id='transcription'), wc_lang.Submodel)
+        self.assertIsInstance(model.submodels.get_one(
+            id='transcription'), wc_lang.Submodel)
 
         errors = obj_model.Validator().run(model, get_related=True)
-        self.assertEqual(errors, None, msg=wc_utils.util.string.indent_forest(errors))
+        self.assertEqual(
+            errors, None, msg=wc_utils.util.string.indent_forest(errors))
