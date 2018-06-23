@@ -7,6 +7,7 @@
 """
 import math
 import numpy
+import scipy.stats as stats
 import wc_kb
 import wc_kb_gen
 import numpy
@@ -367,4 +368,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         Returns:
             :obj:`int` or :obj:`numpy.ndarray` of :obj:`int`: random normally distributed integer(s)
         """
-        return numpy.int64(numpy.round(random.normal(mean, numpy.sqrt(mean), (count, ))))
+        a = (0-mean)/numpy.sqrt(mean)
+        b = (numpy.inf - mean)/numpy.sqrt(mean)
+        mu = mean
+
+        return numpy.int64(numpy.round(stats.truncnorm.rvs(a, b, loc=mean, scale=numpy.sqrt(mean), size=count)))
