@@ -357,7 +357,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             for locus in transcription_loci:
                 locus.polymer = chromosome
 
-    def rand(self, mean, count=1):
+    def rand(self, mean, count=1, min=0, max=numpy.inf):
         """ Generated 1 or more random normally distributed integer(s) with standard deviation equal
         to the square root of the mean value.
 
@@ -368,8 +368,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         Returns:
             :obj:`int` or :obj:`numpy.ndarray` of :obj:`int`: random normally distributed integer(s)
         """
-        a = (0-mean)/numpy.sqrt(mean)
-        b = (numpy.inf - mean)/numpy.sqrt(mean)
+        a = (min-mean)/numpy.sqrt(mean)
+        b = (max - mean)/numpy.sqrt(mean)
         mu = mean
 
         return numpy.int64(numpy.round(stats.truncnorm.rvs(a, b, loc=mean, scale=numpy.sqrt(mean), size=count)))
