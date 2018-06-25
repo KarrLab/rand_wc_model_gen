@@ -23,16 +23,14 @@ class TranscriptionSubmodelGeneratorTestCase(unittest.TestCase):
                     'mean_volume': 1e-15,
                     'mean_doubling_time': 1000.,
                 },
-                'ChromosomesGenesTusGenerator': {
+                'GenomeGenerator': {
                     'num_chromosomes': 1,
                     'mean_num_genes': 100.,
                     'mean_gene_len': 100.,
-                },
-                'MetabolitesGenerator': {
-                },
-                'RnaGenerator': {
                     'mean_copy_number': 10.,
                     'mean_half_life': 120.,
+                },
+                'MetabolitesGenerator': {
                 },
             },
         }).run()
