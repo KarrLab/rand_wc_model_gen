@@ -16,13 +16,20 @@ class TestGenomeGenerator(unittest.TestCase):
 
     def setUp(self):
         # The knowledge base that is needed for the KBComponentGenerator
-        kb = wc_kb.KnowledgeBase()
-        kb.cell = wc_kb.Cell()
         # Creates the GenomeGenerator object and sets the parameters as given
-        options = {
-            'mean_num_genes': 100}
-        self.gen = genome.GenomeGenerator(kb, options)
-        self.gen.run()
+        kb = kb_gen.KbGenerator(options={
+            'component': {
+                'PropertiesGenerator': {
+                    'mean_volume': 1e-15,
+                    'mean_doubling_time': 1000.,
+                },
+                'GenomeGenerator': {
+                    'mean_num_genes': 100.,
+                },
+                'MetabolitesGenerator': {
+                },
+            },
+        }).run()
 
     def test_init(self):
         self.assertEqual(type(self.gen), genome.GenomeGenerator)

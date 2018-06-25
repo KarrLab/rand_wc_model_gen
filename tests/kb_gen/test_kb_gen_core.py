@@ -17,11 +17,15 @@ class KbGeneratorTestCase(unittest.TestCase):
     def test(self):
         gen = kb_gen.KbGenerator(options={
             'component': {
+                'PropertiesGenerator': {
+                    'mean_volume': 1e-15,
+                    'mean_doubling_time': 1000.,
+                },
                 'GenomeGenerator': {
                     'num_chromosomes': 10,
                     'mean_num_genes': 100,
-                }
-            }
+                },
+            },
         })
 
         kb = gen.run()
