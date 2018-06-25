@@ -17,7 +17,7 @@ class MetabolismSubmodelGeneratorTestCase(unittest.TestCase):
     def test(self):
         kb = kb_gen.KbGenerator(options={
             'component': {
-                'ChromosomesGenesTusGenerator': {
+                'GenomeGenerator': {
                     'num_chromosomes': 1,
                     'mean_num_genes': 100,
                     'mean_gene_len': 100,
