@@ -10,6 +10,7 @@ import wc_kb
 import unittest
 from rand_wc_model_gen.kb_gen import genome
 from Bio.Data import CodonTable
+from rand_wc_model_gen import kb_gen
 
 
 class TestGenomeGenerator(unittest.TestCase):
