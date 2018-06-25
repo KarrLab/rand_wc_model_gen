@@ -27,12 +27,10 @@ class TestGenomeGenerator(unittest.TestCase):
                 'GenomeGenerator': {
                     'mean_num_genes': 100.,
                 },
-                'MetabolitesGenerator': {
-                },
             },
         }).run()
 
-        self.gen = kb.DEFAULT_COMPONENT_GENERATORS[1]
+        self.gen = kb.component_generators[1]
 
     def test_init(self):
         self.assertEqual(type(self.gen), genome.GenomeGenerator)
