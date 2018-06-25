@@ -32,6 +32,8 @@ class TestGenomeGenerator(unittest.TestCase):
             },
         }).run()
 
+        self.gen = kb.DEFAULT_COMPONENT_GENERATORS[1]
+
     def test_init(self):
         self.assertEqual(type(self.gen), genome.GenomeGenerator)
 
