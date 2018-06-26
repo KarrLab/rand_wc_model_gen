@@ -39,7 +39,7 @@ class TestGenomeGenerator(unittest.TestCase):
         
 
     def test_init(self):
-        self.assertEqual(type(self.whole_gen), kb_gen.KbGenerator)
+        self.assertEqual(type(self.whole_gen), kb_gen.kbGenerator)
 
     def test_num_chromosomes(self):
         chromosomes = self.kb.cell.species_types.get(
