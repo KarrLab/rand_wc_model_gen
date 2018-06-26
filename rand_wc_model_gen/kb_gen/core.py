@@ -9,7 +9,6 @@
 from .genome import GenomeGenerator
 from .metabolites import MetabolitesGenerator
 from .properties import PropertiesGenerator
-from .rna import RnaGenerator
 from numpy import random
 import rand_wc_model_gen
 import wc_kb
@@ -30,14 +29,12 @@ class KbGenerator(wc_kb_gen.KbGenerator):
         * GenomeGenerator
         * MetabolitesGenerator
         * PropertiesGenerator
-        * RnaGenerator
     """
 
     DEFAULT_COMPONENT_GENERATORS = (
         PropertiesGenerator,
         GenomeGenerator,
         MetabolitesGenerator,
-        RnaGenerator,
     )
 
     def run(self):
