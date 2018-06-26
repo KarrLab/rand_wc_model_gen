@@ -30,7 +30,7 @@ class TestGenomeGenerator(unittest.TestCase):
             },
         })
 
-        self.kb = whole_gen.run()
+        self.kb = self.whole_gen.run()
 
         component_options = self.whole_gen.options.get('component', {})
 
