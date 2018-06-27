@@ -134,27 +134,33 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             assert(i >= 1)
         options['operon_gen_spacing'] = operon_gen_spacing
 
-        mean_copy_number = options.get('mean_copy_number', 0.4)  # DOI: 10.1038/ismej.2012.94
+        # DOI: 10.1038/ismej.2012.94
+        mean_copy_number = options.get('mean_copy_number', 0.4)
         assert(mean_copy_number > 0)
         options['mean_copy_number'] = mean_copy_number
 
-        mean_half_life = options.get('mean_half_life', 2.1 * 60)  # DOI: 10.1073/pnas.0308747101
+        # DOI: 10.1073/pnas.0308747101
+        mean_half_life = options.get('mean_half_life', 2.1 * 60)
         assert(mean_half_life > 0)
         options['mean_half_life'] = mean_half_life
 
-        mean_copy_number = options.get('mean_copy_number', 0.4)  # DOI: 10.1038/ismej.2012.94
+        # DOI: 10.1038/ismej.2012.94
+        mean_copy_number = options.get('mean_copy_number', 0.4)
         assert(mean_copy_number > 0)
         options['mean_copy_number'] = mean_copy_number
 
-        mean_half_life = options.get('mean_half_life', 2.1 * 60)  # DOI: 10.1073/pnas.0308747101
+        # DOI: 10.1073/pnas.0308747101
+        mean_half_life = options.get('mean_half_life', 2.1 * 60)
         assert(mean_half_life > 0)
         options['mean_half_life'] = mean_half_life
 
-        mean_copy_number = options.get('mean_copy_number', 0.4)  # DOI: 10.1038/ismej.2012.94
+        # DOI: 10.1038/ismej.2012.94
+        mean_copy_number = options.get('mean_copy_number', 0.4)
         assert(mean_copy_number > 0)
         options['mean_copy_number'] = mean_copy_number
 
-        mean_half_life = options.get('mean_half_life', 2.1 * 60)  # DOI: 10.1073/pnas.0308747101
+        # DOI: 10.1073/pnas.0308747101
+        mean_half_life = options.get('mean_half_life', 2.1 * 60)
         assert(mean_half_life > 0)
         options['mean_half_life'] = mean_half_life
 
@@ -185,7 +191,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         five_prime_len = options.get('five_prime_len')
         operon_gen_spacing = options.get('operon_gen_spacing')
         cell = self.knowledge_base.cell
-
 
         # Define DNA Constants
         self.knowledge_base.translation_table = translation_table
@@ -218,7 +223,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                 if (np.sum(operon_sizes)+operon_size_i > num_polycistronic_genes):
                     operon_size_i = num_polycistronic_genes - \
                         np.sum(operon_sizes)
-                operon_sizes.append(operon_size_i)
+                operon_sizes.append(int(operon_size_i))
 
             # Determine num of operons and transcription units
             num_operons = len(operon_sizes)
@@ -375,7 +380,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         options = self.options
         mean_copy_number = options.get('mean_copy_number')
         mean_half_life = options.get('mean_half_life')
-        mean_volume =self.knowledge_base.cell.properties.get_one(id='mean_volume').value
+        mean_volume = self.knowledge_base.cell.properties.get_one(
+            id='mean_volume').value
         for chromosome in self.knowledge_base.cell.species_types.get(__type=wc_kb.core.DnaSpeciesType):
 
             for i in range(len(chromosome.loci)):
@@ -401,8 +407,10 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
                     # print(rna.type)
 
-                    rna.concentration = np.random.gamma(1, mean_copy_number) / scipy.constants.Avogadro / mean_volume
-                    rna.half_life = np.random.normal(mean_half_life, np.sqrt(mean_half_life))
+                    rna.concentration = np.random.gamma(
+                        1, mean_copy_number) / scipy.constants.Avogadro / mean_volume
+                    rna.half_life = np.random.normal(
+                        mean_half_life, np.sqrt(mean_half_life))
 
                     rna.transcription_units.append(tu)
 
@@ -417,7 +425,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                             prot.gene = gene  # associates protein with GeneLocus object for corresponding gene
                             prot.rna = rna
 
-
     def rand(self, mean, count=1, min=0, max=np.inf):
         """ Generated 1 or more random normally distributed integer(s) between the minimum and maximum values,  with standard deviation equal  to the square root of the mean value.
 
@@ -431,5 +438,5 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         """
         a = (min-mean)/np.sqrt(mean)
         b = (max - mean)/np.sqrt(mean)
-      
+
         return np.int64(np.round(stats.truncnorm.rvs(a, b, loc=mean, scale=np.sqrt(mean), size=count)))

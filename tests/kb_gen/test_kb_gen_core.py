@@ -24,11 +24,10 @@ class KbGeneratorTestCase(unittest.TestCase):
                 'GenomeGenerator': {
                     'num_chromosomes': 10,
                     'mean_num_genes': 100,
+                    'mean_num_sRNA': 5,
+                    'mean_num_rRNA': 5,
+                    'mean_num_tRNA': 5}}})
 
-                    'mean_num_sRNA': 10,
-                    'mean_num_rRNA': 10,
-                    'mean_num_tRNA': 10}}})
-        
         kb = gen.run()
         self.assertEqual(len(kb.cell.species_types.get(
             __type=wc_kb.DnaSpeciesType)), 10)
