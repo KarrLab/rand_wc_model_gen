@@ -38,6 +38,9 @@ class Test(unittest.TestCase):
             file.write('        [[[component]]]\n')
             file.write('            [[[[GenomeGenerator]]]]\n')
             file.write('                num_chromosomes = 5\n')
+            file.write('                mean_num_rRNA = 5\n')
+            file.write('                mean_num_sRNA = 5\n')
+            file.write('                mean_num_tRNA = 5\n')
 
         config = rand_wc_model_gen.config.get_config(
             extra_path=self.extra_path)
