@@ -25,7 +25,7 @@ class TranscriptionSubmodelGeneratorTestCase(unittest.TestCase):
                 },
                 'GenomeGenerator': {
                     'num_chromosomes': 1,
-                    'mean_num_genes': 100.,
+                    'mean_num_genes': 500.,
                     'mean_gene_len': 100.,
                     'mean_copy_number': 10.,
                     'mean_half_life': 120.,
@@ -38,7 +38,8 @@ class TranscriptionSubmodelGeneratorTestCase(unittest.TestCase):
         rnas = cell.species_types.get(__type=wc_kb.RnaSpeciesType)
 
         model = wc_lang.Model()
-        gen = transcription.TranscriptionSubmodelGenerator(kb, model, options={})
+        gen = transcription.TranscriptionSubmodelGenerator(
+            kb, model, options={})
         gen.run()
 
         submodel = model.submodels.get_one(id='transcription')
@@ -50,25 +51,35 @@ class TranscriptionSubmodelGeneratorTestCase(unittest.TestCase):
         # check species types and species generated
         atp = model.species_types.get_one(id='atp')
         atp_cytosol = atp.species.get_one(compartment=cytosol)
-        self.assertEqual(atp_cytosol.concentration.units, wc_lang.ConcentrationUnit.M)
+        self.assertEqual(atp_cytosol.concentration.units,
+                         wc_lang.ConcentrationUnit.M)
 
         concs = []
         for species_type in model.species_types:
             if species_type.id.startswith('rna_'):
                 species = species_type.species.get_one(compartment=cytosol)
                 concs.append(species.concentration.value)
-                self.assertEqual(species.concentration.units, wc_lang.ConcentrationUnit.M)
-        numpy.testing.assert_almost_equal(numpy.mean(concs), 10. / scipy.constants.Avogadro / 1e-15, decimal=2)
+                self.assertEqual(species.concentration.units,
+                                 wc_lang.ConcentrationUnit.M)
+        numpy.testing.assert_almost_equal(numpy.mean(
+            concs), 10. / scipy.constants.Avogadro / 1e-15, decimal=2)
 
         # check reactions generated
         self.assertEqual(len(submodel.reactions), len(rnas))
-        atp = model.species_types.get_one(id='atp').species.get_one(compartment=cytosol)
-        ctp = model.species_types.get_one(id='ctp').species.get_one(compartment=cytosol)
-        gtp = model.species_types.get_one(id='gtp').species.get_one(compartment=cytosol)
-        utp = model.species_types.get_one(id='utp').species.get_one(compartment=cytosol)
-        ppi = model.species_types.get_one(id='ppi').species.get_one(compartment=cytosol)
-        h2o = model.species_types.get_one(id='h2o').species.get_one(compartment=cytosol)
-        h = model.species_types.get_one(id='h').species.get_one(compartment=cytosol)
+        atp = model.species_types.get_one(
+            id='atp').species.get_one(compartment=cytosol)
+        ctp = model.species_types.get_one(
+            id='ctp').species.get_one(compartment=cytosol)
+        gtp = model.species_types.get_one(
+            id='gtp').species.get_one(compartment=cytosol)
+        utp = model.species_types.get_one(
+            id='utp').species.get_one(compartment=cytosol)
+        ppi = model.species_types.get_one(
+            id='ppi').species.get_one(compartment=cytosol)
+        h2o = model.species_types.get_one(
+            id='h2o').species.get_one(compartment=cytosol)
+        h = model.species_types.get_one(
+            id='h').species.get_one(compartment=cytosol)
         self.assertEqual(
             + submodel.reactions[0].participants.get_one(species=atp).coefficient
             + submodel.reactions[0].participants.get_one(species=ctp).coefficient
@@ -92,8 +103,9 @@ class TranscriptionSubmodelGeneratorTestCase(unittest.TestCase):
             self.assertEqual(rl.direction.name, 'forward')
             self.assertEqual(rl.equation.expression, 'k_cat')
             self.assertEqual(rl.equation.modifiers, [])
-            self.assertEqual(rl.equation.parameters, [])            
+            self.assertEqual(rl.equation.parameters, [])
             numpy.testing.assert_equal(rl.k_m, float('nan'))
 
         k_cats = [rxn.rate_laws[0].k_cat for rxn in submodel.reactions]
-        numpy.testing.assert_almost_equal(numpy.mean(k_cats), 10. * numpy.log(2.) * (1. / 120.), decimal=2)
+        numpy.testing.assert_almost_equal(numpy.mean(
+            k_cats), 10. * numpy.log(2.) * (1. / 120.), decimal=2)

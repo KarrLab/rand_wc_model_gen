@@ -24,7 +24,8 @@ class CliTestCase(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
 
-        self.kb_core_path = os.path.join(self.temp_dir, 'kb', 'core', 'core.xlsx')
+        self.kb_core_path = os.path.join(
+            self.temp_dir, 'kb', 'core', 'core.xlsx')
         self.kb_seq_path = os.path.join(self.temp_dir, 'kb', 'seq', 'seq.fna')
         self.model_path = os.path.join(self.temp_dir, 'model', 'model.xlsx')
         self.sim_results_path = os.path.join(self.temp_dir, 'sim_results')
@@ -39,7 +40,10 @@ class CliTestCase(unittest.TestCase):
             file.write('        [[[component]]]\n')
             file.write('            [[[[GenomeGenerator]]]]\n')
             file.write('                num_chromosomes = 1\n')
-            file.write('                mean_num_genes = 10.\n')
+            file.write('                mean_num_rRNA = 5\n')
+            file.write('                mean_num_tRNA = 5\n')
+            file.write('                mean_num_sRNA = 5\n')
+            file.write('                mean_num_genes = 100.\n')
             file.write('                mean_gene_len = 10.\n')
             file.write('    [[kb]]\n')
             file.write('        [[[path]]]\n')
@@ -64,12 +68,14 @@ class CliTestCase(unittest.TestCase):
         with mock.patch('sys.argv', ['rand_wc_model_gen', '--help']):
             with self.assertRaises(SystemExit) as context:
                 __main__.main()
-                self.assertRegexpMatches(context.Exception, 'usage: rand_wc_model_gen')
+                self.assertRegexpMatches(
+                    context.Exception, 'usage: rand_wc_model_gen')
 
         with mock.patch('sys.argv', ['rand_wc_model_gen']):
             with abduct.captured(abduct.out(), abduct.err()) as (stdout, stderr):
                 __main__.main()
-                self.assertRegexpMatches(stdout.getvalue().strip(), 'usage: rand_wc_model_gen')
+                self.assertRegexpMatches(
+                    stdout.getvalue().strip(), 'usage: rand_wc_model_gen')
                 self.assertEqual(stderr.getvalue(), '')
 
     def test_get_version(self):
@@ -77,14 +83,16 @@ class CliTestCase(unittest.TestCase):
             with __main__.App(argv=['-v']) as app:
                 with self.assertRaises(SystemExit):
                     app.run()
-            self.assertEqual(stdout.getvalue().strip(), rand_wc_model_gen.__version__)
+            self.assertEqual(stdout.getvalue().strip(),
+                             rand_wc_model_gen.__version__)
             self.assertEqual(stderr.getvalue(), '')
 
         with abduct.captured(abduct.out(), abduct.err()) as (stdout, stderr):
             with __main__.App(argv=['--version']) as app:
                 with self.assertRaises(SystemExit):
                     app.run()
-            self.assertEqual(stdout.getvalue().strip(), rand_wc_model_gen.__version__)
+            self.assertEqual(stdout.getvalue().strip(),
+                             rand_wc_model_gen.__version__)
             self.assertEqual(stderr.getvalue(), '')
 
     def test_generate(self):
@@ -108,7 +116,8 @@ class CliTestCase(unittest.TestCase):
             app.run()
 
         # assert
-        self.assertTrue(os.path.isfile(os.path.join(app.results['sim_results_path'], 'run_results.h5')))
+        self.assertTrue(os.path.isfile(os.path.join(
+            app.results['sim_results_path'], 'run_results.h5')))
 
     def test_analyze(self):
         # generate model
@@ -116,10 +125,11 @@ class CliTestCase(unittest.TestCase):
             app.run()
 
         # simulate model
-        for i_sim in range(3):            
+        for i_sim in range(3):
             with __main__.App(argv=['simulate', '--config-path', self.config_path, '--seed', str(i_sim)]) as app:
                 app.run()
-            time.sleep(1.)  # todo: remove after results directory naming is fixed
+            # todo: remove after results directory naming is fixed
+            time.sleep(1.)
 
         # analyze simulation results
         with __main__.App(argv=['analyze', '--config-path', self.config_path]) as app:

@@ -31,8 +31,11 @@ class RnaSimulationAnalysisTestCase(unittest.TestCase):
             'component': {
                 'GenomeGenerator': {
                     'num_chromosomes': 1,
-                    'mean_num_genes': 10.,
+                    'mean_num_genes': 100.,
                     'mean_gene_len': 100.,
+                    'mean_num_rRNA': 1,
+                    'mean_num_tRNA': 1,
+                    'mean_num_sRNA': 1,
                 },
             },
         }).run()

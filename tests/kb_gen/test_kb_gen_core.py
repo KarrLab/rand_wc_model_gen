@@ -24,15 +24,18 @@ class KbGeneratorTestCase(unittest.TestCase):
                 'GenomeGenerator': {
                     'num_chromosomes': 10,
                     'mean_num_genes': 100,
-                },
-            },
-        })
 
+                    'mean_num_sRNA': 10,
+                    'mean_num_rRNA': 10,
+                    'mean_num_tRNA': 10}}})
+        
         kb = gen.run()
-        self.assertEqual(len(kb.cell.species_types.get(__type=wc_kb.DnaSpeciesType)), 10)
+        self.assertEqual(len(kb.cell.species_types.get(
+            __type=wc_kb.DnaSpeciesType)), 10)
 
         errors = obj_model.Validator().run(kb, get_related=True)
-        self.assertEqual(errors, None, msg=wc_utils.util.string.indent_forest(errors))
+        self.assertEqual(
+            errors, None, msg=wc_utils.util.string.indent_forest(errors))
 
     def test_clean_and_validate_options(self):
         gen = kb_gen.KbGenerator()

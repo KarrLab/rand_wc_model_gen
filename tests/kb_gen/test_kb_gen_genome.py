@@ -1,6 +1,6 @@
 """ Test the generation of a random chromosome and accompanying mRNA and protein sequences
-:Author: Bilal Shaikh <bilal.shaikh@columbia.edu>
 :Author: Ashwin Srinivasan <ashwins@mit.edu>
+:Author: Bilal Shaikh <bilal.shaikh@columbia.edu>
 :Date: 2018-06-13
 :Copyright: 2018, Karr Lab
 :License: MIT
@@ -8,9 +8,8 @@
 import math
 import wc_kb
 import unittest
-from rand_wc_model_gen.kb_gen import genome
-from Bio.Data import CodonTable
 from rand_wc_model_gen import kb_gen
+from Bio.Data import CodonTable
 
 
 class TestGenomeGenerator(unittest.TestCase):
@@ -25,18 +24,20 @@ class TestGenomeGenerator(unittest.TestCase):
                     'mean_doubling_time': 1000.,
                 },
                 'GenomeGenerator': {
-                    'mean_num_genes': 100.,
+
+                    'mean_num_genes': 1000.,
                 },
             },
         })
 
         self.kb = self.whole_gen.run()
+        component_options = self.whole_gen.options.get('component', {})
+        self.options = component_options.get('GenomeGenerator', {})
+        self.options = component_options.get('GenomeGenerator', {})
 
         component_options = self.whole_gen.options.get('component', {})
 
         self.options = component_options.get('GenomeGenerator', {})
-
-        
 
     def test_init(self):
         self.assertEqual(type(self.whole_gen), kb_gen.KbGenerator)
@@ -47,7 +48,7 @@ class TestGenomeGenerator(unittest.TestCase):
         self.assertEqual(len(chromosomes),
                          self.options.get('num_chromosomes'))
 
-    def test_rna_props(self):
+    def test_rna_counts(self):
         rRna = 0
         tRna = 0
         sRna = 0
@@ -64,20 +65,20 @@ class TestGenomeGenerator(unittest.TestCase):
 
         total = len(rnas)
 
-        rRna_prop = rRna / total
-        tRna_prop = tRna / total
-        sRna_prop = sRna / total
+        rRna_count = rRna / total
+        tRna_count = tRna / total
+        sRna_count = sRna / total
 
-        real_rRna = self.options.get('rRNA_prop')
-        real_tRna = self.options.get('tRNA_prop')
-        real_sRna = self.options.get('ncRNA_prop')
+        real_rRna = self.gen.options.get('mean_num_rRNA')
+        real_tRna = self.gen.options.get('mean_num_tRNA')
+        real_sRna = self.gen.options.get('mean_num_sRNA')
 
         self.assertAlmostEqual(
-            rRna_prop, real_rRna, delta=3 * math.sqrt(real_rRna))
+            rRna_count, real_rRna, delta=3 * math.sqrt(real_rRna))
         self.assertAlmostEqual(
-            tRna_prop, real_tRna, delta=3 * math.sqrt(real_tRna))
+            tRna_count, real_tRna, delta=3 * math.sqrt(real_tRna))
         self.assertAlmostEqual(
-            sRna_prop, real_sRna, delta=3 * math.sqrt(real_sRna))
+            sRna_count, real_sRna, delta=3 * math.sqrt(real_sRna))
 
     # test total number of RNAs (should match number of transcription units)
     # test total number of proteins (should match number of GeneLocus objects with mRNA)
@@ -187,16 +188,16 @@ class TestGenomeGenerator(unittest.TestCase):
         self.assertAlmostEqual(
             avg_operon_gen, operon_gen_num, delta=3 * math.sqrt(operon_gen_num))
 
-    '''def test_protein_start_codon(self):
->>>>>>> origin/Combining
-        for protein in self.gen.knowledge_base.cell.species_types.get(__type=wc_kb.core.ProteinSpeciesType):
-            seq = str(protein.get_seq())
-            self.assertEqual(seq[0], 'M')
+        def test_protein_start_codon(self):
+
+            for protein in self.gen.knowledge_base.cell.species_types.get(__type=wc_kb.core.ProteinSpeciesType):
+                seq = str(protein.get_seq())
+                self.assertEqual(seq[0], 'M')
 
     def test_protein_stop_codon(self):
         for protein in self.gen.knowledge_base.cell.species_types.get(__type=wc_kb.core.ProteinSpeciesType):
             seq = str(protein.get_seq())
-            self.assertEqual(seq[-1], '*')'''
+            self.assertEqual(seq[-1], '*')
 
     def tearDown(self):
         pass
