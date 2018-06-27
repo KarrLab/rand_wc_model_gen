@@ -22,9 +22,9 @@ class ModelGeneratorTestCase(unittest.TestCase):
                     'num_chromosomes': 1,
                     'mean_num_genes': 100,
                     'mean_gene_len': 100,
-                },
-            },
-        }).run()
+                    'mean_num_sRNA': 5,
+                    'mean_num_rRNA': 5,
+                    'mean_num_tRNA': 5}}}).run()
         model = model_gen.ModelGenerator(kb).run()
 
         self.assertIsInstance(model.submodels.get_one(

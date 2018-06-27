@@ -9,7 +9,6 @@
 from rand_wc_model_gen import kb_gen
 from rand_wc_model_gen.model_gen import metabolism
 import unittest
-import wc_kb
 import wc_lang
 
 
@@ -21,7 +20,10 @@ class MetabolismSubmodelGeneratorTestCase(unittest.TestCase):
                     'num_chromosomes': 1,
                     'mean_num_genes': 100,
                     'mean_gene_len': 100,
-                },
+                    'mean_num_sRNA': 5,
+                    'mean_num_rRNA': 5,
+                    'mean_num_tRNA': 5},
+
                 'PropertiesGenerator': {
                     'mean_cell_density': 1e6,
                     'mean_fraction_dry_weight': 0.3,
@@ -44,4 +46,5 @@ class MetabolismSubmodelGeneratorTestCase(unittest.TestCase):
         self.assertEqual(cytosol.name, 'extracellular space')
 
         # check parameters generated
-        self.assertEqual(model.parameters.get_one(id='fractionDryWeight').value, 0.3)
+        self.assertEqual(model.parameters.get_one(
+            id='fractionDryWeight').value, 0.3)

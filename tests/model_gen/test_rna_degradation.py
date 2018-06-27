@@ -29,6 +29,10 @@ class RnaDegradationSubmodelGeneratorTestCase(unittest.TestCase):
                     'mean_gene_len': 100.,
                     'mean_copy_number': 10.,
                     'mean_half_life': 120.,
+                    'mean_num_sRNA': 5,
+                    'mean_num_rRNA': 5,
+                    'mean_num_tRNA': 5
+
                 },
                 'MetabolitesGenerator': {
                 },

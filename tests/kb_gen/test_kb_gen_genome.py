@@ -25,12 +25,13 @@ class TestGenomeGenerator(unittest.TestCase):
                 },
                 'GenomeGenerator': {
 
-                    'mean_num_genes': 1000.,
+                    'mean_num_genes': 500.,
                 },
             },
         })
 
         self.kb = self.whole_gen.run()
+
         component_options = self.whole_gen.options.get('component', {})
         self.options = component_options.get('GenomeGenerator', {})
         self.options = component_options.get('GenomeGenerator', {})
@@ -69,9 +70,9 @@ class TestGenomeGenerator(unittest.TestCase):
         tRna_count = tRna / total
         sRna_count = sRna / total
 
-        real_rRna = self.gen.options.get('mean_num_rRNA')
-        real_tRna = self.gen.options.get('mean_num_tRNA')
-        real_sRna = self.gen.options.get('mean_num_sRNA')
+        real_rRna = self.options.get('mean_num_rRNA')
+        real_tRna = self.options.get('mean_num_tRNA')
+        real_sRna = self.options.get('mean_num_sRNA')
 
         self.assertAlmostEqual(
             rRna_count, real_rRna, delta=3 * math.sqrt(real_rRna))
@@ -190,12 +191,12 @@ class TestGenomeGenerator(unittest.TestCase):
 
         def test_protein_start_codon(self):
 
-            for protein in self.gen.knowledge_base.cell.species_types.get(__type=wc_kb.core.ProteinSpeciesType):
+            for protein in self.kb.cell.species_types.get(__type=wc_kb.core.ProteinSpeciesType):
                 seq = str(protein.get_seq())
                 self.assertEqual(seq[0], 'M')
 
     def test_protein_stop_codon(self):
-        for protein in self.gen.knowledge_base.cell.species_types.get(__type=wc_kb.core.ProteinSpeciesType):
+        for protein in self.kb.cell.species_types.get(__type=wc_kb.core.ProteinSpeciesType):
             seq = str(protein.get_seq())
             self.assertEqual(seq[-1], '*')
 
