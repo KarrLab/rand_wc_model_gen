@@ -88,6 +88,11 @@ class CliTestCase(unittest.TestCase):
             self.assertEqual(stderr.getvalue(), '')
 
     def test_generate(self):
+        # verify that KB and model files haven't been created
+        self.assertFalse(os.path.isfile(self.kb_core_path))
+        self.assertFalse(os.path.isfile(self.kb_seq_path))
+        self.assertFalse(os.path.isfile(self.model_path))
+
         # generate model
         with __main__.App(argv=['generate', '--config-path', self.config_path]) as app:
             app.run()
