@@ -207,10 +207,13 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
             # Determine numbers of each type of gene
             num_genes = self.rand(mean_num_genes/num_chromosomes)[0]
-            num_polycistronic_genes = self.rand(operon_prop*num_genes)[0]
+
+            num_polycistronic_genes = self.rand(
+                operon_prop*num_genes, max=num_genes-1)[0]
+
             num_monocistronic_genes = num_genes-num_polycistronic_genes
 
-            # Create a list of the size of each gene
+            # Create a list of the size of each gene in BPS
             gene_lens = self.rand(mean_gene_len*3, count=num_genes)
 
             # Create a list of the size of each operon
