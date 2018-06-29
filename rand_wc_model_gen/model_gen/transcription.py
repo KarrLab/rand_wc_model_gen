@@ -24,7 +24,7 @@ class TranscriptionSubmodelGenerator(wc_model_gen.SubmodelGenerator):
         cytosol.initial_volume = cell.properties.get_one(
             id='mean_volume').value
 
-    def generate_species(self):
+    def gen_species(self):
         """ Generate species associated with submodel """
         cell = self.knowledge_base.cell
         model = self.model
@@ -63,7 +63,7 @@ class TranscriptionSubmodelGenerator(wc_model_gen.SubmodelGenerator):
                 species.concentration = wc_lang.Concentration(
                     value=rna.concentration, units=wc_lang.ConcentrationUnit.M)
 
-    def generate_reactions(self):
+    def gen_reactions(self):
         """ Generate reactions associated with submodel """
         model = self.model
         submodel = self.submodel
@@ -111,7 +111,7 @@ class TranscriptionSubmodelGenerator(wc_model_gen.SubmodelGenerator):
             rxn.participants.add(h2o.species_coefficients.get_or_create(
                 coefficient=kb_rna.get_len() - 1))
 
-    def generate_rate_laws(self):
+    def gen_rate_laws(self):
         """ Generate rate laws associated with submodel """
         cell = self.knowledge_base.cell
 
