@@ -74,16 +74,19 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         operon_prop = (options.get('operon_prop', 0.53))
         assert(operon_prop >= 0 and operon_prop <= 1)
         options['operon_prop'] = operon_prop
-
-        mean_num_sRNA = options.get('mean_num_sRNA', 65)
+        
+        #Defualt 65
+        mean_num_sRNA = options.get('mean_num_sRNA', 5)
         assert(mean_num_sRNA >= 0)
         options['mean_num_sRNA'] = mean_num_sRNA
-
-        mean_num_rRNA = options.get('mean_num_rRNA', 25)
+    
+        #Default 25
+        mean_num_rRNA = options.get('mean_num_rRNA', 5)
         assert(mean_num_rRNA >= 0)
         options['mean_num_rRNA'] = mean_num_rRNA
 
-        mean_num_tRNA = options.get('mean_num_tRNA', 90)
+        #Default 90
+        mean_num_tRNA = options.get('mean_num_tRNA', 5)
         assert(mean_num_tRNA >= 0)
         options['mean_num_tRNA'] = mean_num_tRNA
 
