@@ -31,3 +31,12 @@ class MetabolismSubmodelGenerator(wc_model_gen.SubmodelGenerator):
         param.submodels.append(self.submodel)
         param.value = cell.properties.get_one(id='mean_fraction_dry_weight').value
         param.units = 'dimensionless'
+
+    def gen_species(self):
+        pass
+
+    def gen_reactions(self):
+        pass
+
+    def gen_rate_laws(self):
+        pass

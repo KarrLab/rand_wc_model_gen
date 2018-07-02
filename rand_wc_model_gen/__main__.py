@@ -20,6 +20,7 @@ import wc_kb.io
 import wc_lang.io
 import wc_sim.multialgorithm.run_results
 import wc_sim.multialgorithm.simulation
+import cProfile
 
 
 class BaseController(CementBaseController):

@@ -30,7 +30,7 @@ class MetabolitesGenerator(wc_kb_gen.KbComponentGenerator):
 
     def get_data(self):
         data_path = self.options.get('data_path')
-        with open(data_path, 'r') as file:
+        with open(data_path, 'r', encoding = 'mac_roman') as file:
             self.data = []
             for met in csv.DictReader(file):
                 met['Intracellular concentration (M)'] = float(met['Intracellular concentration (M)'])

@@ -74,7 +74,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(rRNA_prop >= 0 and rRNA_prop <= 1)
         options['rRNA_prop'] = rRNA_prop
 
-        tRNA_prop = options.get('tRNA_prop', 0.02)
+        tRNA_prop = options.get('tRNA_prop', 0.5)
         assert(tRNA_prop >= 0 and tRNA_prop <= 1)
         options['tRNA_prop'] = tRNA_prop
 

@@ -28,7 +28,7 @@ def get_config(extra_path=None, extra_vals=None):
         default=pkg_resources.resource_filename('rand_wc_model_gen', 'config/core.default.cfg'),
         schema=pkg_resources.resource_filename('rand_wc_model_gen', 'config/core.schema.cfg'),
         user=[
-            'rand_wc_model_gen.cfg',
+            'rand_wc_model_gen_without_git.cfg',
             os.path.expanduser('~/.wc/rand_wc_model_gen.cfg'),
         ],
     )
