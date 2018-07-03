@@ -202,7 +202,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                     id='gene_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.GeneLocus)
                 gene.start = gene_start  # 1-indexed
                 gene.polymer = chro
-                gene.end = gene_start + gene_lens[i_gene]  # 1-indexed
+                gene.end = gene_start + gene_lens[i_gene] - 1  # 1-indexed
+                #print(gene_lens[i_gene] % 3 == 0)
                 gene.name = 'gene {} {}'.format(i_chr+1, i_gene+1)
                 typeList = [wc_kb.GeneType.mRna, wc_kb.GeneType.rRna,
                             wc_kb.GeneType.sRna, wc_kb.GeneType.tRna]
@@ -217,6 +218,9 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         seq_str[gene_start+2: gene.end-3] + \
                         stop_codon + seq_str[gene.end:]
                     chro.seq = Seq(seq_str, Alphabet.DNAAlphabet())
+
+                #print(len(gene.get_seq()) % 3 == 0)
+
 
     def gen_rnas_proteins(self):
         """ Creates RNA and protein objects corresponding to genes on chromosome
@@ -253,6 +257,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                     rna.half_life = random.normal(mean_half_life, numpy.sqrt(mean_half_life))
 
                     rna.transcription_units.append(tu)
+
+                    #print(rna.get_seq
 
                     if rna.type == wc_kb.RnaType.mRna:
                         for gene in tu.genes:
