@@ -7,7 +7,7 @@
 """
 
 from rand_wc_model_gen import kb_gen
-from rand_wc_model_gen.model_gen import transcription
+from wc_model_gen.rand_gen import transcription
 import numpy
 import scipy
 import unittest

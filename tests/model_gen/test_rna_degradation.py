@@ -7,7 +7,7 @@
 """
 
 from rand_wc_model_gen import kb_gen
-from rand_wc_model_gen.model_gen import rna_degradation
+from wc_model_gen.rand_gen import rna_degradation
 import numpy
 import scipy
 import unittest
@@ -35,6 +35,7 @@ class RnaDegradationSubmodelGeneratorTestCase(unittest.TestCase):
             },
         }).run()
         cell = kb.cell
+        
         rnas = cell.species_types.get(__type=wc_kb.RnaSpeciesType)
 
         model = wc_lang.Model()
