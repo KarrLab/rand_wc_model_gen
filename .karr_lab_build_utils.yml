@@ -1,4 +1,8 @@
 downstream_dependencies:
   - wc
+  - wc_model_gen
 email_notifications:
   - arthur.p.goldberg@mssm.edu
+  - jonrkarr@gmail.com
+  - bilal.shaikh@columbia.edu
+  - ashwins9999@gmail.com
