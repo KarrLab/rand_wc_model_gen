@@ -159,6 +159,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         PROB_BASES = [(1 - mean_gc_frac) / 2, mean_gc_frac /
                       2, mean_gc_frac/2, (1-mean_gc_frac)/2]
 
+
         # Create a chromosome n times
         for i_chr in range(num_chromosomes):
             # number of genes in the chromosome
@@ -177,9 +178,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             for i in range(0, seq_len, 3):
                 codon_i = STOP_CODONS[0]
 
-                while(codon_i in (STOP_CODONS or START_CODONS)):
-                    codon_i = "".join(random.choice(
-                        BASES, p=PROB_BASES, size=(3,)))
+                codon_i = "".join(random.choice(
+                    BASES, p=PROB_BASES, size=(3,)))
 
                 seq_str.append(codon_i)
 
@@ -214,12 +214,19 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                     start_codon = random.choice(START_CODONS)
                     stop_codon = random.choice(STOP_CODONS)
                     seq_str = str(chro.seq)
-                    seq_str = seq_str[: gene_start-1] + start_codon + \
+                    seq_str = seq_str[:gene_start-1] + start_codon + \
                         seq_str[gene_start+2: gene.end-3] + \
                         stop_codon + seq_str[gene.end:]
+                    for i in range(gene.start+2, gene.end-3, 3):
+                        #print(seq_str[i:i+3])
+                        while seq_str[i:i+3] in START_CODONS or seq_str[i:i+3] in STOP_CODONS:
+                            #print('here')
+                            codon_i = "".join(random.choice(
+                                BASES, p=PROB_BASES, size=(3,)))
+                            seq_str = seq_str[:i]+codon_i+seq_str[i+3:]
                     chro.seq = Seq(seq_str, Alphabet.DNAAlphabet())
 
-                #print(len(gene.get_seq()) % 3 == 0)
+                
 
 
     def gen_rnas_proteins(self):
@@ -263,7 +270,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                     if rna.type == wc_kb.RnaType.mRna:
                         for gene in tu.genes:
                             # creates ProteinSpecipe object for corresponding protein sequence(s)
-
+                            #print(gene.get_seq()[0:3])
                             prot = self.knowledge_base.cell.species_types.get_or_create(
                                 id='prot_{}'.format(gene.id), __type=wc_kb.ProteinSpeciesType)
                             prot.name = 'prot {}'.format(gene.id)
@@ -273,6 +280,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
                             prot.gene = gene  # associates protein with GeneLocus object for corresponding gene
                             prot.rna = rna
+
 
     def gen_tus(self):
         """ Creates transcription units with 5'/3' UTRs, polycistronic mRNAs, and other types of RNA (tRNA, rRNA, sRNA)
