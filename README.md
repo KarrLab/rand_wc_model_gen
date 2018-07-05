@@ -1,8 +1,8 @@
 [//]: # ( [![PyPI package](https://img.shields.io/pypi/v/rand_wc_model_gen.svg)](https://pypi.python.org/pypi/rand_wc_model_gen) )
-[![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](http://docs.karrlab.org/rand_wc_model_gen)
-[![Test results](https://circleci.com/gh/KarrLab/rand_wc_model_gen.svg?style=shield&circle-token=6965e63dcc639d776121b0dde0ce6bcf142c3624)](https://circleci.com/gh/KarrLab/rand_wc_model_gen)
-[![Test coverage](https://coveralls.io/repos/github/KarrLab/rand_wc_model_gen/badge.svg?t=CQo40O)](https://coveralls.io/github/KarrLab/rand_wc_model_gen)
-[![Code analysis](https://api.codeclimate.com/v1/badges/a9d32ece26a8d3c363e0/maintainability)](https://codeclimate.com/repos/5a5a4c14c6d48802930020d9)
+[![Documentation](https://readthedocs.org/projects/rand_wc_model_gen/badge/?version=latest)](http://docs.karrlab.org/rand_wc_model_gen)
+[![Test results](https://circleci.com/gh/KarrLab/rand_wc_model_gen.svg?style=shield)](https://circleci.com/gh/KarrLab/rand_wc_model_gen)
+[![Test coverage](https://coveralls.io/repos/github/KarrLab/rand_wc_model_gen/badge.svg)](https://coveralls.io/github/KarrLab/rand_wc_model_gen)
+[![Code analysis](https://api.codeclimate.com/v1/badges/a9d32ece26a8d3c363e0/maintainability)](https://codeclimate.com/github/KarrLab/rand_wc_model_gen)
 [![License](https://img.shields.io/github/license/KarrLab/rand_wc_model_gen.svg)](LICENSE)
 ![Analytics](https://ga-beacon.appspot.com/UA-86759801-1/rand_wc_model_gen/README.md?pixel)
 
