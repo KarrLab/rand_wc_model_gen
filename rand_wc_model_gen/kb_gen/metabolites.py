@@ -24,16 +24,19 @@ class MetabolitesGenerator(wc_kb_gen.KbComponentGenerator):
     def clean_and_validate_options(self):
         """ Apply default options and validate options """
         options = self.options
-        data_path = options.get('data_path', pkg_resources.resource_filename('rand_wc_model_gen', os.path.join('data', 'metabolites.csv')))
+        data_path = options.get('data_path', pkg_resources.resource_filename(
+            'rand_wc_model_gen', os.path.join('data', 'metabolites.csv')))
+        print(data_path)
         assert(os.path.isfile(data_path))
         options['data_path'] = data_path
 
     def get_data(self):
         data_path = self.options.get('data_path')
-        with open(data_path, 'r', encoding = 'mac_roman') as file:
+        with open(data_path, 'r', encoding='mac_roman') as file:
             self.data = []
             for met in csv.DictReader(file):
-                met['Intracellular concentration (M)'] = float(met['Intracellular concentration (M)'])
+                met['Intracellular concentration (M)'] = float(
+                    met['Intracellular concentration (M)'])
                 self.data.append(met)
 
     def gen_components(self):

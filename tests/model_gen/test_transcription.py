@@ -15,7 +15,7 @@ import wc_kb
 import wc_lang
 
 
-class TranscriptionSubmodelGeneratorTestCase(unittest.TestCase):
+class TranscriptionSubmodelGeneratorTestCase(unittest.TestCase):   
     def test(self):
         kb = kb_gen.KbGenerator(options={
             'component': {
