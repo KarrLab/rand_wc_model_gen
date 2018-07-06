@@ -11,7 +11,7 @@ from wc_model_gen.rand_gen.rna_degradation import RnaDegradationSubmodelGenerato
 from wc_model_gen.rand_gen.transcription import TranscriptionSubmodelGenerator
 from wc_model_gen.rand_gen.translation import TranslationSubmodelGenerator
 import rand_wc_model_gen
-import wc_model_gen
+
 
 
 class ModelGenerator(wc_model_gen.ModelGenerator):
