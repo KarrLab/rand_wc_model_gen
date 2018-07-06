@@ -7,6 +7,7 @@
 """
 
 import rand_wc_model_gen
+import wc_model_gen
 import types
 import unittest
 
@@ -21,5 +22,5 @@ class ApiTestCase(unittest.TestCase):
         self.assertIsInstance(rand_wc_model_gen.kb_gen, types.ModuleType)
         self.assertIsInstance(rand_wc_model_gen.kb_gen.KbGenerator, type)
 
-        self.assertIsInstance(rand_wc_model_gen.model_gen, types.ModuleType)
-        self.assertIsInstance(rand_wc_model_gen.model_gen.ModelGenerator, type)
+        self.assertIsInstance(wc_model_gen.rand_gen, types.ModuleType)
+        self.assertIsInstance(wc_model_gen.rand_gen.RandomModelGenerator, type)
