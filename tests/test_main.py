@@ -7,7 +7,6 @@
 """
 
 from rand_wc_model_gen import __main__
-from wc_utils.util import rand
 import abduct
 import mock
 import os

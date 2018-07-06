@@ -9,18 +9,16 @@
 
 from cement.core.foundation import CementApp
 from cement.core.controller import CementBaseController, expose
-import glob
 import os
 import rand_wc_model_gen
 import rand_wc_model_gen.analysis
 import rand_wc_model_gen.config
 import rand_wc_model_gen.kb_gen
-import rand_wc_model_gen.model_gen
+from wc_model_gen import rand_gen
 import wc_kb.io
 import wc_lang.io
 import wc_sim.multialgorithm.run_results
 import wc_sim.multialgorithm.simulation
-import cProfile
 
 
 class BaseController(CementBaseController):
@@ -57,7 +55,7 @@ class GenerateController(CementBaseController):
         args = self.app.pargs
         config = rand_wc_model_gen.config.get_config(extra_path=args.config_path)['rand_wc_model_gen']
         kb = rand_wc_model_gen.kb_gen.KbGenerator(options=config['kb_gen']).run()
-        model = rand_wc_model_gen.model_gen.ModelGenerator(kb, options=config['model_gen']).run()
+        model = rand_gen.RandomModelGenerator(kb, options=config['model_gen']).run()
 
         if not os.path.isdir(os.path.dirname(config['kb']['path']['core'])):
             os.makedirs(os.path.dirname(config['kb']['path']['core']))

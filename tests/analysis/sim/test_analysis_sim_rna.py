@@ -8,8 +8,7 @@
 
 from rand_wc_model_gen import analysis
 from rand_wc_model_gen import kb_gen
-from rand_wc_model_gen import model_gen
-from wc_utils.util import rand
+from wc_model_gen import rand_gen
 import os
 import shutil
 import tempfile
@@ -38,7 +37,7 @@ class RnaSimulationAnalysisTestCase(unittest.TestCase):
         }).run()
 
         # generate model
-        model = model_gen.ModelGenerator(kb).run()
+        model = rand_gen.RandomModelGenerator(kb).run()
 
         # run simulations
         sim_results_path = os.path.join(self.temp_dir, 'sim_results')
