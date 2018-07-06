@@ -10,7 +10,6 @@
 import rand_wc_model_gen
 import rand_wc_model_gen.config
 import os
-import pkg_resources
 import tempfile
 import unittest
 

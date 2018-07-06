@@ -2,7 +2,7 @@
 README.rst
 
 # version
-include VERSION
+include rand_wc_model_gen/VERSION
 
 # license
 include LICENSE
@@ -12,4 +12,8 @@ include requirements.txt
 include requirements.optional.txt
 
 #metabolites file
-include data/metabolites.csv
+include rand_wc_model_gen/data/metabolites.csv
+
+#Config files
+include rand_wc_model_gen/config/core.default.cfg
+include rand_wc_model_gen/config/core.schema.cfg
