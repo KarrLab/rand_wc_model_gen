@@ -66,6 +66,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(mean_num_genes >= 1)
         options['mean_num_genes'] = mean_num_genes
 
+        print(mean_num_genes)
+
         ncRNA_prop = options.get('ncRNA_prop', 0.014)
         assert(ncRNA_prop >= 0 and ncRNA_prop <= 1)
         options['ncRNA_prop'] = ncRNA_prop
@@ -74,7 +76,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(rRNA_prop >= 0 and rRNA_prop <= 1)
         options['rRNA_prop'] = rRNA_prop
 
-        tRNA_prop = options.get('tRNA_prop', 0.5)
+        tRNA_prop = options.get('tRNA_prop', 0.4)
         assert(tRNA_prop >= 0 and tRNA_prop <= 1)
         options['tRNA_prop'] = tRNA_prop
 
@@ -139,6 +141,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         ncRNA_prop = options.get('ncRNA_prop')
         rRNA_prop = options.get('rRNA_prop')
         tRNA_prop = options.get('tRNA_prop')
+
+        #print(tRNA_prop)
 
         cell = self.knowledge_base.cell
 

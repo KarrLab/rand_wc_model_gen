@@ -38,7 +38,7 @@ class CliTestCase(unittest.TestCase):
             file.write('        [[[component]]]\n')
             file.write('            [[[[GenomeGenerator]]]]\n')
             file.write('                num_chromosomes = 1\n')
-            file.write('                mean_num_genes = 10.\n')
+            file.write('                mean_num_genes = 100.\n')
             file.write('                mean_gene_len = 10.\n')
             file.write('    [[kb]]\n')
             file.write('        [[[path]]]\n')
