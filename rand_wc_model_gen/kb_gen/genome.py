@@ -66,7 +66,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(mean_num_genes >= 1)
         options['mean_num_genes'] = mean_num_genes
 
-        print(mean_num_genes)
+        #print(mean_num_genes)
 
         ncRNA_prop = options.get('ncRNA_prop', 0.014)
         assert(ncRNA_prop >= 0 and ncRNA_prop <= 1)
