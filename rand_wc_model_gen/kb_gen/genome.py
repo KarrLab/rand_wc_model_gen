@@ -284,6 +284,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                             prot.cell.knowledge_base = self.knowledge_base
 
                             prot.gene = gene  # associates protein with GeneLocus object for corresponding gene
+                            print(prot.gene.get_seq()[0:3])
                             prot.rna = rna
 
 
