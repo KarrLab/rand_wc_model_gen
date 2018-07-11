@@ -204,9 +204,9 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             for i_gene, gene_start in enumerate(gene_starts):
                 gene = self.knowledge_base.cell.loci.get_or_create(
                     id='gene_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.GeneLocus)
-                gene.start = gene_start # 1-indexed
+                gene.start = gene_start + 1 # 1-indexed
                 gene.polymer = chro
-                gene.end = gene_start + gene_lens[i_gene] - 1  # 1-indexed
+                gene.end = gene.start + gene_lens[i_gene] - 1  # 1-indexed
                 #print(gene_lens[i_gene] % 3 == 0)
                 gene.name = 'gene {} {}'.format(i_chr+1, i_gene+1)
                 typeList = [wc_kb.GeneType.mRna, wc_kb.GeneType.rRna,
