@@ -169,7 +169,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             # number of genes in the chromosome
             num_genes = self.rand(mean_num_genes / num_chromosomes)[0]
             # list of gene lengths (generated randomly) on chromosome
-            gene_lens = 3 * self.rand(mean_gene_len, count=num_genes)
+            gene_lens = 3 * self.rand(mean_gene_len, count=num_genes, min = 2)
 
             intergene_lens = 3 * self.rand(
                 mean_gene_len / mean_coding_frac * (1 - mean_coding_frac), count=num_genes)
@@ -204,7 +204,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             for i_gene, gene_start in enumerate(gene_starts):
                 gene = self.knowledge_base.cell.loci.get_or_create(
                     id='gene_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.GeneLocus)
-                gene.start = gene_start  # 1-indexed
+                gene.start = gene_start # 1-indexed
                 gene.polymer = chro
                 gene.end = gene_start + gene_lens[i_gene] - 1  # 1-indexed
                 #print(gene_lens[i_gene] % 3 == 0)
@@ -218,8 +218,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                     start_codon = random.choice(START_CODONS)
                     stop_codon = random.choice(STOP_CODONS)
                     seq_str = str(chro.seq)
-                    seq_str = seq_str[:gene_start-1] + start_codon + \
-                        seq_str[gene_start+2: gene.end-3] + \
+                    seq_str = seq_str[:gene.start-1] + start_codon + \
+                        seq_str[gene.start+2: gene.end-3] + \
                         stop_codon + seq_str[gene.end:]
                     for i in range(gene.start+2, gene.end-3, 3):
                         #print(seq_str[i:i+3])
@@ -228,6 +228,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                             codon_i = "".join(random.choice(
                                 BASES, p=PROB_BASES, size=(3,)))
                             seq_str = seq_str[:i]+codon_i+seq_str[i+3:]
+
                     chro.seq = Seq(seq_str, Alphabet.DNAAlphabet())
 
                 
