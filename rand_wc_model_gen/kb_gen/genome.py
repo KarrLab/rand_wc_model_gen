@@ -38,7 +38,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
     * operon_prop (:obj: 'float'): Proportion of genes that should be in an operon (polycistronic mRNA)
     * operon_gen_num (:obj: 'int'): Average number of genes in an operon
     * mean_copy_number (:obj:`float`): mean copy number of each RNA
-    * mean_half_life (:obj:`float`): mean half-life of each RNA in s
+    * mean_half_life (:obj:`float`): mean half-life of RNAs
     """
 
     def clean_and_validate_options(self):
@@ -122,6 +122,23 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         mean_half_life = options.get('mean_half_life', 2.1 * 60)
         assert(mean_half_life > 0)
         options['mean_half_life'] = mean_half_life
+
+        assigned_trnas = options.get('assigned_trnas', ['tRNA-Ser', 'tRNA-Leu', 'tRNA-Arg',
+                                                        'tRNA-Thr', 'tRNA-Gly', 'tRNA-Phe',
+                                                        'tRNA-Trp', 'tRNA-Lys', 'tRNA-Ile',
+                                                        'tRNA-Ala', 'tRNA-Met', 'tRNA-Gln',
+                                                        'tRNA-Pro', 'tRNA-Val', 'tRNA-Cys',
+                                                        'tRNA-Tyr', 'tRNA-His', 'tRNA-Asn',
+                                                        'tRNA-Asp'])
+
+        assert (len(assigned_trnas) <= tRNA_prop*mean_num_genes)
+        options['assigned_trnas'] = assigned_trnas
+
+        assigned_proteins = options.get('assigned_proteins', ['IF1', 'IF2', 'IF3', 'EFtu', 'EFts',
+                                                              'EFg', 'RF1', 'RF2', 'RF3',
+                                                              'deg_ATPase', 'deg_protease'])
+        assert(len(assigned_proteins) <= mean_num_genes)
+        options['assigned_proteins'] = assigned_proteins
 
     def gen_components(self):
         self.gen_genome()
@@ -395,15 +412,13 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
     def assign_species(self):
         """ Takes random samples of the generated rnas and proteins and assigns them functions based on the included list of proteins and rnas"""
 
+        assigned_trnas = self.options['assigned_trnas']
+        assigned_proteins = self.options['assigned_proteins']
+
         prots = self.knowledge_base.cell.species_types.get(
             __type=wc_kb.ProteinSpeciesType)
         rnas = self.knowledge_base.cell.species_types.get(
             __type=wc_kb.RnaSpeciesType)
-        # A list of tRNAs to be assigned. If more than one tRNA codes for an amini acid, include that one in the list multiple times
-        assigned_trnas = ['tRNA-Ser', 'tRNA-Leu', 'tRNA-Arg', 'tRNA-Thr', 'tRNA-Gly', 'tRNA-Phe',
-                          'tRNA-Trp', 'tRNA-Lys', 'tRNA-Ile', 'tRNA-Ala', 'tRNA-Met', 'tRNA-Gln',
-                          'tRNA-Pro', 'tRNA-Val', 'tRNA-Cys', 'tRNA-Tyr', 'tRNA-His', 'tRNA-Asn',
-                          'tRNA-Asp']
 
         trnas = []
         for rna in rnas:
@@ -418,10 +433,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         for rna in sampled_trnas:
             rna_name = next(assigned_trnas)
             rna.name = rna_name
-
-            # The names of the proteins that need to be assigned to a protein species type. Add proteins to this list as they are needed.
-        assigned_proteins = ['IF1', 'IF2', 'IF3', 'EFtu', 'EFts', 'EFg',
-                             'RF1', 'RF2', 'RF3', 'Proteosome_ATPase', 'Proteosome_protease']
 
         sampled_proteins = numpy.random.choice(
             prots, len(assigned_proteins), replace=False)
