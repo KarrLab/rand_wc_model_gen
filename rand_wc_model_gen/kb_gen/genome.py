@@ -127,6 +127,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         self.gen_genome()
         self.gen_tus()
         self.gen_rnas_proteins()
+        self.assign_species()
 
     def gen_genome(self):
         '''Construct knowledge base components and generate the DNA sequence'''
@@ -279,7 +280,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                             # print(gene.get_seq()[0:3])
                             prot = self.knowledge_base.cell.species_types.get_or_create(
                                 id='prot_{}'.format(gene.id), __type=wc_kb.ProteinSpeciesType)
-                            prot.name = None
+                            prot.name = 'prot_{}'.format(gene.id)
 
                             prot.cell = self.knowledge_base.cell
                             prot.cell.knowledge_base = self.knowledge_base
@@ -390,6 +391,90 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                 i_gene += 1
             for locus in transcription_loci:
                 locus.polymer = chromosome
+
+    def assign_species(self):
+
+        prots = self.knowledge_base.cell.species_types.get(
+            __type=wc_kb.ProteinSpeciesType)
+        rnas = self.knowledge_base.cell.species_types.get(
+            __type=wc_kb.RnaSpeciesType)
+
+        trnas = []
+        for rna in rnas:
+            if rna.type == wc_kb.RnaType.tRna:
+                trnas.append(rna)
+
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Ser'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Leu'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Arg'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Thr'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Gly'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Phe'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Trp'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Lys'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Ile'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Ala'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Met'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Gln'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Glu'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Pro'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Val'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Cys'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Tyr'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-His'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Asn'
+        trnas.remove(trna)
+        trna = numpy.random.choice(trnas)
+        trna.name = 'tRNA-Asp'
+        trnas.remove(trna)
+
+        assigned_proteins = iter(['IF1', 'IF2', 'IF3', 'EFtu', 'EFts', 'EFg',
+                                  'RF1', 'RF2', 'RF3', 'Proteosome_ATPase', 'Proteosome_protease'])
+
+        sampled_proteins = numpy.random.choice(
+            prots, len(assigned_proteins), replace=False)
+
+        for protein in sampled_proteins:
+            protein_name = assigned_proteins.next()
+            protein.id = protein_name
+            protein.name = protein_name
 
     def rand(self, mean, count=1, min=0, max=numpy.inf):
         """ Generated 1 or more random normally distributed integer(s) with standard deviation equal
