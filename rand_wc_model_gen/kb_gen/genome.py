@@ -66,7 +66,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(mean_num_genes >= 1)
         options['mean_num_genes'] = mean_num_genes
 
-        #print(mean_num_genes)
+        # print(mean_num_genes)
 
         ncRNA_prop = options.get('ncRNA_prop', 0.014)
         assert(ncRNA_prop >= 0 and ncRNA_prop <= 1)
@@ -113,11 +113,13 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(operon_gen_num >= 2)
         options['operon_gen_num'] = operon_gen_num
 
-        mean_copy_number = options.get('mean_copy_number', 0.4)  # DOI: 10.1038/ismej.2012.94
+        # DOI: 10.1038/ismej.2012.94
+        mean_copy_number = options.get('mean_copy_number', 0.4)
         assert(mean_copy_number > 0)
         options['mean_copy_number'] = mean_copy_number
 
-        mean_half_life = options.get('mean_half_life', 2.1 * 60)  # DOI: 10.1073/pnas.0308747101
+        # DOI: 10.1073/pnas.0308747101
+        mean_half_life = options.get('mean_half_life', 2.1 * 60)
         assert(mean_half_life > 0)
         options['mean_half_life'] = mean_half_life
 
@@ -142,7 +144,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         rRNA_prop = options.get('rRNA_prop')
         tRNA_prop = options.get('tRNA_prop')
 
-        #print(tRNA_prop)
+        # print(tRNA_prop)
 
         cell = self.knowledge_base.cell
 
@@ -163,13 +165,12 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         PROB_BASES = [(1 - mean_gc_frac) / 2, mean_gc_frac /
                       2, mean_gc_frac/2, (1-mean_gc_frac)/2]
 
-
         # Create a chromosome n times
         for i_chr in range(num_chromosomes):
             # number of genes in the chromosome
             num_genes = self.rand(mean_num_genes / num_chromosomes)[0]
             # list of gene lengths (generated randomly) on chromosome
-            gene_lens = 3 * self.rand(mean_gene_len, count=num_genes, min = 2)
+            gene_lens = 3 * self.rand(mean_gene_len, count=num_genes, min=2)
 
             intergene_lens = 3 * self.rand(
                 mean_gene_len / mean_coding_frac * (1 - mean_coding_frac), count=num_genes)
@@ -204,7 +205,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             for i_gene, gene_start in enumerate(gene_starts):
                 gene = self.knowledge_base.cell.loci.get_or_create(
                     id='gene_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.GeneLocus)
-                gene.start = gene_start + 1 # 1-indexed
+                gene.start = gene_start + 1  # 1-indexed
                 gene.polymer = chro
                 gene.end = gene.start + gene_lens[i_gene] - 1  # 1-indexed
                 #print(gene_lens[i_gene] % 3 == 0)
@@ -222,17 +223,14 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         seq_str[gene.start+2: gene.end-3] + \
                         stop_codon + seq_str[gene.end:]
                     for i in range(gene.start+2, gene.end-3, 3):
-                        #print(seq_str[i:i+3])
+                        # print(seq_str[i:i+3])
                         while seq_str[i:i+3] in START_CODONS or seq_str[i:i+3] in STOP_CODONS:
-                            #print('here')
+                            # print('here')
                             codon_i = "".join(random.choice(
                                 BASES, p=PROB_BASES, size=(3,)))
                             seq_str = seq_str[:i]+codon_i+seq_str[i+3:]
 
                     chro.seq = Seq(seq_str, Alphabet.DNAAlphabet())
-
-                
-
 
     def gen_rnas_proteins(self):
         """ Creates RNA and protein objects corresponding to genes on chromosome
@@ -241,7 +239,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         options = self.options
         mean_copy_number = options.get('mean_copy_number')
         mean_half_life = options.get('mean_half_life')
-        mean_volume =self.knowledge_base.cell.properties.get_one(id='mean_volume').value
+        mean_volume = self.knowledge_base.cell.properties.get_one(
+            id='mean_volume').value
         for chromosome in self.knowledge_base.cell.species_types.get(__type=wc_kb.core.DnaSpeciesType):
             for i in range(len(chromosome.loci)):
 
@@ -265,30 +264,28 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         rna.type = wc_kb.RnaType.sRna
 
                     # print(rna.type)
-                    rna.concentration = random.gamma(1, mean_copy_number) / scipy.constants.Avogadro / mean_volume
-                    rna.half_life = random.normal(mean_half_life, numpy.sqrt(mean_half_life))
+                    rna.concentration = random.gamma(
+                        1, mean_copy_number) / scipy.constants.Avogadro / mean_volume
+                    rna.half_life = random.normal(
+                        mean_half_life, numpy.sqrt(mean_half_life))
 
                     rna.transcription_units.append(tu)
 
-                    #print(rna.get_seq
+                    # print(rna.get_seq
 
                     if rna.type == wc_kb.RnaType.mRna:
                         for gene in tu.genes:
                             # creates ProteinSpecipe object for corresponding protein sequence(s)
-                            #print(gene.get_seq()[0:3])
+                            # print(gene.get_seq()[0:3])
                             prot = self.knowledge_base.cell.species_types.get_or_create(
                                 id='prot_{}'.format(gene.id), __type=wc_kb.ProteinSpeciesType)
-                            prot.name = 'prot {}'.format(gene.id)
+                            prot.name = None
 
                             prot.cell = self.knowledge_base.cell
                             prot.cell.knowledge_base = self.knowledge_base
 
                             prot.gene = gene  # associates protein with GeneLocus object for corresponding gene
-                            print(prot.gene.get_seq()[0:3])
-                            print(gene.start)
-                            print(gene.end)
                             prot.rna = rna
-
 
     def gen_tus(self):
         """ Creates transcription units with 5'/3' UTRs, polycistronic mRNAs, and other types of RNA (tRNA, rRNA, sRNA)
