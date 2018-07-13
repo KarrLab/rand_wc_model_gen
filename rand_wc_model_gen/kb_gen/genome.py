@@ -209,7 +209,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                 gene.start = gene_start + 1  # 1-indexed
                 gene.polymer = chro
                 gene.end = gene.start + gene_lens[i_gene] - 1  # 1-indexed
-                #print(gene_lens[i_gene] % 3 == 0)
+                # print(gene_lens[i_gene] % 3 == 0)
                 gene.name = 'gene {} {}'.format(i_chr+1, i_gene+1)
                 typeList = [wc_kb.GeneType.mRna, wc_kb.GeneType.rRna,
                             wc_kb.GeneType.sRna, wc_kb.GeneType.tRna]
@@ -393,86 +393,42 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                 locus.polymer = chromosome
 
     def assign_species(self):
+        """ Takes random samples of the generated rnas and proteins and assigns them functions based on the included list of proteins and rnas"""
 
         prots = self.knowledge_base.cell.species_types.get(
             __type=wc_kb.ProteinSpeciesType)
         rnas = self.knowledge_base.cell.species_types.get(
             __type=wc_kb.RnaSpeciesType)
+        # A list of tRNAs to be assigned. If more than one tRNA codes for an amini acid, include that one in the list multiple times
+        assigned_trnas = ['tRNA-Ser', 'tRNA-Leu', 'tRNA-Arg', 'tRNA-Thr', 'tRNA-Gly', 'tRNA-Phe',
+                          'tRNA-Trp', 'tRNA-Lys', 'tRNA-Ile', 'tRNA-Ala', 'tRNA-Met', 'tRNA-Gln',
+                          'tRNA-Pro', 'tRNA-Val', 'tRNA-Cys', 'tRNA-Tyr', 'tRNA-His', 'tRNA-Asn',
+                          'tRNA-Asp']
 
         trnas = []
         for rna in rnas:
             if rna.type == wc_kb.RnaType.tRna:
                 trnas.append(rna)
 
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Ser'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Leu'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Arg'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Thr'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Gly'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Phe'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Trp'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Lys'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Ile'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Ala'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Met'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Gln'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Glu'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Pro'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Val'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Cys'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Tyr'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-His'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Asn'
-        trnas.remove(trna)
-        trna = numpy.random.choice(trnas)
-        trna.name = 'tRNA-Asp'
-        trnas.remove(trna)
+        sampled_trnas = numpy.random.choice(
+            trnas, len(assigned_trnas), replace=False)
 
-        assigned_proteins = iter(['IF1', 'IF2', 'IF3', 'EFtu', 'EFts', 'EFg',
-                                  'RF1', 'RF2', 'RF3', 'Proteosome_ATPase', 'Proteosome_protease'])
+        assigned_trnas = iter(assigned_trnas)
+
+        for rna in sampled_trnas:
+            rna_name = next(assigned_trnas)
+            rna.name = rna_name
+
+            # The names of the proteins that need to be assigned to a protein species type. Add proteins to this list as they are needed.
+        assigned_proteins = ['IF1', 'IF2', 'IF3', 'EFtu', 'EFts', 'EFg',
+                             'RF1', 'RF2', 'RF3', 'Proteosome_ATPase', 'Proteosome_protease']
 
         sampled_proteins = numpy.random.choice(
             prots, len(assigned_proteins), replace=False)
 
+        assigned_proteins = iter(assigned_proteins)
         for protein in sampled_proteins:
-            protein_name = assigned_proteins.next()
+            protein_name = next(assigned_proteins)
             protein.id = protein_name
             protein.name = protein_name
 
