@@ -36,8 +36,6 @@ class TestGenomeGenerator(unittest.TestCase):
 
         self.options = component_options.get('GenomeGenerator', {})
 
-        
-
     def test_init(self):
         self.assertEqual(type(self.whole_gen), kb_gen.KbGenerator)
 
@@ -187,16 +185,19 @@ class TestGenomeGenerator(unittest.TestCase):
         self.assertAlmostEqual(
             avg_operon_gen, operon_gen_num, delta=3 * math.sqrt(operon_gen_num))
 
-    '''def test_protein_start_codon(self):
->>>>>>> origin/Combining
-        for protein in self.gen.knowledge_base.cell.species_types.get(__type=wc_kb.core.ProteinSpeciesType):
+    def test_protein_start_codon(self):
+
+        for protein in self.kb.cell.species_types.get(__type=wc_kb.core.ProteinSpeciesType):
             seq = str(protein.get_seq())
             self.assertEqual(seq[0], 'M')
 
-    def test_protein_stop_codon(self):
-        for protein in self.gen.knowledge_base.cell.species_types.get(__type=wc_kb.core.ProteinSpeciesType):
-            seq = str(protein.get_seq())
-            self.assertEqual(seq[-1], '*')'''
+    def test_assignment(self):
+        rna = self.kb.cell.species_types.get(name='tRNA-Ser')
+        rna = rna[0]
+        assert (rna.type == wc_kb.RnaType.tRna)
+
+        protein = self.kb.cell.species_types.get(id="IF1")
+        assert(type(protein[0]) == wc_kb.ProteinSpeciesType)
 
     def tearDown(self):
         pass
