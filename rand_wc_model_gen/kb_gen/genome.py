@@ -123,13 +123,13 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(mean_half_life > 0)
         options['mean_half_life'] = mean_half_life
 
-        assigned_trnas = options.get('assigned_trnas', ['tRNA-Ser', 'tRNA-Leu', 'tRNA-Arg',
-                                                        'tRNA-Thr', 'tRNA-Gly', 'tRNA-Phe',
-                                                        'tRNA-Trp', 'tRNA-Lys', 'tRNA-Ile',
-                                                        'tRNA-Ala', 'tRNA-Met', 'tRNA-Gln',
-                                                        'tRNA-Pro', 'tRNA-Val', 'tRNA-Cys',
-                                                        'tRNA-Tyr', 'tRNA-His', 'tRNA-Asn',
-                                                        'tRNA-Asp'])
+        assigned_trnas = options.get('assigned_trnas', ['tRNA_Ser', 'tRNA_Leu', 'tRNA_Arg',
+                                                        'tRNA_Thr', 'tRNA_Gly', 'tRNA_Phe',
+                                                        'tRNA_Trp', 'tRNA_Lys', 'tRNA_Ile',
+                                                        'tRNA_Ala', 'tRNA_Met', 'tRNA_Gln',
+                                                        'tRNA_Pro', 'tRNA_Val', 'tRNA_Cys',
+                                                        'tRNA_Tyr', 'tRNA_His', 'tRNA_Asn',
+                                                        'tRNA_Asp'])
 
         assert (len(assigned_trnas) <= tRNA_prop*mean_num_genes)
         options['assigned_trnas'] = assigned_trnas
@@ -432,6 +432,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
         for rna in sampled_trnas:
             rna_name = next(assigned_trnas)
+            rna.id = rna_name
             rna.name = rna_name
 
         sampled_proteins = numpy.random.choice(
