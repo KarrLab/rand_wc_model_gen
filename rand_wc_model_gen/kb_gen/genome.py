@@ -129,7 +129,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                                                         'tRNA_Ala', 'tRNA_Met', 'tRNA_Gln',
                                                         'tRNA_Pro', 'tRNA_Val', 'tRNA_Cys',
                                                         'tRNA_Tyr', 'tRNA_His', 'tRNA_Asn',
-                                                        'tRNA_Asp'])
+                                                        'tRNA_Asp', 'tRNA_Glu'])
 
         assert (len(assigned_trnas) <= tRNA_prop*mean_num_genes)
         options['assigned_trnas'] = assigned_trnas

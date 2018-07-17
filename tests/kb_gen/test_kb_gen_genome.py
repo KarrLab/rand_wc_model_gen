@@ -192,7 +192,7 @@ class TestGenomeGenerator(unittest.TestCase):
             self.assertEqual(seq[0], 'M')
 
     def test_assignment(self):
-        rna = self.kb.cell.species_types.get(name='tRNA-Ser')
+        rna = self.kb.cell.species_types.get(name='tRNA_Ser')
         rna = rna[0]
         assert (rna.type == wc_kb.RnaType.tRna)
 
