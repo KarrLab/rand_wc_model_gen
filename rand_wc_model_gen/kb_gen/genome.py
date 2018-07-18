@@ -305,7 +305,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                             prot.gene = gene  # associates protein with GeneLocus object for corresponding gene
                             prot.rna = rna
                             prot.half_life = 1
-                            prot.concentration = 1
+                            prot.concentration = rna.concentration
 
 
     def gen_tus(self):
