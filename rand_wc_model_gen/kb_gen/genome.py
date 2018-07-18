@@ -304,6 +304,8 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
                             prot.gene = gene  # associates protein with GeneLocus object for corresponding gene
                             prot.rna = rna
+                            prot.half_life = 1
+                            prot.concentration = 1
 
 
     def gen_tus(self):
@@ -444,11 +446,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             protein_name = next(assigned_proteins)
             protein.id = protein_name
             protein.name = protein_name
-            protein.half_life = 1
-            if protein_name == 'deg_rnase':
-                protein.concentration = 5000/scipy.constants.Avogadro / mean_volume    #http://bionumbers.hms.harvard.edu/bionumber.aspx?id=108959&ver=1&trm=average%20rnase%20concentration&org=
-            else:
-                protein.concentration = 1
                 
 
     def rand(self, mean, count=1, min=0, max=numpy.inf):
