@@ -136,7 +136,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
         assigned_proteins = options.get('assigned_proteins', ['IF1', 'IF2', 'IF3', 'EFtu', 'EFts',
                                                               'EFg', 'RF1', 'RF2', 'RF3',
-                                                              'deg_ATPase', 'deg_protease'])
+                                                              'deg_ATPase', 'deg_protease', 'deg_rnase'])
         assert(len(assigned_proteins) <= mean_num_genes)
         options['assigned_proteins'] = assigned_proteins
 
@@ -305,6 +305,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                             prot.gene = gene  # associates protein with GeneLocus object for corresponding gene
                             prot.rna = rna
 
+
     def gen_tus(self):
         """ Creates transcription units with 5'/3' UTRs, polycistronic mRNAs, and other types of RNA (tRNA, rRNA, sRNA)
 
@@ -443,6 +444,12 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             protein_name = next(assigned_proteins)
             protein.id = protein_name
             protein.name = protein_name
+            protein.half_life = 1
+            if protein_name == 'deg_rnase':
+                protein.concentration = 5000/scipy.constants.Avogadro / mean_volume    #http://bionumbers.hms.harvard.edu/bionumber.aspx?id=108959&ver=1&trm=average%20rnase%20concentration&org=
+            else:
+                protein.concentration = 1
+                
 
     def rand(self, mean, count=1, min=0, max=numpy.inf):
         """ Generated 1 or more random normally distributed integer(s) with standard deviation equal
