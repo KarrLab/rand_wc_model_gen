@@ -10,6 +10,7 @@ from .genome import GenomeGenerator
 from .metabolites import MetabolitesGenerator
 from .properties import PropertiesGenerator
 from .observables import ObservablesGenerator
+from .compartments import CompartmentsGenerator
 from numpy import random
 import rand_wc_model_gen
 import wc_kb
@@ -34,6 +35,7 @@ class KbGenerator(wc_kb_gen.KbGenerator):
 
     DEFAULT_COMPONENT_GENERATORS = (
         PropertiesGenerator,
+        CompartmentsGenerator,
         GenomeGenerator,
         MetabolitesGenerator,
         ObservablesGenerator,
