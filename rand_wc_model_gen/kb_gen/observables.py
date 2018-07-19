@@ -41,8 +41,7 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
         assert (len(assigned_trnas) <= count)
         options['assigned_trnas'] = assigned_trnas
 
-        assigned_proteins = options.get('assigned_proteins', ['IF1', 'IF2', 'IF3', 'EFtu', 'EFts',
-                                                              'EFg', 'RF1', 'RF2', 'RF3',
+        assigned_proteins = options.get('assigned_proteins', ['IF', 'EF', 'RF',
                                                               'deg_ATPase', 'deg_protease', 'deg_rnase'])
 
         prots = self.knowledge_base.cell.species_types.get(
