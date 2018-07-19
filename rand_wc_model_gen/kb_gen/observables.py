@@ -115,5 +115,3 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
             protein.id = protein_name
             protein.name = protein_name
                 
-
-   
