@@ -123,28 +123,11 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(mean_half_life > 0)
         options['mean_half_life'] = mean_half_life
 
-        assigned_trnas = options.get('assigned_trnas', ['tRNA_Ser', 'tRNA_Leu', 'tRNA_Arg',
-                                                        'tRNA_Thr', 'tRNA_Gly', 'tRNA_Phe',
-                                                        'tRNA_Trp', 'tRNA_Lys', 'tRNA_Ile',
-                                                        'tRNA_Ala', 'tRNA_Met', 'tRNA_Gln',
-                                                        'tRNA_Pro', 'tRNA_Val', 'tRNA_Cys',
-                                                        'tRNA_Tyr', 'tRNA_His', 'tRNA_Asn',
-                                                        'tRNA_Asp', 'tRNA_Glu'])
-
-        assert (len(assigned_trnas) <= tRNA_prop*mean_num_genes)
-        options['assigned_trnas'] = assigned_trnas
-
-        assigned_proteins = options.get('assigned_proteins', ['IF1', 'IF2', 'IF3', 'EFtu', 'EFts',
-                                                              'EFg', 'RF1', 'RF2', 'RF3',
-                                                              'deg_ATPase', 'deg_protease', 'deg_rnase'])
-        assert(len(assigned_proteins) <= mean_num_genes)
-        options['assigned_proteins'] = assigned_proteins
 
     def gen_components(self):
         self.gen_genome()
         self.gen_tus()
         self.gen_rnas_proteins()
-        self.assign_species()
 
     def gen_genome(self):
         '''Construct knowledge base components and generate the DNA sequence'''
@@ -412,40 +395,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             for locus in transcription_loci:
                 locus.polymer = chromosome
 
-    def assign_species(self):
-        """ Takes random samples of the generated rnas and proteins and assigns them functions based on the included list of proteins and rnas"""
 
-        assigned_trnas = self.options['assigned_trnas']
-        assigned_proteins = self.options['assigned_proteins']
-
-        prots = self.knowledge_base.cell.species_types.get(
-            __type=wc_kb.ProteinSpeciesType)
-        rnas = self.knowledge_base.cell.species_types.get(
-            __type=wc_kb.RnaSpeciesType)
-
-        trnas = []
-        for rna in rnas:
-            if rna.type == wc_kb.RnaType.tRna:
-                trnas.append(rna)
-
-        sampled_trnas = numpy.random.choice(
-            trnas, len(assigned_trnas), replace=False)
-
-        assigned_trnas = iter(assigned_trnas)
-
-        for rna in sampled_trnas:
-            rna_name = next(assigned_trnas)
-            rna.id = rna_name
-            rna.name = rna_name
-
-        sampled_proteins = numpy.random.choice(
-            prots, len(assigned_proteins), replace=False)
-
-        assigned_proteins = iter(assigned_proteins)
-        for protein in sampled_proteins:
-            protein_name = next(assigned_proteins)
-            protein.id = protein_name
-            protein.name = protein_name
                 
 
     def rand(self, mean, count=1, min=0, max=numpy.inf):
