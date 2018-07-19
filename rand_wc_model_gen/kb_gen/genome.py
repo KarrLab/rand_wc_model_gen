@@ -29,14 +29,14 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
     * mean_num_genes (:obj:`float`): mean number of genes
     * mean_gene_len (:obj:`float`): mean codon length of a gene
     * mean_coding_frac (:obj:`float`): mean coding fraction of the genome
-    * translation_table (:obj: 'int'): The NCBI standard genetic code used
-    * ncRNA_prop (:obj: 'float'): The proportion of non coding RNAs
-    * rRNA_prop  (:obj: 'float'): The proportion of ribosomal RNAs
-    * tRNA_prop (:obj: 'float'): The proportion of transfer RNAs
-    * five_prime_len (:obj: 'int'): Average 5' UTR length for transcription units
-    * three_prime_len (:obj: 'int'): Average 3' UTR length for transcription units
-    * operon_prop (:obj: 'float'): Proportion of genes that should be in an operon (polycistronic mRNA)
-    * operon_gen_num (:obj: 'int'): Average number of genes in an operon
+    * translation_table (:obj:'int'): The NCBI standard genetic code used
+    * ncRNA_prop (:obj:'float'): The proportion of non coding RNAs
+    * rRNA_prop  (:obj:'float'): The proportion of ribosomal RNAs
+    * tRNA_prop (:obj:'float'): The proportion of transfer RNAs
+    * five_prime_len (:obj:'int'): Average 5' UTR length for transcription units
+    * three_prime_len (:obj:'int'): Average 3' UTR length for transcription units
+    * operon_prop (:obj:'float'): Proportion of genes that should be in an operon (polycistronic mRNA)
+    * operon_gen_num (:obj:'int'): Average number of genes in an operon
     * mean_copy_number (:obj:`float`): mean copy number of each RNA
     * mean_half_life (:obj:`float`): mean half-life of RNAs
     """
@@ -122,7 +122,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         mean_half_life = options.get('mean_half_life', 2.1 * 60)
         assert(mean_half_life > 0)
         options['mean_half_life'] = mean_half_life
-
 
     def gen_components(self):
         self.gen_genome()
@@ -290,7 +289,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                             prot.half_life = 1
                             prot.concentration = rna.concentration
 
-
     def gen_tus(self):
         """ Creates transcription units with 5'/3' UTRs, polycistronic mRNAs, and other types of RNA (tRNA, rRNA, sRNA)
 
@@ -394,9 +392,6 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                 i_gene += 1
             for locus in transcription_loci:
                 locus.polymer = chromosome
-
-
-                
 
     def rand(self, mean, count=1, min=0, max=numpy.inf):
         """ Generated 1 or more random normally distributed integer(s) with standard deviation equal
