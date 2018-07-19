@@ -1,3 +1,12 @@
+""" Tests of compartment generation"
+
+:Author: Bilal Shaikh <bilal.shaikh@columbia.edu>
+:Date: 2018-07-19
+:Copyright: 2018, Karr Lab
+:License: MIT
+"""
+
+
 import wc_kb
 import wc_kb_gen
 import unittest

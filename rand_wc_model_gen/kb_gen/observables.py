@@ -1,26 +1,21 @@
 """
-:Author: Ashwin Srinivasan <ashwins@mit.edu>
-:Date: 2018-07-19
+:Author: Bilal Shaikh <bilal.shaikh@columbia.edu>
+::Date: 2018-07-19
 :Copyright: 2018, Karr Lab
 :License: MIT
 """
-import math
-import scipy.stats as stats
-import scipy.constants
 import wc_kb
 import wc_kb_gen
 import numpy
-import math
-from numpy import random
-from Bio.Seq import Seq, Alphabet
-from Bio.Data import CodonTable
+
 
 class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
     """
     Creates observable objects for proteins and tRNAs that are assigned to specific functions. Adds these observables to the knowledge base.
 
     Options:
-    
+        * assigned_trnas (:obj:'list'): A list of the names of trnas to be created
+        * assigned_proteins (:obj: 'list'): A list of the names of proteins to be created
     """
 
     def clean_and_validate_options(self):
@@ -38,12 +33,12 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
         rnas = self.knowledge_base.cell.species_types.get(
             __type=wc_kb.RnaSpeciesType)
 
-        trnas = []
+        count = 0
         for rna in rnas:
             if rna.type == wc_kb.RnaType.tRna:
-                trnas.append(rna)
-        
-        assert (len(assigned_trnas) <= len(trnas))
+                count += 1
+
+        assert (len(assigned_trnas) <= count)
         options['assigned_trnas'] = assigned_trnas
 
         assigned_proteins = options.get('assigned_proteins', ['IF1', 'IF2', 'IF3', 'EFtu', 'EFts',
@@ -56,32 +51,10 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
         assert(len(assigned_proteins) <= len(prots))
         options['assigned_proteins'] = assigned_proteins
 
-
-
     def gen_components(self):
-        self.assign_species()
-        self.assign_observables()
-
-
-    def assign_observables(self):
-        assigned_trnas = self.options['assigned_trnas']
-        assigned_proteins = self.options['assigned_proteins']
-        cell = self.knowledge_base.cell
-
-        for trna in assigned_trnas:
-            kb_trna = cell.species_types.get(id = trna)
-            obs_trna = cell.observables.get_or_create(id = kb_trna.id)
-            obs_trna.name = kb_trna.name
-            
-
-        for prot in assigned_proteins:
-            kb_prot = cell.species_types.get(id = prot)
-            obs_prot = cell.observables.get_or_create(id = kb_prot.id)
-            obs_prot.name = kb_prot.name
-
-
-   def assign_species(self):
         """ Takes random samples of the generated rnas and proteins and assigns them functions based on the included list of proteins and rnas"""
+        cell = self.knowledge_base.cell
+        cytosol = cell.compartments.get_one(id='c')
 
         assigned_trnas = self.options['assigned_trnas']
         assigned_proteins = self.options['assigned_proteins']
@@ -105,6 +78,10 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
             rna_name = next(assigned_trnas)
             rna.id = rna_name
             rna.name = rna_name
+            observable = cell.observables.get_or_create(id=rna_name+'_obs')
+            observable.name = rna_name
+            observable.species.append(
+                wc_kb.SpeciesCoefficient(species=wc_kb.Species(species_type=rna, compartment=cytosol), coefficient=1))
 
         sampled_proteins = numpy.random.choice(
             prots, len(assigned_proteins), replace=False)
@@ -114,4 +91,7 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
             protein_name = next(assigned_proteins)
             protein.id = protein_name
             protein.name = protein_name
-                
+            observable = cell.observables.get_or_create(id=protein_name+'_obs')
+            observable.name = protein_name
+            observable.species.append(
+                wc_kb.SpeciesCoefficient(species=wc_kb.Species(species_type=protein, compartment=cytosol), coefficient=1))
