@@ -38,7 +38,7 @@ class ObservablesGeneratorTestCase(unittest.TestCase):
         cell = self.cell
 
         obs1 = cell.observables.get_one(id='a_obs')
-        self.assertIsInstance(obs1, wc_kb.Observable)
+        self.assertIsInstance(obs1, wc_kb.core.Observable)
         species_coefficient = obs1.species[0]
         self.assertIsInstance(species_coefficient, wc_kb.SpeciesCoefficient)
         species = species_coefficient.species

@@ -79,6 +79,7 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
             rna.name = rna_name
             observable = cell.observables.get_or_create(id=rna_name+'_obs')
             observable.name = rna_name
+            #print(observable.name)
             observable.species.append(
                 wc_kb.SpeciesCoefficient(species=wc_kb.Species(species_type=rna, compartment=cytosol), coefficient=1))
 
