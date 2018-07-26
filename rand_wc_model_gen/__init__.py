@@ -7,5 +7,5 @@ with open(pkg_resources.resource_filename('rand_wc_model_gen', 'VERSION'), 'r') 
 # API
 from . import analysis
 from . import config
-from . import kb_gen
+from wc_kb_gen import random
 

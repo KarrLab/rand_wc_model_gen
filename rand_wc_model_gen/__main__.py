@@ -13,7 +13,7 @@ import os
 import rand_wc_model_gen
 import rand_wc_model_gen.analysis
 import rand_wc_model_gen.config
-import rand_wc_model_gen.kb_gen
+import wc_kb_gen.random
 from wc_model_gen import rand_gen
 import wc_kb.io
 import wc_lang.io
@@ -54,7 +54,7 @@ class GenerateController(CementBaseController):
     def default(self):
         args = self.app.pargs
         config = rand_wc_model_gen.config.get_config(extra_path=args.config_path)['rand_wc_model_gen']
-        kb = rand_wc_model_gen.kb_gen.KbGenerator(options=config['kb_gen']).run()
+        kb = wc_kb_gen.random.RandomKbGenerator(options=config['kb_gen']).run()
         model = rand_gen.RandomModelGenerator(kb, options=config['model_gen']).run()
 
         if not os.path.isdir(os.path.dirname(config['kb']['path']['core'])):
