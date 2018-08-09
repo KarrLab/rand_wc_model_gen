@@ -14,9 +14,9 @@ import rand_wc_model_gen
 import rand_wc_model_gen.analysis
 import rand_wc_model_gen.config
 import wc_kb_gen.random
-from wc_model_gen import rand_gen
 import wc_kb.io
 import wc_lang.io
+import wc_model_gen.prokaryote
 import wc_sim.multialgorithm.run_results
 import wc_sim.multialgorithm.simulation
 
@@ -55,7 +55,7 @@ class GenerateController(CementBaseController):
         args = self.app.pargs
         config = rand_wc_model_gen.config.get_config(extra_path=args.config_path)['rand_wc_model_gen']
         kb = wc_kb_gen.random.RandomKbGenerator(options=config['kb_gen']).run()
-        model = rand_gen.RandomModelGenerator(kb, options=config['model_gen']).run()
+        model = wc_model_gen.prokaryote.ProkaryoteModelGenerator(kb, options=config['model_gen']).run()
 
         if not os.path.isdir(os.path.dirname(config['kb']['path']['core'])):
             os.makedirs(os.path.dirname(config['kb']['path']['core']))

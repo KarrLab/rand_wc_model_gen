@@ -8,12 +8,12 @@
 
 from rand_wc_model_gen import analysis
 from rand_wc_model_gen import kb_gen
-from wc_model_gen import rand_gen
 import os
 import shutil
 import tempfile
 import time
 import unittest
+import wc_model_gen.prokaryote
 import wc_sim.multialgorithm.simulation
 
 
@@ -37,7 +37,7 @@ class RnaSimulationAnalysisTestCase(unittest.TestCase):
         }).run()
 
         # generate model
-        model = rand_gen.RandomModelGenerator(kb).run()
+        model = wc_model_gen.prokaryote.ProkaryoteModelGenerator(kb).run()
 
         # run simulations
         sim_results_path = os.path.join(self.temp_dir, 'sim_results')

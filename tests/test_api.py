@@ -22,5 +22,5 @@ class ApiTestCase(unittest.TestCase):
         self.assertIsInstance(rand_wc_model_gen.kb_gen, types.ModuleType)
         self.assertIsInstance(rand_wc_model_gen.kb_gen.KbGenerator, type)
 
-        self.assertIsInstance(wc_model_gen.rand_gen, types.ModuleType)
-        self.assertIsInstance(wc_model_gen.rand_gen.RandomModelGenerator, type)
+        self.assertIsInstance(wc_model_gen.prokaryote, types.ModuleType)
+        self.assertIsInstance(wc_model_gen.prokaryote.ProkaryoteModelGenerator, type)
