@@ -7,8 +7,7 @@
 :License: MIT
 """
 
-from cement.core.foundation import CementApp
-from cement.core.controller import CementBaseController, expose
+import cement
 import os
 import rand_wc_model_gen
 import rand_wc_model_gen.analysis
@@ -21,7 +20,7 @@ import wc_sim.multialgorithm.run_results
 import wc_sim.multialgorithm.simulation
 
 
-class BaseController(CementBaseController):
+class BaseController(cement.Controller):
     """ Base controller for command line application """
 
     class Meta:
@@ -31,12 +30,12 @@ class BaseController(CementBaseController):
             (['-v', '--version'], dict(action='version', version=rand_wc_model_gen.__version__)),
         ]
 
-    @expose(hide=True)
-    def default(self):
+    @cement.ex(hide=True)
+    def _default(self):
         self.app.args.print_help()
 
 
-class GenerateController(CementBaseController):
+class GenerateController(cement.Controller):
     """ Generate a random whole-cell knowledge base and a random whole-cell model """
 
     class Meta:
@@ -50,8 +49,8 @@ class GenerateController(CementBaseController):
                                      help='Path to configuration file')),
         ]
 
-    @expose(hide=True)
-    def default(self):
+    @cement.ex(hide=True)
+    def _default(self):
         args = self.app.pargs
         config = rand_wc_model_gen.config.get_config(extra_path=args.config_path)['rand_wc_model_gen']
         kb = wc_kb_gen.random.RandomKbGenerator(options=config['kb_gen']).run()
@@ -72,7 +71,7 @@ class GenerateController(CementBaseController):
                                 set_repo_metadata_from_path=config['model_gen']['set_repo_metadata_from_path'])
 
 
-class SimulateController(CementBaseController):
+class SimulateController(cement.Controller):
     """ Simulate a random whole-cell model """
 
     class Meta:
@@ -85,8 +84,8 @@ class SimulateController(CementBaseController):
             (['--seed'], dict(type=int, default=None, help='Random number generator seed')),
         ]
 
-    @expose(hide=True)
-    def default(self):
+    @cement.ex(hide=True)
+    def _default(self):
         args = self.app.pargs
         config = rand_wc_model_gen.config.get_config(extra_path=args.config_path)['rand_wc_model_gen']
 
@@ -106,7 +105,7 @@ class SimulateController(CementBaseController):
         }
 
 
-class AnalyzeController(CementBaseController):
+class AnalyzeController(cement.Controller):
     """ Analyze a random whole-cell knowledge base, model, and their simulations """
 
     class Meta:
@@ -118,8 +117,8 @@ class AnalyzeController(CementBaseController):
             (['--config-path'], dict(type=str, default=None, help='Path to configuration file')),
         ]
 
-    @expose(hide=True)
-    def default(self):
+    @cement.ex(hide=True)
+    def _default(self):
         args = self.app.pargs
         config = rand_wc_model_gen.config.get_config(extra_path=args.config_path)['rand_wc_model_gen']
         kb = wc_kb.io.Reader().run(config['kb']['path']['core'], config['kb']['path']['seq'])
@@ -130,7 +129,7 @@ class AnalyzeController(CementBaseController):
         runner.run()
 
 
-class App(CementApp):
+class App(cement.App):
     """ Command line application 
 
     Attributes:
