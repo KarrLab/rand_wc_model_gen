@@ -53,12 +53,12 @@ class MetabolitesGeneratorTestCase(unittest.TestCase):
         })
         gen.run()
 
-        h2o = cell.species_types.get_one(__type=wc_kb.MetaboliteSpeciesType, id='h2o')
+        h2o = cell.species_types.get_one(__type=wc_kb.core.MetaboliteSpeciesType, id='h2o')
         self.assertEqual(h2o.get_empirical_formula(), wc_utils.util.chem.EmpiricalFormula('H2O'))
         self.assertEqual(h2o.get_charge(), 0)
         self.assertEqual(h2o.concentration, 55.)
 
-        h = cell.species_types.get_one(__type=wc_kb.MetaboliteSpeciesType, id='h')
+        h = cell.species_types.get_one(__type=wc_kb.core.MetaboliteSpeciesType, id='h')
         self.assertEqual(h.get_empirical_formula(), wc_utils.util.chem.EmpiricalFormula('H'))
         self.assertEqual(h.get_charge(), 1)
         self.assertEqual(h.concentration, 1e-6)

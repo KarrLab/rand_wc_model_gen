@@ -46,7 +46,7 @@ class MetabolitesGenerator(wc_kb_gen.KbComponentGenerator):
         # generate metabolites
         for met in self.data:
             cell.species_types.get_or_create(
-                __type=wc_kb.MetaboliteSpeciesType,
+                __type=wc_kb.core.MetaboliteSpeciesType,
                 id=met['Id'], name=met['Name'],
                 structure=met['Structure (InChI)'],
                 concentration=met['Intracellular concentration (M)'])

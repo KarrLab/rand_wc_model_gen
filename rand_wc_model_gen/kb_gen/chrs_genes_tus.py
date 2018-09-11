@@ -82,7 +82,7 @@ class ChromosomesGenesTusGenerator(wc_kb_gen.KbComponentGenerator):
                                                                          2, mean_gc_frac / 2, (1 - mean_gc_frac) / 2), size=(seq_len, ))), Alphabet.DNAAlphabet())
 
             chr = cell.species_types.get_or_create(
-                id='chr_{}'.format(i_chr + 1), __type=wc_kb.DnaSpeciesType)
+                id='chr_{}'.format(i_chr + 1), __type=wc_kb.core.DnaSpeciesType)
             chr.name = 'Chromosome {}'.format(i_chr + 1)
             chr.circular = chromosome_topology == 'circular'
             chr.double_stranded = True
@@ -92,23 +92,23 @@ class ChromosomesGenesTusGenerator(wc_kb_gen.KbComponentGenerator):
                                                    numpy.concatenate((numpy.round(intergene_lens[0:1] / 2), intergene_lens[1:]))))
             for i_gene in range(num_genes):
                 tu = cell.loci.get_or_create(id='tu_{}_{}'.format(
-                    i_chr + 1, i_gene + 1), __type=wc_kb.TranscriptionUnitLocus)
+                    i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote_schema.TranscriptionUnitLocus)
                 tu.polymer = chr
                 tu.name = 'Transcription unit {}-{}'.format(
                     i_chr + 1, i_gene + 1)
                 tu.start = gene_starts[i_gene]
                 tu.end = gene_starts[i_gene] + gene_lens[i_gene] - 1
                 tu.strand = random.choice(
-                    (wc_kb.PolymerStrand.positive, wc_kb.PolymerStrand.negative))
+                    (wc_kb.core.PolymerStrand.positive, wc_kb.core.PolymerStrand.negative))
 
                 gene = cell.loci.get_or_create(id='gene_{}_{}'.format(
-                    i_chr + 1, i_gene + 1), __type=wc_kb.GeneLocus)
+                    i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote_schema.GeneLocus)
                 gene.polymer = chr
                 gene.transcription_units.append(tu)
                 gene.name = 'Gene {}-{}'.format(i_chr + 1, i_gene + 1)
                 gene.start = gene_starts[i_gene]
                 gene.end = gene_starts[i_gene] + gene_lens[i_gene] - 1
-                gene.type = wc_kb.GeneType.mRna
+                gene.type = wc_kb.core.GeneType.mRna
                 gene.strand = tu.strand
 
     def rand(self, mean, count=1):

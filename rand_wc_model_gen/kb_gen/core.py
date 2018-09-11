@@ -45,7 +45,7 @@ class KbGenerator(wc_kb_gen.KbGenerator):
         """ Generate a knowledge base of experimental data for a whole-cell model
 
         Returns:
-            :obj:`wc_kb.KnowledgeBase`: knowledge base
+            :obj:`wc_kb.core.KnowledgeBase`: knowledge base
         """
         self.clean_and_validate_options()
         random.seed(self.options.get('seed'))

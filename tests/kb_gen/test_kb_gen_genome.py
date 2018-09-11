@@ -50,14 +50,14 @@ class TestGenomeGenerator(unittest.TestCase):
         tRna = 0
         sRna = 0
         rnas = self.kb.cell.species_types.get(
-            __type=wc_kb.core.RnaSpeciesType)
+            __type=wc_kb.prokaryote_schema.RnaSpeciesType)
 
         for rna in rnas:
-            if rna.type == wc_kb.RnaType.rRna:
+            if rna.type == wc_kb.core.RnaType.rRna:
                 rRna += 1
-            elif rna.type == wc_kb.RnaType.tRna:
+            elif rna.type == wc_kb.core.RnaType.tRna:
                 tRna += 1
-            elif rna.type == wc_kb.RnaType.sRna:
+            elif rna.type == wc_kb.core.RnaType.sRna:
                 sRna += 1
 
         total = len(rnas)
@@ -81,16 +81,16 @@ class TestGenomeGenerator(unittest.TestCase):
     # test total number of proteins (should match number of GeneLocus objects with mRNA)
     def test_rna_num(self):
         rnas = self.kb.cell.species_types.get(
-            __type=wc_kb.core.RnaSpeciesType)
+            __type=wc_kb.prokaryote_schema.RnaSpeciesType)
         tus = self.kb.cell.loci.get(
-            __type=wc_kb.core.TranscriptionUnitLocus)
+            __type=wc_kb.prokaryote_schema.TranscriptionUnitLocus)
         self.assertEqual(len(rnas), len(tus))
 
     def test_prot_num(self):
         prots = self.kb.cell.species_types.get(
-            __type=wc_kb.core.ProteinSpeciesType)
+            __type=wc_kb.prokaryote_schema.ProteinSpeciesType)
         genes = self.kb.cell.loci.get(
-            __type=wc_kb.core.GeneLocus)
+            __type=wc_kb.prokaryote_schema.GeneLocus)
         geneCount = 0
         for gene in genes:
             if gene.type == wc_kb.core.GeneType.mRna:
@@ -101,18 +101,18 @@ class TestGenomeGenerator(unittest.TestCase):
         trans_table = self.kb.translation_table
         START_CODONS = CodonTable.unambiguous_dna_by_id[trans_table].start_codons
 
-        genes = self.kb.cell.loci.get(__type=wc_kb.GeneLocus)
+        genes = self.kb.cell.loci.get(__type=wc_kb.prokaryote_schema.GeneLocus)
         for gene in genes:
-            if gene.type == wc_kb.GeneType.mRna:
+            if gene.type == wc_kb.core.GeneType.mRna:
 
                 self.assertIn(gene.get_seq()[0:3], START_CODONS)
 
     def test_stop_codon(self):
         trans_table = self.kb.translation_table
-        genes = self.kb.cell.loci.get(__type=wc_kb.GeneLocus)
+        genes = self.kb.cell.loci.get(__type=wc_kb.prokaryote_schema.GeneLocus)
         STOP_CODONS = CodonTable.unambiguous_dna_by_id[trans_table].stop_codons
         for gene in genes:
-            if gene.type == wc_kb.GeneType.mRna:
+            if gene.type == wc_kb.core.GeneType.mRna:
                 self.assertIn(gene.get_seq()[-3:], STOP_CODONS)
 
     # tests first and last sites of proteins
@@ -122,7 +122,7 @@ class TestGenomeGenerator(unittest.TestCase):
     def test_length(self):
         # Tests that the average length of the genes is within 3 standard deviations of the expected.
 
-        genes = self.kb.cell.loci.get(__type=wc_kb.GeneLocus)
+        genes = self.kb.cell.loci.get(__type=wc_kb.prokaryote_schema.GeneLocus)
 
         sum_len = 0
         for gene in genes:
@@ -136,12 +136,12 @@ class TestGenomeGenerator(unittest.TestCase):
         # checks average lengths of 5'/3' UTRs on transcription units with mRna
     def test_utrs(self):
         tus = self.kb.cell.loci.get(
-            __type=wc_kb.core.TranscriptionUnitLocus)
+            __type=wc_kb.prokaryote_schema.TranscriptionUnitLocus)
         sum_five_prime = 0
         sum_three_prime = 0
         mRnaCount = 0
         for tu in tus:
-            if tu.genes[0].type == wc_kb.GeneType.mRna:  # checks if it is mRna
+            if tu.genes[0].type == wc_kb.core.GeneType.mRna:  # checks if it is mRna
                 mRnaCount += 1
                 five_prime_gene = tu.genes[0]
                 three_prime_gene = tu.genes[len(tu.genes)-1]
@@ -158,7 +158,7 @@ class TestGenomeGenerator(unittest.TestCase):
 
     def test_operons(self):
         tus = self.kb.cell.loci.get(
-            __type=wc_kb.core.TranscriptionUnitLocus)
+            __type=wc_kb.prokaryote_schema.TranscriptionUnitLocus)
         gene_sum = 0
         operonCount = 0
         for tu in tus:
@@ -169,11 +169,11 @@ class TestGenomeGenerator(unittest.TestCase):
         avg_operon_gen = gene_sum / operonCount
         operon_gen_num = self.options.get('operon_gen_num')
 
-        genes = self.kb.cell.loci.get(__type=wc_kb.GeneLocus)
+        genes = self.kb.cell.loci.get(__type=wc_kb.prokaryote_schema.GeneLocus)
         geneCount = 0
 
         for gene in genes:
-            if gene.type == wc_kb.GeneType.mRna:
+            if gene.type == wc_kb.core.GeneType.mRna:
                 geneCount += 1
 
         avg_in_operon = gene_sum / geneCount
@@ -187,17 +187,17 @@ class TestGenomeGenerator(unittest.TestCase):
 
     def test_protein_start_codon(self):
 
-        for protein in self.kb.cell.species_types.get(__type=wc_kb.core.ProteinSpeciesType):
+        for protein in self.kb.cell.species_types.get(__type=wc_kb.prokaryote_schema.ProteinSpeciesType):
             seq = str(protein.get_seq())
             self.assertEqual(seq[0], 'M')
 
     def test_assignment(self):
         rna = self.kb.cell.species_types.get(name='tRNA_Ser')
         rna = rna[0]
-        assert (rna.type == wc_kb.RnaType.tRna)
+        assert (rna.type == wc_kb.core.RnaType.tRna)
 
         protein = self.kb.cell.species_types.get(id="IF")
-        assert(type(protein[0]) == wc_kb.ProteinSpeciesType)
+        assert(type(protein[0]) == wc_kb.prokaryote_schema.ProteinSpeciesType)
 
     def tearDown(self):
         pass

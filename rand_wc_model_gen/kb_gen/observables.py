@@ -31,11 +31,11 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
                                                         'tRNA_Asp', 'tRNA_Glu'])
 
         rnas = self.knowledge_base.cell.species_types.get(
-            __type=wc_kb.RnaSpeciesType)
+            __type=wc_kb.prokaryote_schema.RnaSpeciesType)
 
         count = 0
         for rna in rnas:
-            if rna.type == wc_kb.RnaType.tRna:
+            if rna.type == wc_kb.core.RnaType.tRna:
                 count += 1
 
         assert (len(assigned_trnas) <= count)
@@ -45,7 +45,7 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
                                                               'deg_ATPase', 'deg_protease', 'deg_rnase'])
 
         prots = self.knowledge_base.cell.species_types.get(
-            __type=wc_kb.ProteinSpeciesType)
+            __type=wc_kb.prokaryote_schema.ProteinSpeciesType)
 
         assert(len(assigned_proteins) <= len(prots))
         options['assigned_proteins'] = assigned_proteins
@@ -59,13 +59,13 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
         assigned_proteins = self.options['assigned_proteins']
 
         prots = self.knowledge_base.cell.species_types.get(
-            __type=wc_kb.ProteinSpeciesType)
+            __type=wc_kb.prokaryote_schema.ProteinSpeciesType)
         rnas = self.knowledge_base.cell.species_types.get(
-            __type=wc_kb.RnaSpeciesType)
+            __type=wc_kb.prokaryote_schema.RnaSpeciesType)
 
         trnas = []
         for rna in rnas:
-            if rna.type == wc_kb.RnaType.tRna:
+            if rna.type == wc_kb.core.RnaType.tRna:
                 trnas.append(rna)
 
         sampled_trnas = numpy.random.choice(
@@ -81,7 +81,7 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
             observable.name = rna_name
             #print(observable.name)
             observable.species.append(
-                wc_kb.SpeciesCoefficient(species=wc_kb.Species(species_type=rna, compartment=cytosol), coefficient=1))
+                wc_kb.core.SpeciesCoefficient(species=wc_kb.core.Species(species_type=rna, compartment=cytosol), coefficient=1))
 
         sampled_proteins = numpy.random.choice(
             prots, len(assigned_proteins), replace=False)
@@ -94,4 +94,4 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
             observable = cell.observables.get_or_create(id=protein_name+'_obs')
             observable.name = protein_name
             observable.species.append(
-                wc_kb.SpeciesCoefficient(species=wc_kb.Species(species_type=protein, compartment=cytosol), coefficient=1))
+                wc_kb.core.SpeciesCoefficient(species=wc_kb.core.Species(species_type=protein, compartment=cytosol), coefficient=1))

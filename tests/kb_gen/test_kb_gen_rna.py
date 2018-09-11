@@ -21,11 +21,11 @@ class RnaGeneratorTestCase(unittest.TestCase):
 
         tus = []
         for i_tu in range(1000):
-            tu = cell.loci.create(__type=wc_kb.TranscriptionUnitLocus,
+            tu = cell.loci.create(__type=wc_kb.prokaryote_schema.TranscriptionUnitLocus,
                                   id='tu_{}'.format(i_tu + 1),
                                   name='Transcription unit {}'.format(i_tu + 1),
-                                  start=10 + 20 * (i_tu), end=20 + 20 * (i_tu), strand=wc_kb.PolymerStrand.positive)
-            tu.genes.create(id='gene_{}'.format(i_tu + 1), type=wc_kb.GeneType.mRna)
+                                  start=10 + 20 * (i_tu), end=20 + 20 * (i_tu), strand=wc_kb.core.PolymerStrand.positive)
+            tu.genes.create(id='gene_{}'.format(i_tu + 1), type=wc_kb.core.GeneType.mRna)
             tus.append(tu)
 
         gen = kb_gen.rna.RnaGenerator(kb, options={
@@ -34,12 +34,12 @@ class RnaGeneratorTestCase(unittest.TestCase):
         })
         gen.run()
 
-        rnas = cell.species_types.get(__type=wc_kb.RnaSpeciesType)
+        rnas = cell.species_types.get(__type=wc_kb.prokaryote_schema.RnaSpeciesType)
         self.assertEqual(len(rnas), 1000)
 
         self.assertEqual(rnas[0].transcription_units, [tus[0]])
         self.assertEqual(rnas[0].name, 'RNA 1')
-        self.assertEqual(rnas[0].type, wc_kb.RnaType.mRna)
+        self.assertEqual(rnas[0].type, wc_kb.core.RnaType.mRna)
 
         concs = [rna.concentration for rna in rnas]
         half_lives = [rna.half_life for rna in rnas]

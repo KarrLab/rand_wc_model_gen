@@ -204,18 +204,18 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             # creates GeneLocus objects for the genes and labels their GeneType (which type of RNA they transcribe)
             for i_gene, gene_start in enumerate(gene_starts):
                 gene = self.knowledge_base.cell.loci.get_or_create(
-                    id='gene_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.GeneLocus)
+                    id='gene_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote_schema.GeneLocus)
                 gene.start = gene_start + 1  # 1-indexed
                 gene.polymer = chro
                 gene.end = gene.start + gene_lens[i_gene] - 1  # 1-indexed
                 # print(gene_lens[i_gene] % 3 == 0)
                 gene.name = 'gene {} {}'.format(i_chr+1, i_gene+1)
-                typeList = [wc_kb.GeneType.mRna, wc_kb.GeneType.rRna,
-                            wc_kb.GeneType.sRna, wc_kb.GeneType.tRna]
+                typeList = [wc_kb.core.GeneType.mRna, wc_kb.core.GeneType.rRna,
+                            wc_kb.core.GeneType.sRna, wc_kb.core.GeneType.tRna]
                 prob_rna = [1 - ncRNA_prop - tRNA_prop -
                             rRNA_prop, rRNA_prop, ncRNA_prop, tRNA_prop]
                 gene.type = random.choice(typeList, p=prob_rna)
-                if gene.type == wc_kb.GeneType.mRna:  # if mRNA, then set up start/stop codons in the gene
+                if gene.type == wc_kb.core.GeneType.mRna:  # if mRNA, then set up start/stop codons in the gene
                     start_codon = random.choice(START_CODONS)
                     stop_codon = random.choice(STOP_CODONS)
                     seq_str = str(chro.seq)
@@ -246,22 +246,22 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
                 locus = chromosome.loci[i]
 
-                if type(locus) == wc_kb.TranscriptionUnitLocus:
+                if type(locus) == wc_kb.prokaryote_schema.TranscriptionUnitLocus:
                     tu = locus
 
                     # creates RnaSpeciesType for RNA sequence corresponding to gene
                     rna = self.knowledge_base.cell.species_types.get_or_create(
-                        id='rna_{}'.format(tu.id), __type=wc_kb.RnaSpeciesType)
+                        id='rna_{}'.format(tu.id), __type=wc_kb.prokaryote_schema.RnaSpeciesType)
                     rna.name = 'rna {}'.format(tu.id)
                     # GeneLocus object for gene sequence, attribute of ProteinSpeciesType object
-                    if tu.genes[0].type == wc_kb.GeneType.mRna:
-                        rna.type = wc_kb.RnaType.mRna
-                    elif tu.genes[0].type == wc_kb.GeneType.rRna:
-                        rna.type = wc_kb.RnaType.rRna
-                    elif tu.genes[0].type == wc_kb.GeneType.tRna:
-                        rna.type = wc_kb.RnaType.tRna
-                    elif tu.genes[0].type == wc_kb.GeneType.sRna:
-                        rna.type = wc_kb.RnaType.sRna
+                    if tu.genes[0].type == wc_kb.core.GeneType.mRna:
+                        rna.type = wc_kb.core.RnaType.mRna
+                    elif tu.genes[0].type == wc_kb.core.GeneType.rRna:
+                        rna.type = wc_kb.core.RnaType.rRna
+                    elif tu.genes[0].type == wc_kb.core.GeneType.tRna:
+                        rna.type = wc_kb.core.RnaType.tRna
+                    elif tu.genes[0].type == wc_kb.core.GeneType.sRna:
+                        rna.type = wc_kb.core.RnaType.sRna
 
                     # print(rna.type)
                     rna.concentration = random.gamma(
@@ -273,12 +273,12 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
                     # print(rna.get_seq
 
-                    if rna.type == wc_kb.RnaType.mRna:
+                    if rna.type == wc_kb.core.RnaType.mRna:
                         for gene in tu.genes:
                             # creates ProteinSpecipe object for corresponding protein sequence(s)
                             # print(gene.get_seq()[0:3])
                             prot = self.knowledge_base.cell.species_types.get_or_create(
-                                id='prot_{}'.format(gene.id), __type=wc_kb.ProteinSpeciesType)
+                                id='prot_{}'.format(gene.id), __type=wc_kb.prokaryote_schema.ProteinSpeciesType)
                             prot.name = 'prot_{}'.format(gene.id)
 
                             prot.cell = self.knowledge_base.cell
@@ -314,7 +314,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
                 gene = chromosome.loci[i_gene]
 
-                if gene.type == wc_kb.GeneType.mRna:
+                if gene.type == wc_kb.core.GeneType.mRna:
                     # polycistronic mRNA (multiple GeneLocus objects per TranscriptionUnitLocus)
                    # print("mrna")
 
@@ -331,7 +331,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
                         # add 3', 5' UTRs to the ends of the transcription unit (upstream of first gene, downstream of last gene)
                         tu = self.knowledge_base.cell.loci.get_or_create(
-                            id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.TranscriptionUnitLocus)
+                            id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote_schema.TranscriptionUnitLocus)
                         tu.name = 'tu {} {}'.format(i_chr+1, i_gene+1)
 
                         five_prime_start = gene.start - five_prime
@@ -349,7 +349,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                             if i_gene >= len(chromosome.loci):
                                 break
 
-                            if (chromosome.loci[i_gene]).type == wc_kb.GeneType.mRna:
+                            if (chromosome.loci[i_gene]).type == wc_kb.core.GeneType.mRna:
                                 gene = chromosome.loci[i_gene]
                                 tu.genes.append(gene)
 
@@ -371,7 +371,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         if three_prime_end >= len(seq):
                             three_prime_end = len(seq) - 1
                         tu = self.knowledge_base.cell.loci.get_or_create(
-                            id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.TranscriptionUnitLocus)
+                            id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote_schema.TranscriptionUnitLocus)
                         tu.start = five_prime_start
                         tu.end = three_prime_end
                         tu.name = 'tu {} {}'.format(i_chr+1, i_gene+1)
@@ -382,7 +382,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                 else:
                    # print("not mrna")
                     tu = self.knowledge_base.cell.loci.get_or_create(
-                        id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.TranscriptionUnitLocus)
+                        id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote_schema.TranscriptionUnitLocus)
                     tu.name = 'tu {} {}'.format(i_chr+1, i_gene+1)
                     tu.start = gene.start
                     tu.end = gene.end

@@ -29,7 +29,7 @@ class KbGeneratorTestCase(unittest.TestCase):
         })
 
         kb = gen.run()
-        self.assertEqual(len(kb.cell.species_types.get(__type=wc_kb.DnaSpeciesType)), 10)
+        self.assertEqual(len(kb.cell.species_types.get(__type=wc_kb.core.DnaSpeciesType)), 10)
 
         errors = obj_model.Validator().run(kb, get_related=True)
         self.assertEqual(errors, None, msg=wc_utils.util.string.indent_forest(errors))
