@@ -63,12 +63,12 @@ class CliTestCase(unittest.TestCase):
         with mock.patch('sys.argv', ['rand_wc_model_gen', '--help']):
             with self.assertRaises(SystemExit) as context:
                 __main__.main()
-                self.assertRegexpMatches(context.Exception, 'usage: rand_wc_model_gen')
+                self.assertRegex(context.Exception, 'usage: rand_wc_model_gen')
 
         with mock.patch('sys.argv', ['rand_wc_model_gen']):
             with abduct.captured(abduct.out(), abduct.err()) as (stdout, stderr):
                 __main__.main()
-                self.assertRegexpMatches(stdout.getvalue().strip(), 'usage: rand_wc_model_gen')
+                self.assertRegex(stdout.getvalue().strip(), 'usage: rand_wc_model_gen')
                 self.assertEqual(stderr.getvalue(), '')
 
     def test_get_version(self):
