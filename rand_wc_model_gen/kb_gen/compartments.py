@@ -12,7 +12,7 @@ class CompartmentsGenerator(wc_kb_gen.KbComponentGenerator):
     Creates compartments for the knowledge base from the provided list of compartment ids and names.At least two compartments, with ids(names) 'c' (cytosol) and 'e' (extracellular), must be created.
 
     Options:
-    * compartments (:obj:'list') a list of (:obj:'tuple') of type (:obj:'string',:obj:'string') that contain the id and name of the compartment.
+    * compartments (:obj:`list`) a list of (:obj:`tuple`) of type (:obj:`string`, :obj:`string`) that contain the id and name of the compartment.
 
     """
 

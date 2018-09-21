@@ -29,14 +29,14 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
     * mean_num_genes (:obj:`float`): mean number of genes
     * mean_gene_len (:obj:`float`): mean codon length of a gene
     * mean_coding_frac (:obj:`float`): mean coding fraction of the genome
-    * translation_table (:obj:'int'): The NCBI standard genetic code used
-    * ncRNA_prop (:obj:'float'): The proportion of non coding RNAs
-    * rRNA_prop  (:obj:'float'): The proportion of ribosomal RNAs
-    * tRNA_prop (:obj:'float'): The proportion of transfer RNAs
-    * five_prime_len (:obj:'int'): Average 5' UTR length for transcription units
-    * three_prime_len (:obj:'int'): Average 3' UTR length for transcription units
-    * operon_prop (:obj:'float'): Proportion of genes that should be in an operon (polycistronic mRNA)
-    * operon_gen_num (:obj:'int'): Average number of genes in an operon
+    * translation_table (:obj:`int`): The NCBI standard genetic code used
+    * ncRNA_prop (:obj:`float`): The proportion of non coding RNAs
+    * rRNA_prop  (:obj:`float`): The proportion of ribosomal RNAs
+    * tRNA_prop (:obj:`float`): The proportion of transfer RNAs
+    * five_prime_len (:obj:`int`): Average 5' UTR length for transcription units
+    * three_prime_len (:obj:`int`): Average 3' UTR length for transcription units
+    * operon_prop (:obj:`float`): Proportion of genes that should be in an operon (polycistronic mRNA)
+    * operon_gen_num (:obj:`int`): Average number of genes in an operon
     * mean_copy_number (:obj:`float`): mean copy number of each RNA
     * mean_half_life (:obj:`float`): mean half-life of RNAs
     """
