@@ -4,7 +4,7 @@ from wc_lang.core import Compartment, Reaction, SpeciesType, Species
 from wc_lang.io import Reader, Writer
 from obj_model.core import Validator
 
-model_core = os.path.join(os.path.dirname(__file__), '../rand_wc_model_gen/data/fixtures', 'model_core.xlsx')
+model_core = os.path.join(os.path.dirname(__file__), 'model_core.xlsx')
 model = Reader().run(model_core)
 
 AspAsp = model.get_component('species_type', 'AspAsp')
