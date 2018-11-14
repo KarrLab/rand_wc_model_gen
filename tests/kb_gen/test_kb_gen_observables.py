@@ -20,7 +20,7 @@ class ObservablesGeneratorTestCase(unittest.TestCase):
         gen = compartments.CompartmentsGenerator(kb)
         gen.run()
         gen = genome.GenomeGenerator(
-            kb, options={'num_chromosomes': 1, 'mean_num_genes': 50})
+            kb, options={'num_chromosomes': 1, 'mean_num_genes': 200})
         gen.run()
         gen = observables.ObservablesGenerator(
             kb, options={'assigned_proteins': ['a', 'b', 'c'], 'assigned_trnas': ['x', 'y', 'z']})

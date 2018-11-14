@@ -25,7 +25,7 @@ class TestGenomeGenerator(unittest.TestCase):
                     'mean_doubling_time': 1000.,
                 },
                 'GenomeGenerator': {
-                    'mean_num_genes': 100.,
+                    'mean_num_genes': 200.,
                 },
             },
         })
@@ -192,16 +192,12 @@ class TestGenomeGenerator(unittest.TestCase):
             self.assertEqual(seq[0], 'M')
 
     def test_assignment(self):
-        rna = self.kb.cell.species_types.get(name='tRNA_Ser')
+        rna = self.kb.cell.species_types.get(name='tRNA_TTT')
         rna = rna[0]
         assert (rna.type == wc_kb.core.RnaType.tRna)
 
-        protein = self.kb.cell.species_types.get(id="IF")
+        protein = self.kb.cell.species_types.get(id="translation_init_factors")
         assert(type(protein[0]) == wc_kb.prokaryote_schema.ProteinSpeciesType)
 
     def tearDown(self):
         pass
-
-
-if __name__ == '__main__':
-    unittest.main()

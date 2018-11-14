@@ -13,7 +13,6 @@ class CompartmentsGenerator(wc_kb_gen.KbComponentGenerator):
 
     Options:
     * compartments (:obj:`list`) a list of (:obj:`tuple`) of type (:obj:`string`, :obj:`string`) that contain the id and name of the compartment.
-
     """
 
     def clean_and_validate_options(self):
@@ -23,9 +22,8 @@ class CompartmentsGenerator(wc_kb_gen.KbComponentGenerator):
             'compartments', [('c', 'cytosol'), ('e', 'extracellular space')])
 
         assert len(compartments) >= 2, "Must define at least 2 compartments"
-        assert('c', 'cytosol') in compartments, "Could not find cytosol"
-        assert (
-            'e', 'extracellular space') in compartments, "Could not find extracellular space"
+        assert ('c', 'cytosol') in compartments, "Could not find cytosol"
+        assert ('e', 'extracellular space') in compartments, "Could not find extracellular space"
 
         options['compartments'] = compartments
 

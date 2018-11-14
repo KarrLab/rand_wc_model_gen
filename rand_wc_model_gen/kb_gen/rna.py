@@ -45,11 +45,14 @@ class RnaGenerator(wc_kb_gen.KbComponentGenerator):
         mean_volume = cell.properties.get_one(id='mean_volume').value
 
         # generate RNA
+        cytosol = cell.compartments.get_one(id='c')
         tus = cell.loci.get(__type=wc_kb.prokaryote_schema.TranscriptionUnitLocus)
         for tu in tus:
             rna = cell.species_types.get_or_create(id=tu.id.replace('tu_', 'rna_'), __type=wc_kb.prokaryote_schema.RnaSpeciesType)
             rna.transcription_units = [tu]
             rna.name = tu.name.replace('Transcription unit', 'RNA')
             rna.type = wc_kb.core.RnaType[tu.genes[0].type.name]
-            rna.concentration = random.gamma(1, mean_copy_number) / scipy.constants.Avogadro / mean_volume
+            rna.species.get_or_create(compartment=cytosol).concentration = wc_kb.core.Concentration(
+                cell=cell,
+                value=random.gamma(1, mean_copy_number) / scipy.constants.Avogadro / mean_volume)
             rna.half_life = random.normal(mean_half_life, numpy.sqrt(mean_half_life))

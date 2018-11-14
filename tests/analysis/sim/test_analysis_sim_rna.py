@@ -30,7 +30,7 @@ class RnaSimulationAnalysisTestCase(unittest.TestCase):
             'component': {
                 'GenomeGenerator': {
                     'num_chromosomes': 1,
-                    'mean_num_genes': 100.,
+                    'mean_num_genes': 200.,
                     'mean_gene_len': 10.,
                 },
             },
@@ -43,9 +43,10 @@ class RnaSimulationAnalysisTestCase(unittest.TestCase):
         sim_results_path = os.path.join(self.temp_dir, 'sim_results')
         for i_sim in range(3):
             sim = wc_sim.multialgorithm.simulation.Simulation(model)
-            sim.run(end_time=10.,
+            sim.run(end_time=1e-1,
+                    time_step=1e-2,
                     seed=i_sim,
-                    checkpoint_period=1.,
+                    checkpoint_period=1e-2,
                     results_dir=sim_results_path)
             # todo: remove after results directory naming is fixed
             time.sleep(1.0)

@@ -96,6 +96,7 @@ class SimulateController(cement.Controller):
             seed = config['sim']['seed']
         simulation = wc_sim.multialgorithm.simulation.Simulation(model)
         num_events, sim_results_path = simulation.run(end_time=config['sim']['end_time'],
+                                                      time_step=config['sim']['time_step'],
                                                       seed=seed,
                                                       checkpoint_period=config['sim_results']['checkpoint_period'],
                                                       results_dir=config['sim_results']['path'])

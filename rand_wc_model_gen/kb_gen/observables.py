@@ -4,9 +4,11 @@
 :Copyright: 2018, Karr Lab
 :License: MIT
 """
+
+from Bio.Data import CodonTable
+import numpy
 import wc_kb
 import wc_kb_gen
-import numpy
 
 
 class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
@@ -22,13 +24,13 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
         """ Apply default options and validate options """
 
         options = self.options
-        assigned_trnas = options.get('assigned_trnas', ['tRNA_Ser', 'tRNA_Leu', 'tRNA_Arg',
-                                                        'tRNA_Thr', 'tRNA_Gly', 'tRNA_Phe',
-                                                        'tRNA_Trp', 'tRNA_Lys', 'tRNA_Ile',
-                                                        'tRNA_Ala', 'tRNA_Met', 'tRNA_Gln',
-                                                        'tRNA_Pro', 'tRNA_Val', 'tRNA_Cys',
-                                                        'tRNA_Tyr', 'tRNA_His', 'tRNA_Asn',
-                                                        'tRNA_Asp', 'tRNA_Glu'])
+        default_assigned_trnas = []
+
+        translation_table = int(options.get('translation_table', 1))
+        codon_table = CodonTable.unambiguous_dna_by_id[translation_table]
+        for codon in codon_table.forward_table.keys():
+            default_assigned_trnas.append('tRNA_{}'.format(codon))
+        assigned_trnas = options.get('assigned_trnas', default_assigned_trnas)
 
         rnas = self.knowledge_base.cell.species_types.get(
             __type=wc_kb.prokaryote_schema.RnaSpeciesType)
@@ -41,8 +43,18 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
         assert (len(assigned_trnas) <= count)
         options['assigned_trnas'] = assigned_trnas
 
-        assigned_proteins = options.get('assigned_proteins', ['IF', 'EF', 'RF',
-                                                              'deg_ATPase', 'deg_protease', 'deg_rnase'])
+        assigned_proteins = options.get('assigned_proteins', [
+            'rna_polymerase',
+
+            'ribosome',
+            'translation_init_factors',
+            'translation_elongation_factors',
+            'translation_release_factors',
+            
+            'deg_atpase',
+            'degrade_rnase',
+            'degrade_protease',
+            ])
 
         prots = self.knowledge_base.cell.species_types.get(
             __type=wc_kb.prokaryote_schema.ProteinSpeciesType)
@@ -80,8 +92,9 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
             observable = cell.observables.get_or_create(id=rna_name+'_obs')
             observable.name = rna_name
             #print(observable.name)
-            observable.species.append(
-                wc_kb.core.SpeciesCoefficient(species=wc_kb.core.Species(species_type=rna, compartment=cytosol), coefficient=1))
+            species = rna.species.get_or_create(compartment=cytosol)
+            species_coeff = species.species_coefficients.get_or_create(coefficient=1)
+            observable.species.append(species_coeff)
 
         sampled_proteins = numpy.random.choice(
             prots, len(assigned_proteins), replace=False)
@@ -93,5 +106,6 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
             protein.name = protein_name
             observable = cell.observables.get_or_create(id=protein_name+'_obs')
             observable.name = protein_name
-            observable.species.append(
-                wc_kb.core.SpeciesCoefficient(species=wc_kb.core.Species(species_type=protein, compartment=cytosol), coefficient=1))
+            species = protein.species.get_or_create(compartment=cytosol)
+            species_coeff = species.species_coefficients.get_or_create(coefficient=1)
+            observable.species.append(species_coeff)

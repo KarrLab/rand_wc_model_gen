@@ -23,10 +23,11 @@ class ChromosomesGenesTusGeneratorTestCase(unittest.TestCase):
     def test_run(self):
         kb = wc_kb.KnowledgeBase()
         cell = kb.cell = wc_kb.Cell()
+        mean_num_genes = 200        
         gen = chrs_genes_tus.ChromosomesGenesTusGenerator(kb, options={
             'num_chromosomes': 2,
             'mean_gc_frac': 1,
-            'mean_num_genes': 100,
+            'mean_num_genes': mean_num_genes,
             'mean_gene_len': 100,
             'mean_coding_frac': 0.75,
         })
@@ -43,8 +44,8 @@ class ChromosomesGenesTusGeneratorTestCase(unittest.TestCase):
 
         tus = cell.loci.get(__type=wc_kb.prokaryote_schema.TranscriptionUnitLocus)
         genes = cell.loci.get(__type=wc_kb.prokaryote_schema.GeneLocus)
-        self.assertAlmostEqual(len(tus), 100, delta=5 * numpy.sqrt(100))
-        self.assertAlmostEqual(len(genes), 100, delta=5 * numpy.sqrt(100))
+        self.assertAlmostEqual(len(tus), mean_num_genes, delta=5 * numpy.sqrt(mean_num_genes))
+        self.assertAlmostEqual(len(genes), mean_num_genes, delta=5 * numpy.sqrt(mean_num_genes))
 
         mu = 100 / 0.75 * 0.25 / 2
         self.assertAlmostEqual(genes[0].start, mu, delta=5 * numpy.sqrt(mu))

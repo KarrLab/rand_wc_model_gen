@@ -38,7 +38,7 @@ class CliTestCase(unittest.TestCase):
             file.write('        [[[component]]]\n')
             file.write('            [[[[GenomeGenerator]]]]\n')
             file.write('                num_chromosomes = 1\n')
-            file.write('                mean_num_genes = 100.\n')
+            file.write('                mean_num_genes = 200.\n')
             file.write('                mean_gene_len = 10.\n')
             file.write('    [[kb]]\n')
             file.write('        [[[path]]]\n')
@@ -49,9 +49,10 @@ class CliTestCase(unittest.TestCase):
             file.write('    [[model]]\n')
             file.write('        path = {}\n'.format(self.model_path))
             file.write('    [[sim]]\n')
-            file.write('        end_time = 5.\n')
+            file.write('        end_time = 0.1\n')
+            file.write('        time_step = 0.01\n')
             file.write('    [[sim_results]]\n')
-            file.write('        checkpoint_period = 1.\n')
+            file.write('        checkpoint_period = 0.01\n')
             file.write('        path = {}\n'.format(self.sim_results_path))
             file.write('    [[analysis]]\n')
             file.write('        path = {}\n'.format(self.analysis_path))
@@ -86,6 +87,7 @@ class CliTestCase(unittest.TestCase):
             self.assertEqual(stdout.getvalue().strip(), rand_wc_model_gen.__version__)
             self.assertEqual(stderr.getvalue(), '')
 
+    @unittest.skipIf(os.getenv('CIRCLECI', '0') in ['1', 'true'], 'Too long for CircleCI')
     def test_generate(self):
         # verify that KB and model files haven't been created
         self.assertFalse(os.path.isfile(self.kb_core_path))
@@ -102,6 +104,7 @@ class CliTestCase(unittest.TestCase):
         kb = wc_kb.io.Reader().run(self.kb_core_path, self.kb_seq_path)
         model = wc_lang.io.Reader().run(self.model_path)
 
+    @unittest.skipIf(os.getenv('CIRCLECI', '0') in ['1', 'true'], 'Too long for CircleCI')
     def test_simulate(self):
         # generate model
         with __main__.App(argv=['generate', '--config-path', self.config_path]) as app:
@@ -114,13 +117,14 @@ class CliTestCase(unittest.TestCase):
         # assert
         self.assertTrue(os.path.isfile(os.path.join(app.results['sim_results_path'], 'run_results.h5')))
 
+    @unittest.skipIf(os.getenv('CIRCLECI', '0') in ['1', 'true'], 'Too long for CircleCI')
     def test_analyze(self):
         # generate model
         with __main__.App(argv=['generate', '--config-path', self.config_path]) as app:
             app.run()
 
         # simulate model
-        for i_sim in range(3):            
+        for i_sim in range(3):
             with __main__.App(argv=['simulate', '--config-path', self.config_path, '--seed', str(i_sim)]) as app:
                 app.run()
             time.sleep(1.)  # todo: remove after results directory naming is fixed

@@ -236,12 +236,16 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         """ Creates RNA and protein objects corresponding to genes on chromosome
 
         """
+        cell = self.knowledge_base.cell
+
         options = self.options
         mean_copy_number = options.get('mean_copy_number')
         mean_half_life = options.get('mean_half_life')
-        mean_volume = self.knowledge_base.cell.properties.get_one(
+        mean_volume = cell.properties.get_one(
             id='mean_volume').value
-        for chromosome in self.knowledge_base.cell.species_types.get(__type=wc_kb.core.DnaSpeciesType):
+
+        cytosol = cell.compartments.get_one(id='c')
+        for chromosome in cell.species_types.get(__type=wc_kb.core.DnaSpeciesType):
             for i in range(len(chromosome.loci)):
 
                 locus = chromosome.loci[i]
@@ -250,7 +254,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                     tu = locus
 
                     # creates RnaSpeciesType for RNA sequence corresponding to gene
-                    rna = self.knowledge_base.cell.species_types.get_or_create(
+                    rna = cell.species_types.get_or_create(
                         id='rna_{}'.format(tu.id), __type=wc_kb.prokaryote_schema.RnaSpeciesType)
                     rna.name = 'rna {}'.format(tu.id)
                     # GeneLocus object for gene sequence, attribute of ProteinSpeciesType object
@@ -264,8 +268,9 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         rna.type = wc_kb.core.RnaType.sRna
 
                     # print(rna.type)
-                    rna.concentration = random.gamma(
-                        1, mean_copy_number) / scipy.constants.Avogadro / mean_volume
+                    rna_conc = random.gamma(1, mean_copy_number) / scipy.constants.Avogadro / mean_volume
+                    rna_species = rna.species.get_or_create(compartment=cytosol)
+                    rna_species.concentration = wc_kb.core.Concentration(cell=cell, value=rna_conc)                    
                     rna.half_life = random.normal(
                         mean_half_life, numpy.sqrt(mean_half_life))
 
@@ -277,17 +282,18 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         for gene in tu.genes:
                             # creates ProteinSpecipe object for corresponding protein sequence(s)
                             # print(gene.get_seq()[0:3])
-                            prot = self.knowledge_base.cell.species_types.get_or_create(
+                            prot = cell.species_types.get_or_create(
                                 id='prot_{}'.format(gene.id), __type=wc_kb.prokaryote_schema.ProteinSpeciesType)
                             prot.name = 'prot_{}'.format(gene.id)
 
-                            prot.cell = self.knowledge_base.cell
+                            prot.cell = cell
                             prot.cell.knowledge_base = self.knowledge_base
 
                             prot.gene = gene  # associates protein with GeneLocus object for corresponding gene
                             prot.rna = rna
                             prot.half_life = 1
-                            prot.concentration = rna.concentration
+                            prot_species = prot.species.get_or_create(compartment=cytosol)
+                            prot_species.concentration = wc_kb.core.Concentration(cell=cell, value=rna_conc)
 
     def gen_tus(self):
         """ Creates transcription units with 5'/3' UTRs, polycistronic mRNAs, and other types of RNA (tRNA, rRNA, sRNA)

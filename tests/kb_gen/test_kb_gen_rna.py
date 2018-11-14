@@ -18,6 +18,7 @@ class RnaGeneratorTestCase(unittest.TestCase):
         kb = wc_kb.KnowledgeBase()
         cell = kb.cell = wc_kb.Cell()
         cell.properties.create(id='mean_volume', value=1, units='L')
+        cytosol = cell.compartments.get_one(id='c')
 
         tus = []
         for i_tu in range(1000):
@@ -41,7 +42,7 @@ class RnaGeneratorTestCase(unittest.TestCase):
         self.assertEqual(rnas[0].name, 'RNA 1')
         self.assertEqual(rnas[0].type, wc_kb.core.RnaType.mRna)
 
-        concs = [rna.concentration for rna in rnas]
+        concs = [rna.species.get_one(compartment=cytosol).concentration.value for rna in rnas]
         half_lives = [rna.half_life for rna in rnas]
         self.assertAlmostEqual(numpy.mean(concs), 10. / scipy.constants.Avogadro / 1., delta=5. * numpy.sqrt(10. / 1000.))
         self.assertAlmostEqual(numpy.mean(half_lives), 120., delta=5. * numpy.sqrt(120. / 1000.))
