@@ -69,7 +69,7 @@ class PropertiesGenerator(wc_kb_gen.KbComponentGenerator):
         prop.value = options.get('mean_doubling_time')
         prop.units = 's'
 
-        prop = cell.properties.get_or_create(id='cell_cycle_length') # todo: merge with mean_doubling_time
+        prop = cell.properties.get_or_create(id='cell_cycle_len') # todo: merge with mean_doubling_time
         prop.value = options.get('mean_doubling_time')
         prop.units = 's'
 

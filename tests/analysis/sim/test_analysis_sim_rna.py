@@ -54,8 +54,10 @@ class RnaSimulationAnalysisTestCase(unittest.TestCase):
 
         # analyze simulation results
         analysis_results_path = os.path.join(self.temp_dir, 'analysis')
+        print(sim_results_path)
+        print(analysis_results_path)
         analysis.sim.rna.RnaSimulationAnalysis(
-            kb, model, sim_results_path, out_path=analysis_results_path).run()
+            sim_results_path, knowledge_base=kb, model=model, out_path=analysis_results_path).run()
 
         self.assertTrue(os.path.isfile(os.path.join(
             analysis_results_path, 'Individual RNA (simulation 1).pdf')))
