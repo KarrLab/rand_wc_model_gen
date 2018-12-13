@@ -5,6 +5,9 @@
 :Copyright: 2018, Karr Lab
 :License: MIT
 """
+
+import Bio.SeqIO
+import Bio.SeqRecord
 import math
 import scipy.stats as stats
 import scipy.constants
@@ -39,6 +42,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
     * operon_gen_num (:obj:`int`): Average number of genes in an operon
     * mean_copy_number (:obj:`float`): mean copy number of each RNA
     * mean_half_life (:obj:`float`): mean half-life of RNAs
+    * seq_path (:obj:`str`): path to save genome sequence    
     """
 
     def clean_and_validate_options(self):
@@ -123,6 +127,9 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         assert(mean_half_life > 0)
         options['mean_half_life'] = mean_half_life
 
+        seq_path = options.get('seq_path')
+        options['seq_path'] = seq_path
+
     def gen_components(self):
         self.gen_genome()
         self.gen_tus()
@@ -143,6 +150,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         ncRNA_prop = options.get('ncRNA_prop')
         rRNA_prop = options.get('rRNA_prop')
         tRNA_prop = options.get('tRNA_prop')
+        seq_path = options.get('seq_path')
 
         # print(tRNA_prop)
 
@@ -166,6 +174,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                       2, mean_gc_frac/2, (1-mean_gc_frac)/2]
 
         # Create a chromosome n times
+        dna_seqs = []
         for i_chr in range(num_chromosomes):
             # number of genes in the chromosome
             num_genes = self.rand(mean_num_genes / num_chromosomes)[0]
@@ -196,7 +205,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             chro.name = 'Chromosome {}'.format(i_chr + 1)
             chro.circular = chromosome_topology == 'circular'
             chro.double_stranded = True
-            chro.seq = seq
+            chro.sequence_path = seq_path
 
             gene_starts = numpy.int64(numpy.cumsum(numpy.concatenate(([0], gene_lens[0:-1])) +
                                                    numpy.concatenate((numpy.round(intergene_lens[0:1] / 2), intergene_lens[1:]))))
@@ -218,7 +227,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                 if gene.type == wc_kb.core.GeneType.mRna:  # if mRNA, then set up start/stop codons in the gene
                     start_codon = random.choice(START_CODONS)
                     stop_codon = random.choice(STOP_CODONS)
-                    seq_str = str(chro.seq)
+                    seq_str = str(seq)
                     seq_str = seq_str[:gene.start-1] + start_codon + \
                         seq_str[gene.start+2: gene.end-3] + \
                         stop_codon + seq_str[gene.end:]
@@ -230,7 +239,14 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                                 BASES, p=PROB_BASES, size=(3,)))
                             seq_str = seq_str[:i]+codon_i+seq_str[i+3:]
 
-                    chro.seq = Seq(seq_str, Alphabet.DNAAlphabet())
+                    seq = Seq(seq_str, Alphabet.DNAAlphabet())
+
+            dna_seqs.append(Bio.SeqRecord.SeqRecord(seq, chro.id))                                                
+
+        with open(seq_path, 'w') as file:
+            writer = Bio.SeqIO.FastaIO.FastaWriter(
+                file, wrap=70, record2title=lambda record: record.id)
+            writer.write_file(dna_seqs)
 
     def gen_rnas_proteins(self):
         """ Creates RNA and protein objects corresponding to genes on chromosome
@@ -310,7 +326,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
         operon_gen_num = options.get('operon_gen_num')
 
         for i_chr, chromosome in enumerate(self.knowledge_base.cell.species_types.get(__type=wc_kb.core.DnaSpeciesType)):
-            seq = chromosome.seq
+            seq = chromosome.get_seq()
             i_gene = 0
             transcription_loci = []
             # print(chromosome.loci)

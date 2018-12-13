@@ -22,6 +22,9 @@ import wc_lang
 class CliTestCase(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
+        os.makedirs(os.path.join(self.temp_dir, 'kb', 'core'))
+        os.makedirs(os.path.join(self.temp_dir, 'kb', 'seq'))
+        os.makedirs(os.path.join(self.temp_dir, 'model'))
 
         self.kb_core_path = os.path.join(self.temp_dir, 'kb', 'core', 'core.xlsx')
         self.kb_seq_path = os.path.join(self.temp_dir, 'kb', 'seq', 'seq.fna')
@@ -40,6 +43,7 @@ class CliTestCase(unittest.TestCase):
             file.write('                num_chromosomes = 1\n')
             file.write('                mean_num_genes = 200.\n')
             file.write('                mean_gene_len = 10.\n')
+            file.write('                seq_path = {}\n'.format(self.kb_seq_path))
             file.write('    [[kb]]\n')
             file.write('        [[[path]]]\n')
             file.write('            core = {}\n'.format(self.kb_core_path))

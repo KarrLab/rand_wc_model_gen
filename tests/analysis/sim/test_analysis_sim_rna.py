@@ -32,6 +32,7 @@ class RnaSimulationAnalysisTestCase(unittest.TestCase):
                     'num_chromosomes': 1,
                     'mean_num_genes': 200.,
                     'mean_gene_len': 10.,
+                    'seq_path': os.path.join(self.temp_dir, 'kb_seq.fna')
                 },
             },
         }).run()

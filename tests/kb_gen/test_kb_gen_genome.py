@@ -7,6 +7,9 @@
 """
 import math
 import wc_kb
+import os
+import shutil
+import tempfile
 import unittest
 from rand_wc_model_gen.kb_gen import genome
 from Bio.Data import CodonTable
@@ -16,6 +19,9 @@ from rand_wc_model_gen import kb_gen
 class TestGenomeGenerator(unittest.TestCase):
 
     def setUp(self):
+
+        self.dir = tempfile.mkdtemp()
+
         # The knowledge base that is needed for the KBComponentGenerator
         # Creates the GenomeGenerator object and sets the parameters as given
         self.whole_gen = kb_gen.KbGenerator(options={
@@ -26,6 +32,7 @@ class TestGenomeGenerator(unittest.TestCase):
                 },
                 'GenomeGenerator': {
                     'mean_num_genes': 200.,
+                    'seq_path': os.path.join(self.dir, 'kb_seq.fna'),
                 },
             },
         })
@@ -35,6 +42,9 @@ class TestGenomeGenerator(unittest.TestCase):
         component_options = self.whole_gen.options.get('component', {})
 
         self.options = component_options.get('GenomeGenerator', {})
+
+    def tearDown(self):
+        shutil.rmtree(self.dir)
 
     def test_init(self):
         self.assertEqual(type(self.whole_gen), kb_gen.KbGenerator)
@@ -198,6 +208,3 @@ class TestGenomeGenerator(unittest.TestCase):
 
         protein = self.kb.cell.species_types.get(id="translation_init_factors")
         assert(type(protein[0]) == wc_kb.prokaryote_schema.ProteinSpeciesType)
-
-    def tearDown(self):
-        pass
