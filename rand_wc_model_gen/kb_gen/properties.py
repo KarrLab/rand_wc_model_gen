@@ -28,10 +28,6 @@ class PropertiesGenerator(wc_kb_gen.KbComponentGenerator):
         assert(mean_volume > 0)
         options['mean_volume'] = mean_volume
 
-        mean_fraction_dry_weight = options.get('mean_fraction_dry_weight', 0.3)
-        assert(mean_fraction_dry_weight > 0)
-        options['mean_fraction_dry_weight'] = mean_fraction_dry_weight
-
         mean_doubling_time = options.get('mean_doubling_time', 30 * 60)
         assert(mean_doubling_time > 0)
         options['mean_doubling_time'] = mean_doubling_time
@@ -53,23 +49,7 @@ class PropertiesGenerator(wc_kb_gen.KbComponentGenerator):
         prop.value = options.get('mean_volume')
         prop.units = 'L'
 
-        prop = cell.properties.get_or_create(id='initial_volume') # todo: merge with mean_volume
-        prop.value = options.get('mean_volume') * math.log(2)
-        prop.units = 'L'
-
-        prop = cell.properties.get_or_create(id='mean_fraction_dry_weight')
-        prop.value = options.get('mean_fraction_dry_weight')
-        prop.units = 'dimensionless'
-
-        prop = cell.properties.get_or_create(id='fraction_dry_weight') # todo: merge with mean_fraction_dry_weight
-        prop.value = options.get('mean_fraction_dry_weight')
-        prop.units = 'dimensionless'
-
         prop = cell.properties.get_or_create(id='mean_doubling_time')
-        prop.value = options.get('mean_doubling_time')
-        prop.units = 's'
-
-        prop = cell.properties.get_or_create(id='cell_cycle_len') # todo: merge with mean_doubling_time
         prop.value = options.get('mean_doubling_time')
         prop.units = 's'
 

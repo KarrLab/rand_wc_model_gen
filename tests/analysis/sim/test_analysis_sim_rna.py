@@ -54,8 +54,6 @@ class RnaSimulationAnalysisTestCase(unittest.TestCase):
 
         # analyze simulation results
         analysis_results_path = os.path.join(self.temp_dir, 'analysis')
-        print(sim_results_path)
-        print(analysis_results_path)
         analysis.sim.rna.RnaSimulationAnalysis(
             sim_results_path, knowledge_base=kb, model=model, out_path=analysis_results_path).run()
 

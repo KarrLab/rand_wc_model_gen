@@ -7,6 +7,7 @@
 """
 
 import csv
+import math
 import os
 import pkg_resources
 import wc_kb
@@ -35,7 +36,9 @@ class MetabolitesGenerator(wc_kb_gen.KbComponentGenerator):
             self.data = []
             for met in csv.DictReader(file):
                 met['Intracellular concentration (M)'] = float(
-                    met['Intracellular concentration (M)'])
+                    met['Intracellular concentration (M)'] or 'NaN')
+                met['Extracellular concentration (M)'] = float(
+                    met['Extracellular concentration (M)'] or 'NaN')
                 self.data.append(met)
 
     def gen_components(self):
@@ -48,10 +51,21 @@ class MetabolitesGenerator(wc_kb_gen.KbComponentGenerator):
                 __type=wc_kb.core.MetaboliteSpeciesType,
                 id=met['Id'], name=met['Name'],
                 structure=met['Structure (InChI)'])
+
             met_species = wc_kb.core.Species(
                 species_type=met_species_type,
                 compartment=cell.compartments.get_or_create(
-                    __type=wc_kb.core.Compartment, id='c', name='cytosol'))
-            cell.concentrations.get_or_create(
-                species=met_species,
-                value=met['Intracellular concentration (M)'])
+                    __type=wc_kb.core.Compartment, id='c'))
+            if not math.isnan(met['Intracellular concentration (M)']):
+                cell.concentrations.get_or_create(
+                    species=met_species,
+                    value=met['Intracellular concentration (M)'])
+
+            met_species = wc_kb.core.Species(
+                species_type=met_species_type,
+                compartment=cell.compartments.get_or_create(
+                    __type=wc_kb.core.Compartment, id='e'))
+            if not math.isnan(met['Extracellular concentration (M)']):
+                cell.concentrations.get_or_create(
+                    species=met_species,
+                    value=met['Extracellular concentration (M)'])
