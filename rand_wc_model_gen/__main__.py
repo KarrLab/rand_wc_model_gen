@@ -12,8 +12,10 @@ import os
 import rand_wc_model_gen
 import rand_wc_model_gen.analysis
 import rand_wc_model_gen.config
-import wc_kb_gen.random
+import wc_kb
 import wc_kb.io
+import wc_kb_gen.random
+import wc_lang
 import wc_lang.io
 import wc_model_gen.prokaryote
 import wc_sim.multialgorithm.run_results
@@ -60,14 +62,13 @@ class GenerateController(cement.Controller):
             os.makedirs(os.path.dirname(config['kb']['path']['core']))
         if not os.path.isdir(os.path.dirname(config['kb']['path']['seq'])):
             os.makedirs(os.path.dirname(config['kb']['path']['seq']))
-        wc_kb.io.Writer().run(kb,
-                              config['kb']['path']['core'], config['kb']['path']['seq'],
+        wc_kb.io.Writer().run(config['kb']['path']['core'], kb,
+                              seq_path=config['kb']['path']['seq'],
                               set_repo_metadata_from_path=config['kb_gen']['set_repo_metadata_from_path'])
 
         if not os.path.isdir(os.path.dirname(config['model']['path'])):
             os.makedirs(os.path.dirname(config['model']['path']))
-        wc_lang.io.Writer().run(model,
-                                config['model']['path'],
+        wc_lang.io.Writer().run(config['model']['path'], model,
                                 set_repo_metadata_from_path=config['model_gen']['set_repo_metadata_from_path'])
 
 
@@ -89,7 +90,7 @@ class SimulateController(cement.Controller):
         args = self.app.pargs
         config = rand_wc_model_gen.config.get_config(extra_path=args.config_path)['rand_wc_model_gen']
 
-        model = wc_lang.io.Reader().run(config['model']['path'])
+        model = wc_lang.io.Reader().run(config['model']['path'])[wc_lang.Model][0]
 
         seed = args.seed
         if seed is None:
@@ -122,8 +123,8 @@ class AnalyzeController(cement.Controller):
     def _default(self):
         args = self.app.pargs
         config = rand_wc_model_gen.config.get_config(extra_path=args.config_path)['rand_wc_model_gen']
-        kb = wc_kb.io.Reader().run(config['kb']['path']['core'], config['kb']['path']['seq'])
-        model = wc_lang.io.Reader().run(config['model']['path'])
+        kb = wc_kb.io.Reader().run(config['kb']['path']['core'], config['kb']['path']['seq'])[wc_kb.KnowledgeBase][0]
+        model = wc_lang.io.Reader().run(config['model']['path'])[wc_lang.Model][0]
         runner = rand_wc_model_gen.analysis.AnalysisRunner(kb, model, config['sim_results']['path'],
                                                            out_path=config['analysis']['path'],
                                                            options=config['analysis'])

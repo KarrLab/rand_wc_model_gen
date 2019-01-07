@@ -105,8 +105,8 @@ class CliTestCase(unittest.TestCase):
         self.assertTrue(os.path.isfile(self.kb_core_path))
         self.assertTrue(os.path.isfile(self.kb_seq_path))
         self.assertTrue(os.path.isfile(self.model_path))
-        kb = wc_kb.io.Reader().run(self.kb_core_path, self.kb_seq_path)
-        model = wc_lang.io.Reader().run(self.model_path)
+        kb = wc_kb.io.Reader().run(self.kb_core_path, self.kb_seq_path)[wc_kb.KnowledgeBase][0]
+        model = wc_lang.io.Reader().run(self.model_path)[wc_lang.Model][0]
 
     @unittest.skipIf(os.getenv('CIRCLECI', '0') in ['1', 'true'], 'Too long for CircleCI')
     def test_simulate(self):
