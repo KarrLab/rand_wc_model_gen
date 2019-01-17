@@ -93,8 +93,8 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
             observable.name = rna_name
             #print(observable.name)
             species = rna.species.get_or_create(compartment=cytosol)
-            species_coeff = species.species_coefficients.get_or_create(coefficient=1)
-            observable.species.append(species_coeff)
+            observable.expression = wc_kb.core.ObservableExpression(
+                expression=species.id(), species=[species])
 
         sampled_proteins = numpy.random.choice(
             prots, len(assigned_proteins), replace=False)
@@ -107,5 +107,6 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
             observable = cell.observables.get_or_create(id=protein_name+'_obs')
             observable.name = protein_name
             species = protein.species.get_or_create(compartment=cytosol)
-            species_coeff = species.species_coefficients.get_or_create(coefficient=1)
-            observable.species.append(species_coeff)
+            observable.expression = wc_kb.core.ObservableExpression(
+                expression=species.id(), species=[species])
+            

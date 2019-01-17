@@ -57,10 +57,8 @@ class ObservablesGeneratorTestCase(unittest.TestCase):
         cell = self.cell
 
         obs1 = cell.observables.get_one(id='a_obs')
-        self.assertIsInstance(obs1, wc_kb.core.Observable)
-        species_coefficient = obs1.species[0]
-        self.assertIsInstance(species_coefficient, wc_kb.core.SpeciesCoefficient)
-        species = species_coefficient.species
+        self.assertIsInstance(obs1, wc_kb.core.Observable)        
+        species = obs1.expression.species[0]
         species_type = species.species_type
         self.assertIsInstance(species, wc_kb.core.Species)
         self.assertIsInstance(species_type, wc_kb.prokaryote_schema.ProteinSpeciesType)
