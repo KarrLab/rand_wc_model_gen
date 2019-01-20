@@ -1,5 +1,5 @@
 downstream_dependencies:
-  - wc
+  - wc_cli
   - wc_model_gen
 email_notifications:
   - arthur.p.goldberg@mssm.edu
