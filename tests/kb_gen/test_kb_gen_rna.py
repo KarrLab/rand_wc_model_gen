@@ -6,8 +6,9 @@
 :License: MIT
 """
 
-import numpy
 from rand_wc_model_gen import kb_gen
+from wc_utils.util.units import unit_registry
+import numpy
 import scipy
 import unittest
 import wc_kb
@@ -17,7 +18,7 @@ class RnaGeneratorTestCase(unittest.TestCase):
     def test(self):
         kb = wc_kb.KnowledgeBase()
         cell = kb.cell = wc_kb.Cell()
-        cell.properties.create(id='mean_volume', value=1, units='L')
+        cell.properties.create(id='mean_volume', value=1, units=unit_registry.parse_units('L'))
         cytosol = cell.compartments.get_one(id='c')
 
         tus = []

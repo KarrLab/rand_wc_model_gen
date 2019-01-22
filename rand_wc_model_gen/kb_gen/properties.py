@@ -6,6 +6,7 @@
 :License: MIT
 """
 
+from wc_utils.util.units import unit_registry
 import math
 import wc_kb
 import wc_kb_gen
@@ -47,12 +48,12 @@ class PropertiesGenerator(wc_kb_gen.KbComponentGenerator):
 
         prop = cell.properties.get_or_create(id='mean_volume')
         prop.value = options.get('mean_volume')
-        prop.units = 'L'
+        prop.units = unit_registry.parse_units('l')
 
         prop = cell.properties.get_or_create(id='mean_doubling_time')
         prop.value = options.get('mean_doubling_time')
-        prop.units = 's'
+        prop.units = unit_registry.parse_units('s')
 
         prop = cell.properties.get_or_create(id='mean_cell_density')
         prop.value = options.get('mean_cell_density')
-        prop.units = 'cells L^{-1}'
+        prop.units = unit_registry.parse_units('cells l^-1')
