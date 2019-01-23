@@ -138,7 +138,7 @@ class App(cement.App):
         results (:obj:`object`): handler results
     """
     class Meta:
-        label = 'rand_wc_model_gen'
+        label = 'rand-wc-model-gen'
         base_controller = 'base'
         handlers = [
             BaseController,
