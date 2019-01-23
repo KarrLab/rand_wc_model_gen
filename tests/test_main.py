@@ -65,15 +65,15 @@ class CliTestCase(unittest.TestCase):
         shutil.rmtree(self.temp_dir)
 
     def test_raw_cli(self):
-        with mock.patch('sys.argv', ['rand_wc_model_gen', '--help']):
+        with mock.patch('sys.argv', ['rand-wc-model-gen', '--help']):
             with self.assertRaises(SystemExit) as context:
                 __main__.main()
-                self.assertRegex(context.Exception, 'usage: rand_wc_model_gen')
+                self.assertRegex(context.Exception, 'usage: rand-wc-model-gen')
 
-        with mock.patch('sys.argv', ['rand_wc_model_gen']):
+        with mock.patch('sys.argv', ['rand-wc-model-gen']):
             with abduct.captured(abduct.out(), abduct.err()) as (stdout, stderr):
                 __main__.main()
-                self.assertRegex(stdout.getvalue().strip(), 'usage: rand_wc_model_gen')
+                self.assertRegex(stdout.getvalue().strip(), 'usage: rand-wc-model-gen')
                 self.assertEqual(stderr.getvalue(), '')
 
     def test_get_version(self):

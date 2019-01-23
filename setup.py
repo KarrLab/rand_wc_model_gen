@@ -48,7 +48,7 @@ setuptools.setup(
     ],
     entry_points={
         'console_scripts': [
-            'rand_wc_model_gen = rand_wc_model_gen.__main__:main',
+            'rand-wc-model-gen = rand_wc_model_gen.__main__:main',
         ],
     },
 )
