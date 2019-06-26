@@ -22,7 +22,6 @@ This initial version of the model generator creates reaction network models.
 1. Install dependencies
 2. Install this package 
     ```
-    pip install git+https://github.com/KarrLab/log.git#egg=log
     pip install git+https://github.com/KarrLab/wc_utils.git#egg=wc_utils
     pip install git+https://github.com/KarrLab/obj_model.git#egg=obj_model
     pip install git+https://github.com/KarrLab/wc_kb.git#egg=wc_kb
