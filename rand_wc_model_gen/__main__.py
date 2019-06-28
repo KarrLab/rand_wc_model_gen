@@ -28,6 +28,7 @@ class BaseController(cement.Controller):
     class Meta:
         label = 'base'
         description = "Random whole-cell model generator"
+        help = "Random whole-cell model generator"
         arguments = [
             (['-v', '--version'], dict(action='version', version=rand_wc_model_gen.__version__)),
         ]
@@ -45,6 +46,7 @@ class GenerateController(cement.Controller):
         stacked_on = 'base'
         stacked_type = 'nested'
         description = "Generate a random whole-cell knowledge base and a random whole-cell model"
+        help = "Generate a random whole-cell knowledge base and a random whole-cell model"
         arguments = [
             (['--config-path'], dict(type=str,
                                      default=None,
@@ -80,6 +82,7 @@ class SimulateController(cement.Controller):
         stacked_on = 'base'
         stacked_type = 'nested'
         description = "Simulate a random whole-cell model"
+        help = "Simulate a random whole-cell model"
         arguments = [
             (['--config-path'], dict(type=str, default=None, help='Path to configuration file')),
             (['--seed'], dict(type=int, default=None, help='Random number generator seed')),
@@ -115,6 +118,7 @@ class AnalyzeController(cement.Controller):
         stacked_on = 'base'
         stacked_type = 'nested'
         description = "Analyze a random whole-cell model and simulations"
+        help = "Analyze a random whole-cell model and simulations"
         arguments = [
             (['--config-path'], dict(type=str, default=None, help='Path to configuration file')),
         ]
