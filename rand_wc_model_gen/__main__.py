@@ -66,12 +66,12 @@ class GenerateController(cement.Controller):
             os.makedirs(os.path.dirname(config['kb']['path']['seq']))
         wc_kb.io.Writer().run(config['kb']['path']['core'], kb,
                               seq_path=config['kb']['path']['seq'],
-                              set_repo_metadata_from_path=config['kb_gen']['set_repo_metadata_from_path'])
+                              data_repo_metadata=config['kb_gen']['data_repo_metadata'])
 
         if not os.path.isdir(os.path.dirname(config['model']['path'])):
             os.makedirs(os.path.dirname(config['model']['path']))
         wc_lang.io.Writer().run(config['model']['path'], model,
-                                set_repo_metadata_from_path=config['model_gen']['set_repo_metadata_from_path'])
+                                data_repo_metadata=config['model_gen']['data_repo_metadata'])
 
 
 class SimulateController(cement.Controller):

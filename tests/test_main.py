@@ -37,7 +37,7 @@ class CliTestCase(unittest.TestCase):
         with open(self.config_path, 'w') as file:
             file.write('[rand_wc_model_gen]\n')
             file.write('    [[kb_gen]]\n')
-            file.write('        set_repo_metadata_from_path = false\n')
+            file.write('        data_repo_metadata = false\n')
             file.write('        [[[component]]]\n')
             file.write('            [[[[GenomeGenerator]]]]\n')
             file.write('                num_chromosomes = 1\n')
@@ -49,7 +49,7 @@ class CliTestCase(unittest.TestCase):
             file.write('            core = {}\n'.format(self.kb_core_path))
             file.write('            seq = {}\n'.format(self.kb_seq_path))
             file.write('    [[model_gen]]\n')
-            file.write('        set_repo_metadata_from_path = false\n')
+            file.write('        data_repo_metadata = false\n')
             file.write('    [[model]]\n')
             file.write('        path = {}\n'.format(self.model_path))
             file.write('    [[sim]]\n')
