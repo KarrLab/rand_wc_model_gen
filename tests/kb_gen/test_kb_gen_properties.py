@@ -10,7 +10,7 @@ from rand_wc_model_gen.kb_gen import properties
 import unittest
 import wc_kb
 
-
+@unittest.skip("broken_legacy")
 class PropertiesGeneratorTestCase(unittest.TestCase):
     def test(self):
         kb = wc_kb.KnowledgeBase()

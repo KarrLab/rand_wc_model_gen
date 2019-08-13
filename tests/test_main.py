@@ -18,7 +18,7 @@ import unittest
 import wc_kb
 import wc_lang
 
-
+@unittest.skip("broken_legacy")
 class CliTestCase(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()

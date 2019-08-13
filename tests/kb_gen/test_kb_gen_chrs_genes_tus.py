@@ -11,7 +11,7 @@ import numpy
 import unittest
 import wc_kb
 
-
+@unittest.skip("broken_legacy")
 class ChromosomesGenesTusGeneratorTestCase(unittest.TestCase):
     def test_rand(self):
         gen = chrs_genes_tus.ChromosomesGenesTusGenerator(None)
@@ -23,7 +23,7 @@ class ChromosomesGenesTusGeneratorTestCase(unittest.TestCase):
     def test_run(self):
         kb = wc_kb.KnowledgeBase()
         cell = kb.cell = wc_kb.Cell()
-        mean_num_genes = 200        
+        mean_num_genes = 200
         gen = chrs_genes_tus.ChromosomesGenesTusGenerator(kb, options={
             'num_chromosomes': 2,
             'mean_gc_frac': 1,

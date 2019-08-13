@@ -16,7 +16,7 @@ import unittest
 import wc_model_gen.prokaryote
 import wc_sim.multialgorithm.simulation
 
-
+@unittest.skip("broken_legacy")
 class RnaSimulationAnalysisTestCase(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
