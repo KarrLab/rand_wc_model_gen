@@ -377,7 +377,7 @@ class RandomModelGenerator(object):
         for species in deg_rna_1.get_reactants():
             deg_rna_1_all_species[species.gen_id()] = species
         k_deg_rna_1 = model.parameters.create(id='k_deg_rna_1', value=math.log(2)/half_life_rna_1.value, type=wc_ontology['WC:k_cat'], units=unit_registry.parse_units('s^-1'))
-        km_deg_rna_1 = model.parameters.create(id='km_deg_rna_1', value=1, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
+        km_deg_rna_1 = model.parameters.create(id='km_deg_rna_1', value=1 / Avogadro.value / c.init_volume.mean, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
         deg_rna_1_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize('k_deg_rna_1 * rna_1[c] / (km_deg_rna_1 * Avogadro * volume_c + rna_1[c])',
                                                                         {wc_lang.Parameter: {'k_deg_rna_1':k_deg_rna_1, 'km_deg_rna_1':km_deg_rna_1, 'Avogadro':Avogadro},
                                                                          wc_lang.Species: deg_rna_1_all_species,
@@ -406,7 +406,7 @@ class RandomModelGenerator(object):
         for species in deg_rna_2.get_reactants():
             deg_rna_2_all_species[species.gen_id()] = species
         k_deg_rna_2 = model.parameters.create(id='k_deg_rna_2', value=math.log(2)/half_life_rna_2.value, type=wc_ontology['WC:k_cat'], units=unit_registry.parse_units('s^-1'))
-        km_deg_rna_2 = model.parameters.create(id='km_deg_rna_2', value=1, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
+        km_deg_rna_2 = model.parameters.create(id='km_deg_rna_2', value=1 / Avogadro.value / c.init_volume.mean, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
         deg_rna_2_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize('k_deg_rna_2 * rna_2[c] / (km_deg_rna_2 * Avogadro * volume_c + rna_2[c])',
                                                                         {wc_lang.Parameter: {'k_deg_rna_2':k_deg_rna_2, 'km_deg_rna_2':km_deg_rna_2, 'Avogadro':Avogadro},
                                                                          wc_lang.Species: deg_rna_2_all_species,
@@ -435,7 +435,7 @@ class RandomModelGenerator(object):
         for species in deg_rna_3.get_reactants():
             deg_rna_3_all_species[species.gen_id()] = species
         k_deg_rna_3 = model.parameters.create(id='k_deg_rna_3', value=math.log(2)/half_life_rna_3.value, type=wc_ontology['WC:k_cat'], units=unit_registry.parse_units('s^-1'))
-        km_deg_rna_3 = model.parameters.create(id='km_deg_rna_3', value=1, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
+        km_deg_rna_3 = model.parameters.create(id='km_deg_rna_3', value=1 / Avogadro.value / c.init_volume.mean, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
         deg_rna_3_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize('k_deg_rna_3 * rna_3[c] / (km_deg_rna_3 * Avogadro * volume_c + rna_3[c])',
                                                                         {wc_lang.Parameter: {'k_deg_rna_3':k_deg_rna_3, 'km_deg_rna_3':km_deg_rna_3, 'Avogadro':Avogadro},
                                                                          wc_lang.Species: deg_rna_3_all_species,
@@ -449,8 +449,119 @@ class RandomModelGenerator(object):
 
 
         # ntp synthesis from nmp
+        km_syn_ntp_ppi = model.parameters.create(id='km_syn_ntp_ppi', value=0.00005, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
 
+        # atp
+        syn_atp = model.reactions.get_or_create(submodel=submodel, id='syn_atp')
+        syn_atp.name = 'synthesis ' + 'ATP'
+        syn_atp.participants = []
+        # lhs
+        syn_atp.participants.add(amp.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=-1))
+        syn_atp.participants.add(ppi.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=-1))
+        syn_atp.participants.add(h.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=-1))
+        # rhs
+        syn_atp.participants.add(atp.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
+        syn_atp.participants.add(h2o.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
+        # rate law
+        syn_atp_all_species = {}
+        for species in syn_atp.get_reactants():
+            syn_atp_all_species[species.gen_id()] = species
+        k_syn_atp = model.parameters.create(id='k_syn_atp', value=math.log(2)/half_life_rna_3.value * 2 * 4, type=wc_ontology['WC:k_cat'], units=unit_registry.parse_units('s^-1'))
+        km_syn_atp_amp = model.parameters.create(id='km_syn_atp_amp', value=0.00005, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
+        syn_atp_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize('k_syn_atp * (amp[c] / (km_syn_atp_amp * Avogadro * volume_c + amp[c])) * (ppi[c] / (km_syn_ntp_ppi * Avogadro * volume_c + ppi[c]))',
+                                                                        {wc_lang.Parameter: {'k_syn_atp':k_syn_atp, 'km_syn_atp_amp':km_syn_atp_amp, 'km_syn_ntp_ppi':km_syn_ntp_ppi, 'Avogadro':Avogadro},
+                                                                         wc_lang.Species: syn_atp_all_species,
+                                                                         wc_lang.Function: {'volume_c':volume_c}})
+        syn_atp_rate_law = model.rate_laws.create(direction=wc_lang.RateLawDirection.forward,
+                              type=None,
+                              expression=syn_atp_rate_law_exp,
+                              reaction=syn_atp,
+                              )
+        syn_atp_rate_law.id = syn_atp_rate_law.gen_id()
 
+        # gtp
+        syn_gtp = model.reactions.get_or_create(submodel=submodel, id='syn_gtp')
+        syn_gtp.name = 'synthesis ' + 'GTP'
+        syn_gtp.participants = []
+        # lhs
+        syn_gtp.participants.add(gmp.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=-1))
+        syn_gtp.participants.add(ppi.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=-1))
+        syn_gtp.participants.add(h.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=-1))
+        # rhs
+        syn_gtp.participants.add(gtp.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
+        syn_gtp.participants.add(h2o.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
+        # rate law
+        syn_gtp_all_species = {}
+        for species in syn_gtp.get_reactants():
+            syn_gtp_all_species[species.gen_id()] = species
+        k_syn_gtp = model.parameters.create(id='k_syn_gtp', value=math.log(2)/half_life_rna_3.value * 2 * 4, type=wc_ontology['WC:k_cat'], units=unit_registry.parse_units('s^-1'))
+        km_syn_gtp_gmp = model.parameters.create(id='km_syn_gtp_gmp', value=0.00005, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
+        syn_gtp_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize('k_syn_gtp * (gmp[c] / (km_syn_gtp_gmp * Avogadro * volume_c + gmp[c])) * (ppi[c] / (km_syn_ntp_ppi * Avogadro * volume_c + ppi[c]))',
+                                                                        {wc_lang.Parameter: {'k_syn_gtp':k_syn_gtp, 'km_syn_gtp_gmp':km_syn_gtp_gmp, 'km_syn_ntp_ppi':km_syn_ntp_ppi, 'Avogadro':Avogadro},
+                                                                         wc_lang.Species: syn_gtp_all_species,
+                                                                         wc_lang.Function: {'volume_c':volume_c}})
+        syn_gtp_rate_law = model.rate_laws.create(direction=wc_lang.RateLawDirection.forward,
+                              type=None,
+                              expression=syn_gtp_rate_law_exp,
+                              reaction=syn_gtp,
+                              )
+        syn_gtp_rate_law.id = syn_gtp_rate_law.gen_id()
+
+        # ctp
+        syn_ctp = model.reactions.get_or_create(submodel=submodel, id='syn_ctp')
+        syn_ctp.name = 'synthesis ' + 'CTP'
+        syn_ctp.participants = []
+        # lhs
+        syn_ctp.participants.add(cmp.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=-1))
+        syn_ctp.participants.add(ppi.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=-1))
+        syn_ctp.participants.add(h.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=-1))
+        # rhs
+        syn_ctp.participants.add(ctp.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
+        syn_ctp.participants.add(h2o.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
+        # rate law
+        syn_ctp_all_species = {}
+        for species in syn_ctp.get_reactants():
+            syn_ctp_all_species[species.gen_id()] = species
+        k_syn_ctp = model.parameters.create(id='k_syn_ctp', value=math.log(2)/half_life_rna_3.value * 2 * 4, type=wc_ontology['WC:k_cat'], units=unit_registry.parse_units('s^-1'))
+        km_syn_ctp_cmp = model.parameters.create(id='km_syn_ctp_cmp', value=0.00005, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
+        syn_ctp_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize('k_syn_ctp * (cmp[c] / (km_syn_ctp_cmp * Avogadro * volume_c + cmp[c])) * (ppi[c] / (km_syn_ntp_ppi * Avogadro * volume_c + ppi[c]))',
+                                                                        {wc_lang.Parameter: {'k_syn_ctp':k_syn_ctp, 'km_syn_ctp_cmp':km_syn_ctp_cmp, 'km_syn_ntp_ppi':km_syn_ntp_ppi, 'Avogadro':Avogadro},
+                                                                         wc_lang.Species: syn_ctp_all_species,
+                                                                         wc_lang.Function: {'volume_c':volume_c}})
+        syn_ctp_rate_law = model.rate_laws.create(direction=wc_lang.RateLawDirection.forward,
+                              type=None,
+                              expression=syn_ctp_rate_law_exp,
+                              reaction=syn_ctp,
+                              )
+        syn_ctp_rate_law.id = syn_ctp_rate_law.gen_id()
+
+        # utp
+        syn_utp = model.reactions.get_or_create(submodel=submodel, id='syn_utp')
+        syn_utp.name = 'synthesis ' + 'UTP'
+        syn_utp.participants = []
+        # lhs
+        syn_utp.participants.add(ump.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=-1))
+        syn_utp.participants.add(ppi.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=-1))
+        syn_utp.participants.add(h.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=-1))
+        # rhs
+        syn_utp.participants.add(utp.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
+        syn_utp.participants.add(h2o.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
+        # rate law
+        syn_utp_all_species = {}
+        for species in syn_utp.get_reactants():
+            syn_utp_all_species[species.gen_id()] = species
+        k_syn_utp = model.parameters.create(id='k_syn_utp', value=math.log(2)/half_life_rna_3.value * 2 * 4, type=wc_ontology['WC:k_cat'], units=unit_registry.parse_units('s^-1'))
+        km_syn_utp_ump = model.parameters.create(id='km_syn_utp_ump', value=0.00005, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
+        syn_utp_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize('k_syn_utp * (ump[c] / (km_syn_utp_ump * Avogadro * volume_c + ump[c])) * (ppi[c] / (km_syn_ntp_ppi * Avogadro * volume_c + ppi[c]))',
+                                                                        {wc_lang.Parameter: {'k_syn_utp':k_syn_utp, 'km_syn_utp_ump':km_syn_utp_ump, 'km_syn_ntp_ppi':km_syn_ntp_ppi, 'Avogadro':Avogadro},
+                                                                         wc_lang.Species: syn_utp_all_species,
+                                                                         wc_lang.Function: {'volume_c':volume_c}})
+        syn_utp_rate_law = model.rate_laws.create(direction=wc_lang.RateLawDirection.forward,
+                              type=None,
+                              expression=syn_utp_rate_law_exp,
+                              reaction=syn_utp,
+                              )
+        syn_utp_rate_law.id = syn_utp_rate_law.gen_id()
 
 
 
@@ -478,6 +589,3 @@ if __name__ == '__main__':
     #                              results_dir=results_parent_dirname,
     #                              checkpoint_period=checkpoint_period)
     # results = RunResults(results_dirname)
-
-    # axes = run_results.get('populations').plot()
-    # axes.savefig('fig', dpi=300)
