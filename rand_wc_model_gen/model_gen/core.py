@@ -245,13 +245,25 @@ class RandModelGen(object):
         init_concs['rna_pol'] = 10 ** 2
         rna_se = model.species_types.create(id='rna_se', name='RNAse', type=wc_ontology['WC:metabolite'])
         init_concs['rna_se'] = 10 ** 2
-        atp_synthase = model.species_types.create(id='atp_synthase', name='ATP synthase', type=wc_ontology['WC:protein'])
+        atp_synthase = model.species_types.create(
+            id='atp_synthase', 
+            name='ATP synthase', 
+            type=wc_ontology['WC:protein'])
         init_concs['atp_synthase'] = 10 ** 3
-        gtp_synthase = model.species_types.create(id='gtp_synthase', name='GTP synthase', type=wc_ontology['WC:protein'])
+        gtp_synthase = model.species_types.create(
+            id='gtp_synthase', 
+            name='GTP synthase', 
+            type=wc_ontology['WC:protein'])
         init_concs['gtp_synthase'] = 10 ** 3
-        ctp_synthase = model.species_types.create(id='ctp_synthase', name='CTP synthase', type=wc_ontology['WC:protein'])
+        ctp_synthase = model.species_types.create(
+            id='ctp_synthase', 
+            name='CTP synthase', 
+            type=wc_ontology['WC:protein'])
         init_concs['ctp_synthase'] = 10 ** 3
-        utp_synthase = model.species_types.create(id='utp_synthase', name='UTP synthase', type=wc_ontology['WC:protein'])
+        utp_synthase = model.species_types.create(
+            id='utp_synthase', 
+            name='UTP synthase', 
+            type=wc_ontology['WC:protein'])
         init_concs['utp_synthase'] = 10 ** 3
 
         # species and initial concentrations
