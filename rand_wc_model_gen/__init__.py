@@ -9,4 +9,4 @@ with open(pkg_resources.resource_filename('rand_wc_model_gen', 'VERSION'), 'r') 
 # from . import config
 # from wc_kb_gen import random
 
-from .model_gen.core import RandomModelGenerator
+from .model_gen.core import RandModelGen
