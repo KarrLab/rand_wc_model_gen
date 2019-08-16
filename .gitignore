@@ -48,6 +48,7 @@ tests/fixtures/secret/
 .Trashes
 .~lock.*
 Thumbs.db
+.~*.xlsx
 
 # configuration
 wc_utils.cfg
