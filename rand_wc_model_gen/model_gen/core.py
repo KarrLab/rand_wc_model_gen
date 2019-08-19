@@ -831,6 +831,9 @@ class RandModelGen(object):
         return {function.id: function for function in model.functions}
 
 def plot(model, results, filename):
+    """ plot simulation results of the hard-coded rna model
+
+    """
 
     # c = model.compartments.get_one(id='c')
     #
@@ -886,17 +889,19 @@ def plot(model, results, filename):
 
 if __name__ == '__main__':
 
-    # model_filename = pkg_resources.resource_filename('rand_wc_model_gen', os.path.join('model_gen', 'model.xlsx'))
-    # results_parent_dirname = 'results'
-    # checkpoint_period = 100.
-    # end_time = 3600. * 10.
-    #
-    # # generate model
-    # model = RandModelGen(options={'id':'test_rand', 'name':'test random model', 'version':'0.0'}).run()
-    #
-    # # write model
-    # wc_lang.io.Writer().run(model_filename, model, data_repo_metadata=False)
-    #
+    # hard-coded rna model
+
+    model_filename = pkg_resources.resource_filename('rand_wc_model_gen', os.path.join('model_gen', 'model.xlsx'))
+    results_parent_dirname = 'results'
+    checkpoint_period = 100.
+    end_time = 3600. * 10.
+
+    # generate model
+    model = RandModelGen(options={'id':'test_rand', 'name':'test random model', 'version':'0.0'}).run()
+
+    # write model
+    wc_lang.io.Writer().run(model_filename, model, data_repo_metadata=False)
+
     # model = wc_lang.io.Reader().run(model_filename)[wc_lang.Model][0]
     #
     # # simulate model
@@ -912,6 +917,8 @@ if __name__ == '__main__':
 
     pass
 
-    model_2_filename = pkg_resources.resource_filename('rand_wc_model_gen', os.path.join('model_gen', 'model_2.xlsx'))
-    model_2 = RandModelGen(options={'id':'test_rand', 'name':'test random model', 'version':'0.0'}).run_with_options('model_options.yml')
-    wc_lang.io.Writer().run(model_2_filename, model_2, data_repo_metadata=False)
+    # run the new refactored version of run() to build model
+
+    # model_2_filename = pkg_resources.resource_filename('rand_wc_model_gen', os.path.join('model_gen', 'model_2.xlsx'))
+    # model_2 = RandModelGen(options={'id':'test_rand', 'name':'test random model', 'version':'0.0'}).run_with_options('model_options.yml')
+    # wc_lang.io.Writer().run(model_2_filename, model_2, data_repo_metadata=False)
