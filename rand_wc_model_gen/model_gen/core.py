@@ -81,12 +81,12 @@ class RandModelGen(object):
         c_init_volume  = wc_lang.InitVolume(distribution=wc_ontology['WC:normal_distribution'], mean=50 * 1E-18, std=0.0)
         c_ph = wc_lang.Ph(distribution=wc_ontology['WC:normal_distribution'], mean=7.75, std=0.775)
         c = model.compartments.create(id='c', name='Cytosol', init_volume=c_init_volume, ph=c_ph)
-        c.init_density = model.parameters.create(id='density_c', value=1100., 
+        c.init_density = model.parameters.create(id='density_c', value=1100.,
                                                  units=unit_registry.parse_units('g l^-1'))
         volume_c = model.functions.create(id='volume_c', units=unit_registry.parse_units('l'))
 
         volume_c.expression, error = wc_lang.FunctionExpression.deserialize(
-            f'{c.id} / {c.init_density.id}', 
+            f'{c.id} / {c.init_density.id}',
             self.get_rate_law_context(model))
         assert error is None, str(error)
 
@@ -109,7 +109,7 @@ class RandModelGen(object):
         h2o_structure.molecular_weight = h2o_structure.empirical_formula.get_molecular_weight()
         h2o_structure.charge = h2o_structure.get_structure().GetTotalCharge()
         h2o = model.species_types.create(id='h2o', name='H2O', type=wc_ontology['WC:metabolite'], structure=h2o_structure)
-        init_concs['h2o'] = 0.0005 * Avogadro.value * c.init_volume.mean
+        init_concs['h2o'] = 55 * Avogadro.value * c.init_volume.mean
 
         h_structure = wc_lang.ChemicalStructure(value='[H+]', format=wc_lang.ChemicalStructureFormat.SMILES)
         h_structure.empirical_formula = OpenBabelUtils.get_formula(h_structure.get_structure())
@@ -131,28 +131,28 @@ class RandModelGen(object):
         atp_structure.molecular_weight = atp_structure.empirical_formula.get_molecular_weight()
         atp_structure.charge = atp_structure.get_structure().GetTotalCharge()
         atp = model.species_types.create(id='atp', name='ATP', type=wc_ontology['WC:metabolite'], structure=atp_structure)
-        init_concs['atp'] = 0.005 * Avogadro.value * c.init_volume.mean
+        init_concs['atp'] = 0.001 * Avogadro.value * c.init_volume.mean
 
         gtp_structure = wc_lang.ChemicalStructure(value='C1=NC2=C(N1C3C(C(C(O3)COP(=O)([O-])OP(=O)([O-])OP(=O)([O-])[O-])O)O)N=C(NC2=O)N', format=wc_lang.ChemicalStructureFormat.SMILES)
         gtp_structure.empirical_formula = OpenBabelUtils.get_formula(gtp_structure.get_structure())
         gtp_structure.molecular_weight = gtp_structure.empirical_formula.get_molecular_weight()
         gtp_structure.charge = gtp_structure.get_structure().GetTotalCharge()
         gtp = model.species_types.create(id='gtp', name='GTP', type=wc_ontology['WC:metabolite'], structure=gtp_structure)
-        init_concs['gtp'] = 0.005 * Avogadro.value * c.init_volume.mean
+        init_concs['gtp'] = 0.001 * Avogadro.value * c.init_volume.mean
 
         ctp_structure = wc_lang.ChemicalStructure(value='C1=CN(C(=O)N=C1N)C2C(C(C(O2)COP(=O)([O-])OP(=O)([O-])OP(=O)([O-])[O-])O)O', format=wc_lang.ChemicalStructureFormat.SMILES)
         ctp_structure.empirical_formula = OpenBabelUtils.get_formula(ctp_structure.get_structure())
         ctp_structure.molecular_weight = ctp_structure.empirical_formula.get_molecular_weight()
         ctp_structure.charge = ctp_structure.get_structure().GetTotalCharge()
         ctp = model.species_types.create(id='ctp', name='CTP', type=wc_ontology['WC:metabolite'], structure=ctp_structure)
-        init_concs['ctp'] = 0.005 * Avogadro.value * c.init_volume.mean
+        init_concs['ctp'] = 0.001 * Avogadro.value * c.init_volume.mean
 
         utp_structure = wc_lang.ChemicalStructure(value='C1=CN(C(=O)NC1=O)C2C(C(C(O2)COP(=O)([O-])OP(=O)([O-])OP(=O)([O-])[O-])O)O', format=wc_lang.ChemicalStructureFormat.SMILES)
         utp_structure.empirical_formula = OpenBabelUtils.get_formula(utp_structure.get_structure())
         utp_structure.molecular_weight = utp_structure.empirical_formula.get_molecular_weight()
         utp_structure.charge = utp_structure.get_structure().GetTotalCharge()
         utp = model.species_types.create(id='utp', name='UTP', type=wc_ontology['WC:metabolite'], structure=utp_structure)
-        init_concs['utp'] = 0.005 * Avogadro.value * c.init_volume.mean
+        init_concs['utp'] = 0.001 * Avogadro.value * c.init_volume.mean
 
         # nmp
         amp_structure = wc_lang.ChemicalStructure(value='C1=NC(=C2C(=N1)N(C=N2)C3C(C(C(O3)COP(=O)([O-])[O-])O)O)N', format=wc_lang.ChemicalStructureFormat.SMILES)
@@ -160,28 +160,28 @@ class RandModelGen(object):
         amp_structure.molecular_weight = amp_structure.empirical_formula.get_molecular_weight()
         amp_structure.charge = amp_structure.get_structure().GetTotalCharge()
         amp = model.species_types.create(id='amp', name='AMP', type=wc_ontology['WC:metabolite'], structure=amp_structure)
-        init_concs['amp'] = 0.00005 * Avogadro.value * c.init_volume.mean
+        init_concs['amp'] = 0.001 * Avogadro.value * c.init_volume.mean
 
         gmp_structure = wc_lang.ChemicalStructure(value='C1=NC2=C(N1C3C(C(C(O3)COP(=O)([O-])[O-])O)O)N=C(NC2=O)N', format=wc_lang.ChemicalStructureFormat.SMILES)
         gmp_structure.empirical_formula = OpenBabelUtils.get_formula(gmp_structure.get_structure())
         gmp_structure.molecular_weight = gmp_structure.empirical_formula.get_molecular_weight()
         gmp_structure.charge = gmp_structure.get_structure().GetTotalCharge()
         gmp = model.species_types.create(id='gmp', name='GMP', type=wc_ontology['WC:metabolite'], structure=gmp_structure)
-        init_concs['gmp'] = 0.00005 * Avogadro.value * c.init_volume.mean
+        init_concs['gmp'] = 0.001 * Avogadro.value * c.init_volume.mean
 
         cmp_structure = wc_lang.ChemicalStructure(value='C1=CN(C(=O)N=C1N)C2C(C(C(O2)COP(=O)([O-])[O-])O)O', format=wc_lang.ChemicalStructureFormat.SMILES)
         cmp_structure.empirical_formula = OpenBabelUtils.get_formula(cmp_structure.get_structure())
         cmp_structure.molecular_weight = cmp_structure.empirical_formula.get_molecular_weight()
         cmp_structure.charge = cmp_structure.get_structure().GetTotalCharge()
         cmp = model.species_types.create(id='cmp', name='CMP', type=wc_ontology['WC:metabolite'], structure=cmp_structure)
-        init_concs['cmp'] = 0.00005 * Avogadro.value * c.init_volume.mean
+        init_concs['cmp'] = 0.001 * Avogadro.value * c.init_volume.mean
 
         ump_structure = wc_lang.ChemicalStructure(value='C1=CN(C(=O)NC1=O)C2C(C(C(O2)COP(=O)([O-])[O-])O)O', format=wc_lang.ChemicalStructureFormat.SMILES)
         ump_structure.empirical_formula = OpenBabelUtils.get_formula(ump_structure.get_structure())
         ump_structure.molecular_weight = ump_structure.empirical_formula.get_molecular_weight()
         ump_structure.charge = ump_structure.get_structure().GetTotalCharge()
         ump = model.species_types.create(id='ump', name='UMP', type=wc_ontology['WC:metabolite'], structure=ump_structure)
-        init_concs['ump'] = 0.00005 * Avogadro.value * c.init_volume.mean
+        init_concs['ump'] = 0.001 * Avogadro.value * c.init_volume.mean
 
 
         # RNA
@@ -246,23 +246,23 @@ class RandModelGen(object):
         rna_se = model.species_types.create(id='rna_se', name='RNAse', type=wc_ontology['WC:metabolite'])
         init_concs['rna_se'] = 10 ** 2
         atp_synthase = model.species_types.create(
-            id='atp_synthase', 
-            name='ATP synthase', 
+            id='atp_synthase',
+            name='ATP synthase',
             type=wc_ontology['WC:protein'])
         init_concs['atp_synthase'] = 10 ** 3
         gtp_synthase = model.species_types.create(
-            id='gtp_synthase', 
-            name='GTP synthase', 
+            id='gtp_synthase',
+            name='GTP synthase',
             type=wc_ontology['WC:protein'])
         init_concs['gtp_synthase'] = 10 ** 3
         ctp_synthase = model.species_types.create(
-            id='ctp_synthase', 
-            name='CTP synthase', 
+            id='ctp_synthase',
+            name='CTP synthase',
             type=wc_ontology['WC:protein'])
         init_concs['ctp_synthase'] = 10 ** 3
         utp_synthase = model.species_types.create(
-            id='utp_synthase', 
-            name='UTP synthase', 
+            id='utp_synthase',
+            name='UTP synthase',
             type=wc_ontology['WC:protein'])
         init_concs['utp_synthase'] = 10 ** 3
 
@@ -279,10 +279,10 @@ class RandModelGen(object):
 
 
         # rna synthesis (transcription)
-        km_atp_trans = model.parameters.create(id='km_atp_trans', value=0.005, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
-        km_gtp_trans = model.parameters.create(id='km_gtp_trans', value=0.005, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
-        km_ctp_trans = model.parameters.create(id='km_ctp_trans', value=0.005, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
-        km_utp_trans = model.parameters.create(id='km_utp_trans', value=0.005, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
+        km_atp_trans = model.parameters.create(id='km_atp_trans', value=0.001, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
+        km_gtp_trans = model.parameters.create(id='km_gtp_trans', value=0.001, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
+        km_ctp_trans = model.parameters.create(id='km_ctp_trans', value=0.001, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
+        km_utp_trans = model.parameters.create(id='km_utp_trans', value=0.001, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
 
         trans_rna_1 = model.reactions.get_or_create(submodel=submodel, id='transcription_' + 'rna_1')
         trans_rna_1.name = 'transcription '+'RNA 1'
@@ -299,9 +299,9 @@ class RandModelGen(object):
         trans_rna_1.participants.add(h.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
         # rate law
         k_trans_rna_1 = model.parameters.create(
-            id='k_trans_rna_1', 
-            value=math.log(2)/half_life_rna_1.value * 8, 
-            type=wc_ontology['WC:k_cat'], 
+            id='k_trans_rna_1',
+            value=math.log(2)/half_life_rna_1.value * 8,
+            type=wc_ontology['WC:k_cat'],
             units=unit_registry.parse_units('s^-1 / M'))
         trans_rna_1_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize(
             'k_trans_rna_1'
@@ -333,9 +333,9 @@ class RandModelGen(object):
         trans_rna_2.participants.add(h.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
         # rate law
         k_trans_rna_2 = model.parameters.create(
-            id='k_trans_rna_2', 
-            value=math.log(2)/half_life_rna_2.value * 8, 
-            type=wc_ontology['WC:k_cat'], 
+            id='k_trans_rna_2',
+            value=math.log(2)/half_life_rna_2.value * 8,
+            type=wc_ontology['WC:k_cat'],
             units=unit_registry.parse_units('s^-1 / M'))
         trans_rna_2_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize(
             'k_trans_rna_2'
@@ -367,9 +367,9 @@ class RandModelGen(object):
         trans_rna_3.participants.add(h.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
         # rate law
         k_trans_rna_3 = model.parameters.create(
-            id='k_trans_rna_3', 
-            value=math.log(2)/half_life_rna_3.value * 8, 
-            type=wc_ontology['WC:k_cat'], 
+            id='k_trans_rna_3',
+            value=math.log(2)/half_life_rna_3.value * 8,
+            type=wc_ontology['WC:k_cat'],
             units=unit_registry.parse_units('s^-1 / M'))
         trans_rna_3_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize(
             'k_trans_rna_3'
@@ -402,9 +402,9 @@ class RandModelGen(object):
         deg_rna_1.participants.add(h.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=len(rna_1_str)-1))
         # rate law
         k_deg_rna_1 = model.parameters.create(
-            id='k_deg_rna_1', 
-            value=math.log(2)/half_life_rna_1.value, 
-            type=wc_ontology['WC:k_cat'], 
+            id='k_deg_rna_1',
+            value=math.log(2)/half_life_rna_1.value,
+            type=wc_ontology['WC:k_cat'],
             units=unit_registry.parse_units('s^-1 / M'))
         km_deg_rna_1 = model.parameters.create(id='km_deg_rna_1', value=1 / Avogadro.value / c.init_volume.mean, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
         deg_rna_1_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize(
@@ -433,9 +433,9 @@ class RandModelGen(object):
         deg_rna_2.participants.add(h.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=len(rna_2_str)-1))
         # rate law
         k_deg_rna_2 = model.parameters.create(
-            id='k_deg_rna_2', 
-            value=math.log(2)/half_life_rna_2.value, 
-            type=wc_ontology['WC:k_cat'], 
+            id='k_deg_rna_2',
+            value=math.log(2)/half_life_rna_2.value,
+            type=wc_ontology['WC:k_cat'],
             units=unit_registry.parse_units('s^-1 / M'))
         km_deg_rna_2 = model.parameters.create(id='km_deg_rna_2', value=1 / Avogadro.value / c.init_volume.mean, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
         deg_rna_2_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize(
@@ -464,9 +464,9 @@ class RandModelGen(object):
         deg_rna_3.participants.add(h.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=len(rna_3_str)-1))
         # rate law
         k_deg_rna_3 = model.parameters.create(
-            id='k_deg_rna_3', 
-            value=math.log(2)/half_life_rna_3.value, 
-            type=wc_ontology['WC:k_cat'], 
+            id='k_deg_rna_3',
+            value=math.log(2)/half_life_rna_3.value,
+            type=wc_ontology['WC:k_cat'],
             units=unit_registry.parse_units('s^-1 / M'))
         km_deg_rna_3 = model.parameters.create(id='km_deg_rna_3', value=1 / Avogadro.value / c.init_volume.mean, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
         deg_rna_3_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize(
@@ -497,10 +497,12 @@ class RandModelGen(object):
         syn_atp.participants.add(atp.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
         syn_atp.participants.add(h2o.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
         # rate law
-        k_syn_atp = model.parameters.create(id='k_syn_atp', value=math.log(2)/half_life_rna_3.value * 2 * 4, type=wc_ontology['WC:k_cat'], units=unit_registry.parse_units('s^-1'))
-        km_syn_atp_amp = model.parameters.create(id='km_syn_atp_amp', value=0.00005, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
+        k_syn_atp = model.parameters.create(id='k_syn_atp', value=math.log(2)/half_life_rna_3.value * 2 * 4 / 10, type=wc_ontology['WC:k_cat'], units=unit_registry.parse_units('s^-1'))
+        km_syn_atp_amp = model.parameters.create(id='km_syn_atp_amp', value=0.001, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
         syn_atp_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize(
-            'k_syn_atp * (amp[c] / (km_syn_atp_amp * Avogadro * volume_c + amp[c])) * (ppi[c] / (km_syn_ntp_ppi * Avogadro * volume_c + ppi[c]))',
+            'k_syn_atp'
+            ' * (amp[c] / (km_syn_atp_amp * Avogadro * volume_c + amp[c]))'
+            ' * (ppi[c] / (km_syn_ntp_ppi * Avogadro * volume_c + ppi[c]))',
             self.get_rate_law_context(model))
         syn_atp_rate_law = model.rate_laws.create(direction=wc_lang.RateLawDirection.forward,
                               type=None,
@@ -521,10 +523,12 @@ class RandModelGen(object):
         syn_gtp.participants.add(gtp.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
         syn_gtp.participants.add(h2o.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
         # rate law
-        k_syn_gtp = model.parameters.create(id='k_syn_gtp', value=math.log(2)/half_life_rna_3.value * 2 * 4, type=wc_ontology['WC:k_cat'], units=unit_registry.parse_units('s^-1'))
-        km_syn_gtp_gmp = model.parameters.create(id='km_syn_gtp_gmp', value=0.00005, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
+        k_syn_gtp = model.parameters.create(id='k_syn_gtp', value=math.log(2)/half_life_rna_3.value * 2 * 4 / 10, type=wc_ontology['WC:k_cat'], units=unit_registry.parse_units('s^-1'))
+        km_syn_gtp_gmp = model.parameters.create(id='km_syn_gtp_gmp', value=0.001, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
         syn_gtp_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize(
-            'k_syn_gtp * (gmp[c] / (km_syn_gtp_gmp * Avogadro * volume_c + gmp[c])) * (ppi[c] / (km_syn_ntp_ppi * Avogadro * volume_c + ppi[c]))',
+            'k_syn_gtp'
+            ' * (gmp[c] / (km_syn_gtp_gmp * Avogadro * volume_c + gmp[c]))'
+            ' * (ppi[c] / (km_syn_ntp_ppi * Avogadro * volume_c + ppi[c]))',
             self.get_rate_law_context(model))
         syn_gtp_rate_law = model.rate_laws.create(direction=wc_lang.RateLawDirection.forward,
                               type=None,
@@ -545,10 +549,12 @@ class RandModelGen(object):
         syn_ctp.participants.add(ctp.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
         syn_ctp.participants.add(h2o.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
         # rate law
-        k_syn_ctp = model.parameters.create(id='k_syn_ctp', value=math.log(2)/half_life_rna_3.value * 2 * 4, type=wc_ontology['WC:k_cat'], units=unit_registry.parse_units('s^-1'))
-        km_syn_ctp_cmp = model.parameters.create(id='km_syn_ctp_cmp', value=0.00005, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
+        k_syn_ctp = model.parameters.create(id='k_syn_ctp', value=math.log(2)/half_life_rna_3.value * 2 * 4 / 10, type=wc_ontology['WC:k_cat'], units=unit_registry.parse_units('s^-1'))
+        km_syn_ctp_cmp = model.parameters.create(id='km_syn_ctp_cmp', value=0.001, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
         syn_ctp_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize(
-            'k_syn_ctp * (cmp[c] / (km_syn_ctp_cmp * Avogadro * volume_c + cmp[c])) * (ppi[c] / (km_syn_ntp_ppi * Avogadro * volume_c + ppi[c]))',
+            'k_syn_ctp'
+            ' * (cmp[c] / (km_syn_ctp_cmp * Avogadro * volume_c + cmp[c]))'
+            ' * (ppi[c] / (km_syn_ntp_ppi * Avogadro * volume_c + ppi[c]))',
             self.get_rate_law_context(model))
         syn_ctp_rate_law = model.rate_laws.create(direction=wc_lang.RateLawDirection.forward,
                               type=None,
@@ -569,10 +575,12 @@ class RandModelGen(object):
         syn_utp.participants.add(utp.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
         syn_utp.participants.add(h2o.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
         # rate law
-        k_syn_utp = model.parameters.create(id='k_syn_utp', value=math.log(2)/half_life_rna_3.value * 2 * 4, type=wc_ontology['WC:k_cat'], units=unit_registry.parse_units('s^-1'))
-        km_syn_utp_ump = model.parameters.create(id='km_syn_utp_ump', value=0.00005, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
+        k_syn_utp = model.parameters.create(id='k_syn_utp', value=math.log(2)/half_life_rna_3.value * 2 * 4 / 10, type=wc_ontology['WC:k_cat'], units=unit_registry.parse_units('s^-1'))
+        km_syn_utp_ump = model.parameters.create(id='km_syn_utp_ump', value=0.001, type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
         syn_utp_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize(
-            'k_syn_utp * (ump[c] / (km_syn_utp_ump * Avogadro * volume_c + ump[c])) * (ppi[c] / (km_syn_ntp_ppi * Avogadro * volume_c + ppi[c]))',
+            'k_syn_utp'
+            ' * (ump[c] / (km_syn_utp_ump * Avogadro * volume_c + ump[c]))'
+            ' * (ppi[c] / (km_syn_ntp_ppi * Avogadro * volume_c + ppi[c]))',
             self.get_rate_law_context(model))
         syn_utp_rate_law = model.rate_laws.create(direction=wc_lang.RateLawDirection.forward,
                               type=None,
@@ -589,7 +597,7 @@ class RandModelGen(object):
         return {
             wc_lang.Compartment: cls.get_rate_law_compartment_context(model),
             wc_lang.Species: cls.get_rate_law_species_context(model),
-            wc_lang.Parameter: cls.get_rate_law_parameter_context(model),            
+            wc_lang.Parameter: cls.get_rate_law_parameter_context(model),
             wc_lang.Function: cls.get_rate_law_function_context(model),
         }
 
@@ -609,13 +617,66 @@ class RandModelGen(object):
     def get_rate_law_function_context(cls, model):
         return {function.id: function for function in model.functions}
 
+def plot(model, results, filename):
+
+    # c = model.compartments.get_one(id='c')
+    #
+    # rna_1 = model.species_types.get_one(id='rna_1').species.get_one(compartment=c)
+    # rna_2 = model.species_types.get_one(id='rna_2').species.get_one(compartment=c)
+    # rna_3 = model.species_types.get_one(id='rna_3').species.get_one(compartment=c)
+    #
+    pops = results.get('populations')
+    time = pops.index
+    pop_rna_1 = pops['rna_1[c]']
+    pop_rna_2 = pops['rna_2[c]']
+    pop_rna_3 = pops['rna_3[c]']
+
+    pop_atp = pops['atp[c]']
+    pop_gtp = pops['gtp[c]']
+    pop_utp = pops['ctp[c]']
+    pop_ctp = pops['utp[c]']
+
+    pop_amp = pops['amp[c]']
+    pop_gmp = pops['gmp[c]']
+    pop_ump = pops['cmp[c]']
+    pop_cmp = pops['ump[c]']
+
+    print(pop_rna_1, pop_atp, pop_gtp, pop_utp, pop_ctp)
+
+    fig1, axes1 = pyplot.subplots(nrows=3, ncols=1)
+
+    axes1[0].plot(time / 3600, pop_rna_1)
+    axes1[0].plot(time / 3600, pop_rna_2)
+    axes1[0].plot(time / 3600, pop_rna_3)
+    axes1[0].set_xlim((time[0] / 3600, time[-1] / 3600))
+    axes1[0].set_ylim((0., 10.0))
+    axes1[0].legend(loc='upper right')
+
+    axes1[1].plot(time / 3600, pop_atp)
+    axes1[1].plot(time / 3600, pop_gtp)
+    axes1[1].plot(time / 3600, pop_utp)
+    axes1[1].plot(time / 3600, pop_ctp)
+    axes1[1].set_xlim((time[0] / 3600, time[-1] / 3600))
+    # axes1[1].set_ylim((0., 10.0))
+    axes1[1].legend(loc='upper right')
+
+    axes1[2].plot(time / 3600, pop_amp)
+    axes1[2].plot(time / 3600, pop_gmp)
+    axes1[2].plot(time / 3600, pop_ump)
+    axes1[2].plot(time / 3600, pop_cmp)
+    axes1[2].set_xlim((time[0] / 3600, time[-1] / 3600))
+    # axes1[2].set_ylim((0., 10.0))
+    axes1[2].legend(loc='upper right')
+
+    fig1.savefig(filename.format('species'))
+    pyplot.close(fig1)
 
 if __name__ == '__main__':
 
     model_filename = pkg_resources.resource_filename('rand_wc_model_gen', os.path.join('model_gen', 'model.xlsx'))
     results_parent_dirname = 'results'
     checkpoint_period = 100.
-    end_time = 100.
+    end_time = 3600. * 10.
 
     # generate model
     model = RandModelGen(options={'id':'test_rand', 'name':'test random model', 'version':'0.0'}).run()
@@ -623,11 +684,13 @@ if __name__ == '__main__':
     # write model
     wc_lang.io.Writer().run(model_filename, model, data_repo_metadata=False)
 
-    # model = wc_lang.io.Reader().run(model_filename)[wc_lang.Model][0]
-    
+    model = wc_lang.io.Reader().run(model_filename)[wc_lang.Model][0]
+
     # simulate model
     sim = Simulation(model)
     _, results_dirname = sim.run(end_time=end_time,
                                  results_dir=results_parent_dirname,
                                  checkpoint_period=checkpoint_period)
     results = RunResults(results_dirname)
+
+    plot(model, results, 'results-{}.pdf')
