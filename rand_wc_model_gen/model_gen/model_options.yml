@@ -17,3 +17,71 @@ compartments:
         init_density:
             value: 1100.
             units: g l^-1
+species_types:
+    basic:
+        - id: h2o
+          name: H2O
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: 'O'
+          init_conc: 55
+        - id: h
+          name: H
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: '[H+]'
+          init_conc: 0.00005
+        - id: ppi
+          name: PPi
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: 'OP(=O)([O-])OP(=O)([O-])[O-]'
+          init_conc: 0.00005
+        - id: atp
+          name: ATP
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: 'C1=NC(=C2C(=N1)N(C=N2)C3C(C(C(O3)COP(=O)([O-])OP(=O)([O-])OP(=O)([O-])[O-])O)O)N'
+          init_conc: 0.001
+        - id: gtp
+          name: GTP
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: 'C1=NC2=C(N1C3C(C(C(O3)COP(=O)([O-])OP(=O)([O-])OP(=O)([O-])[O-])O)O)N=C(NC2=O)N'
+          init_conc: 0.001
+        - id: ctp
+          name: CTP
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: 'C1=CN(C(=O)N=C1N)C2C(C(C(O2)COP(=O)([O-])OP(=O)([O-])OP(=O)([O-])[O-])O)O'
+          init_conc: 0.001
+        - id: utp
+          name: UTP
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: 'C1=CN(C(=O)NC1=O)C2C(C(C(O2)COP(=O)([O-])OP(=O)([O-])OP(=O)([O-])[O-])O)O'
+          init_conc: 0.001
+        - id: amp
+          name: AMP
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: 'C1=NC(=C2C(=N1)N(C=N2)C3C(C(C(O3)COP(=O)([O-])[O-])O)O)N'
+          init_conc: 0.001
+        - id: gmp
+          name: GMP
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: 'C1=NC2=C(N1C3C(C(C(O3)COP(=O)([O-])[O-])O)O)N=C(NC2=O)N'
+          init_conc: 0.001
+        - id: cmp
+          name: CMP
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: 'C1=CN(C(=O)N=C1N)C2C(C(C(O2)COP(=O)([O-])[O-])O)O'
+          init_conc: 0.001
+        - id: ump
+          name: UMP
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: 'C1=CN(C(=O)NC1=O)C2C(C(C(O2)COP(=O)([O-])[O-])O)O'
+          init_conc: 0.001
