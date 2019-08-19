@@ -15,6 +15,7 @@ from matplotlib import pyplot
 import numpy
 import os
 import pkg_resources
+from ruamel import yaml
 import scipy.constants
 import wc_lang
 import wc_lang.io
@@ -56,6 +57,289 @@ class RandModelGen(object):
         version = options.get('version', None)
         assert(isinstance(version, str) or version is None)
         options['version'] = version
+
+    def gen_cell_options(self, model, options):
+        """ Generate cell information of the random model
+
+        Args:
+            model (:obj:`wc_lang.Model`): model
+            options (:obj:`dict`): dictionary of options
+        """
+        model.parameters.create(id='cellCycleLength',
+                                  type=None,
+                                  value=options['cellCycleLength']['value'],
+                                  units=unit_registry.parse_units(options['cellCycleLength']['units']))
+
+    def gen_compartments(self, model, options):
+        """ Generate compartment information of the random model
+
+        Args:
+            model (:obj:`wc_lang.Model`): model
+            options (:obj:`dict`): dictionary of options
+        """
+        c_init_volume  = wc_lang.InitVolume(distribution=wc_ontology[options['c']['init_volume']['distribution']],
+                                            mean=options['c']['init_volume']['mean'],
+                                            std=options['c']['init_volume']['std'])
+        c_ph = wc_lang.Ph(distribution=wc_ontology[options['c']['ph']['distribution']],
+                            mean=options['c']['ph']['mean'],
+                            std=options['c']['ph']['mean'])
+        c = model.compartments.create(id='c', name='Cytosol', init_volume=c_init_volume, ph=c_ph)
+        c.init_density = model.parameters.create(id='density_c',
+                                                 value=options['c']['init_density']['value'],
+                                                 units=unit_registry.parse_units(options['c']['init_density']['units']))
+        volume_c = model.functions.create(id='volume_c', units=unit_registry.parse_units('l'))
+
+        volume_c.expression, error = wc_lang.FunctionExpression.deserialize(
+            f'{c.id} / {c.init_density.id}',
+            self.get_rate_law_context(model))
+        assert error is None, str(error)
+
+    def gen_species(self, model, options):
+        """ Generate species type, species, and init concentrations of the random model
+
+        Args:
+            model (:obj:`wc_lang.Model`): model
+            options (:obj:`dict`): dictionary of options
+        """
+        Avogadro = model.parameters.get_one(id='Avogadro')
+        c = model.compartments.get_one(id='c')
+
+        # species types
+
+        # init_concs = {}
+        #
+        # # other
+        # h2o_structure = wc_lang.ChemicalStructure(value='O', format=wc_lang.ChemicalStructureFormat.SMILES)
+        # h2o_structure.empirical_formula = OpenBabelUtils.get_formula(h2o_structure.get_structure())
+        # h2o_structure.molecular_weight = h2o_structure.empirical_formula.get_molecular_weight()
+        # h2o_structure.charge = h2o_structure.get_structure().GetTotalCharge()
+        # h2o = model.species_types.create(id='h2o', name='H2O', type=wc_ontology['WC:metabolite'], structure=h2o_structure)
+        # init_concs['h2o'] = 55 * Avogadro.value * c.init_volume.mean
+        #
+        # h_structure = wc_lang.ChemicalStructure(value='[H+]', format=wc_lang.ChemicalStructureFormat.SMILES)
+        # h_structure.empirical_formula = OpenBabelUtils.get_formula(h_structure.get_structure())
+        # h_structure.molecular_weight = h_structure.empirical_formula.get_molecular_weight()
+        # h_structure.charge = h_structure.get_structure().GetTotalCharge()
+        # h = model.species_types.create(id='h', name='H', type=wc_ontology['WC:metabolite'], structure=h_structure)
+        # init_concs['h'] = 0.00005 * Avogadro.value * c.init_volume.mean
+        #
+        # ppi_structure = wc_lang.ChemicalStructure(value='OP(=O)([O-])OP(=O)([O-])[O-]', format=wc_lang.ChemicalStructureFormat.SMILES)
+        # ppi_structure.empirical_formula = OpenBabelUtils.get_formula(ppi_structure.get_structure())
+        # ppi_structure.molecular_weight = ppi_structure.empirical_formula.get_molecular_weight()
+        # ppi_structure.charge = ppi_structure.get_structure().GetTotalCharge()
+        # ppi = model.species_types.create(id='ppi', name='PPi', type=wc_ontology['WC:metabolite'], structure=ppi_structure)
+        # init_concs['ppi'] = 0.00005 * Avogadro.value * c.init_volume.mean
+        #
+        # # ntp
+        # atp_structure = wc_lang.ChemicalStructure(value='C1=NC(=C2C(=N1)N(C=N2)C3C(C(C(O3)COP(=O)([O-])OP(=O)([O-])OP(=O)([O-])[O-])O)O)N', format=wc_lang.ChemicalStructureFormat.SMILES)
+        # atp_structure.empirical_formula = OpenBabelUtils.get_formula(atp_structure.get_structure())
+        # atp_structure.molecular_weight = atp_structure.empirical_formula.get_molecular_weight()
+        # atp_structure.charge = atp_structure.get_structure().GetTotalCharge()
+        # atp = model.species_types.create(id='atp', name='ATP', type=wc_ontology['WC:metabolite'], structure=atp_structure)
+        # init_concs['atp'] = 0.001 * Avogadro.value * c.init_volume.mean
+        #
+        # gtp_structure = wc_lang.ChemicalStructure(value='C1=NC2=C(N1C3C(C(C(O3)COP(=O)([O-])OP(=O)([O-])OP(=O)([O-])[O-])O)O)N=C(NC2=O)N', format=wc_lang.ChemicalStructureFormat.SMILES)
+        # gtp_structure.empirical_formula = OpenBabelUtils.get_formula(gtp_structure.get_structure())
+        # gtp_structure.molecular_weight = gtp_structure.empirical_formula.get_molecular_weight()
+        # gtp_structure.charge = gtp_structure.get_structure().GetTotalCharge()
+        # gtp = model.species_types.create(id='gtp', name='GTP', type=wc_ontology['WC:metabolite'], structure=gtp_structure)
+        # init_concs['gtp'] = 0.001 * Avogadro.value * c.init_volume.mean
+        #
+        # ctp_structure = wc_lang.ChemicalStructure(value='C1=CN(C(=O)N=C1N)C2C(C(C(O2)COP(=O)([O-])OP(=O)([O-])OP(=O)([O-])[O-])O)O', format=wc_lang.ChemicalStructureFormat.SMILES)
+        # ctp_structure.empirical_formula = OpenBabelUtils.get_formula(ctp_structure.get_structure())
+        # ctp_structure.molecular_weight = ctp_structure.empirical_formula.get_molecular_weight()
+        # ctp_structure.charge = ctp_structure.get_structure().GetTotalCharge()
+        # ctp = model.species_types.create(id='ctp', name='CTP', type=wc_ontology['WC:metabolite'], structure=ctp_structure)
+        # init_concs['ctp'] = 0.001 * Avogadro.value * c.init_volume.mean
+        #
+        # utp_structure = wc_lang.ChemicalStructure(value='C1=CN(C(=O)NC1=O)C2C(C(C(O2)COP(=O)([O-])OP(=O)([O-])OP(=O)([O-])[O-])O)O', format=wc_lang.ChemicalStructureFormat.SMILES)
+        # utp_structure.empirical_formula = OpenBabelUtils.get_formula(utp_structure.get_structure())
+        # utp_structure.molecular_weight = utp_structure.empirical_formula.get_molecular_weight()
+        # utp_structure.charge = utp_structure.get_structure().GetTotalCharge()
+        # utp = model.species_types.create(id='utp', name='UTP', type=wc_ontology['WC:metabolite'], structure=utp_structure)
+        # init_concs['utp'] = 0.001 * Avogadro.value * c.init_volume.mean
+        #
+        # # nmp
+        # amp_structure = wc_lang.ChemicalStructure(value='C1=NC(=C2C(=N1)N(C=N2)C3C(C(C(O3)COP(=O)([O-])[O-])O)O)N', format=wc_lang.ChemicalStructureFormat.SMILES)
+        # amp_structure.empirical_formula = OpenBabelUtils.get_formula(amp_structure.get_structure())
+        # amp_structure.molecular_weight = amp_structure.empirical_formula.get_molecular_weight()
+        # amp_structure.charge = amp_structure.get_structure().GetTotalCharge()
+        # amp = model.species_types.create(id='amp', name='AMP', type=wc_ontology['WC:metabolite'], structure=amp_structure)
+        # init_concs['amp'] = 0.001 * Avogadro.value * c.init_volume.mean
+        #
+        # gmp_structure = wc_lang.ChemicalStructure(value='C1=NC2=C(N1C3C(C(C(O3)COP(=O)([O-])[O-])O)O)N=C(NC2=O)N', format=wc_lang.ChemicalStructureFormat.SMILES)
+        # gmp_structure.empirical_formula = OpenBabelUtils.get_formula(gmp_structure.get_structure())
+        # gmp_structure.molecular_weight = gmp_structure.empirical_formula.get_molecular_weight()
+        # gmp_structure.charge = gmp_structure.get_structure().GetTotalCharge()
+        # gmp = model.species_types.create(id='gmp', name='GMP', type=wc_ontology['WC:metabolite'], structure=gmp_structure)
+        # init_concs['gmp'] = 0.001 * Avogadro.value * c.init_volume.mean
+        #
+        # cmp_structure = wc_lang.ChemicalStructure(value='C1=CN(C(=O)N=C1N)C2C(C(C(O2)COP(=O)([O-])[O-])O)O', format=wc_lang.ChemicalStructureFormat.SMILES)
+        # cmp_structure.empirical_formula = OpenBabelUtils.get_formula(cmp_structure.get_structure())
+        # cmp_structure.molecular_weight = cmp_structure.empirical_formula.get_molecular_weight()
+        # cmp_structure.charge = cmp_structure.get_structure().GetTotalCharge()
+        # cmp = model.species_types.create(id='cmp', name='CMP', type=wc_ontology['WC:metabolite'], structure=cmp_structure)
+        # init_concs['cmp'] = 0.001 * Avogadro.value * c.init_volume.mean
+        #
+        # ump_structure = wc_lang.ChemicalStructure(value='C1=CN(C(=O)NC1=O)C2C(C(C(O2)COP(=O)([O-])[O-])O)O', format=wc_lang.ChemicalStructureFormat.SMILES)
+        # ump_structure.empirical_formula = OpenBabelUtils.get_formula(ump_structure.get_structure())
+        # ump_structure.molecular_weight = ump_structure.empirical_formula.get_molecular_weight()
+        # ump_structure.charge = ump_structure.get_structure().GetTotalCharge()
+        # ump = model.species_types.create(id='ump', name='UMP', type=wc_ontology['WC:metabolite'], structure=ump_structure)
+        # init_concs['ump'] = 0.001 * Avogadro.value * c.init_volume.mean
+        #
+        #
+        # # RNA
+        # # half life = 3 min
+        # rna_1_str = 'AAUGUGC'
+        # rna_1_structure = wc_lang.ChemicalStructure(
+        #                     value=rna_1_str,
+        #                     format=wc_lang.ChemicalStructureFormat.BpForms,
+        #                     alphabet=wc_lang.ChemicalStructureAlphabet.rna)
+        # rna_1_structure.empirical_formula = rna_1_structure.get_structure().get_formula()
+        # rna_1_structure.molecular_weight = rna_1_structure.empirical_formula.get_molecular_weight()
+        # rna_1_structure.charge = rna_1_structure.get_structure().get_charge()
+        # rna_1 = model.species_types.create(id='rna_1',
+        #                             name='RNA 1',
+        #                             type=wc_ontology['WC:RNA'],
+        #                             structure=rna_1_structure)
+        # half_life_rna_1 = model.parameters.create(id='half_life_rna_1',
+        #                                           type=None,
+        #                                           value=180,
+        #                                           units=unit_registry.parse_units('s'))
+        # init_concs['rna_1'] = 1
+        #
+        # rna_2_str = 'UCAG'
+        # rna_2_structure = wc_lang.ChemicalStructure(
+        #                     value=rna_2_str,
+        #                     format=wc_lang.ChemicalStructureFormat.BpForms,
+        #                     alphabet=wc_lang.ChemicalStructureAlphabet.rna)
+        # rna_2_structure.empirical_formula = rna_2_structure.get_structure().get_formula()
+        # rna_2_structure.molecular_weight = rna_2_structure.empirical_formula.get_molecular_weight()
+        # rna_2_structure.charge = rna_2_structure.get_structure().get_charge()
+        # rna_2 = model.species_types.create(id='rna_2',
+        #                             name='RNA 2',
+        #                             type=wc_ontology['WC:RNA'],
+        #                             structure=rna_2_structure)
+        # half_life_rna_2 = model.parameters.create(id='half_life_rna_2',
+        #                                           type=None,
+        #                                           value=180,
+        #                                           units=unit_registry.parse_units('s'))
+        # init_concs['rna_2'] = 1
+        #
+        # rna_3_str = 'ACGUC'
+        # rna_3_structure = wc_lang.ChemicalStructure(
+        #                     value=rna_3_str,
+        #                     format=wc_lang.ChemicalStructureFormat.BpForms,
+        #                     alphabet=wc_lang.ChemicalStructureAlphabet.rna)
+        # rna_3_structure.empirical_formula = rna_3_structure.get_structure().get_formula()
+        # rna_3_structure.molecular_weight = rna_3_structure.empirical_formula.get_molecular_weight()
+        # rna_3_structure.charge = rna_3_structure.get_structure().get_charge()
+        # rna_3 = model.species_types.create(id='rna_3',
+        #                             name='RNA 3',
+        #                             type=wc_ontology['WC:RNA'],
+        #                             structure=rna_3_structure)
+        # half_life_rna_3 = model.parameters.create(id='half_life_rna_3',
+        #                                           type=None,
+        #                                           value=180,
+        #                                           units=unit_registry.parse_units('s'))
+        # init_concs['rna_3'] = 1
+        #
+        # # enzymes
+        # rna_pol = model.species_types.create(id='rna_pol', name='RNA polymerase', type=wc_ontology['WC:metabolite'])
+        # init_concs['rna_pol'] = 10 ** 2
+        # rna_se = model.species_types.create(id='rna_se', name='RNAse', type=wc_ontology['WC:metabolite'])
+        # init_concs['rna_se'] = 10 ** 2
+        # atp_synthase = model.species_types.create(
+        #     id='atp_synthase',
+        #     name='ATP synthase',
+        #     type=wc_ontology['WC:protein'])
+        # init_concs['atp_synthase'] = 10 ** 3
+        # gtp_synthase = model.species_types.create(
+        #     id='gtp_synthase',
+        #     name='GTP synthase',
+        #     type=wc_ontology['WC:protein'])
+        # init_concs['gtp_synthase'] = 10 ** 3
+        # ctp_synthase = model.species_types.create(
+        #     id='ctp_synthase',
+        #     name='CTP synthase',
+        #     type=wc_ontology['WC:protein'])
+        # init_concs['ctp_synthase'] = 10 ** 3
+        # utp_synthase = model.species_types.create(
+        #     id='utp_synthase',
+        #     name='UTP synthase',
+        #     type=wc_ontology['WC:protein'])
+        # init_concs['utp_synthase'] = 10 ** 3
+        #
+        # # species and initial concentrations
+        # for model_species_type in model.species_types:
+        #     model_species = model.species.get_or_create(species_type=model_species_type, compartment=c)
+        #     model_species.id = model_species.gen_id()
+        #     conc = model.distribution_init_concentrations.create(species=model_species, mean=init_concs[model_species_type.id], units=unit_registry.parse_units('molecule'))
+        #     conc.id = conc.gen_id()
+
+    def gen_submodels(self, model, options):
+        """ Generate submodels of the random model
+
+        Args:
+            model (:obj:`wc_lang.Model`): model
+            options (:obj:`dict`): dictionary of options
+        """
+        submodel = model.submodels.create(id='submodel_rna')
+
+    def gen_reactions(self, model, options):
+        """ Generate reactions and rate laws of the random model
+
+        Args:
+            model (:obj:`wc_lang.Model`): model
+            options (:obj:`dict`): dictionary of options
+        """
+
+    def run_with_options(self, option_path):
+        """ Generate a :obj:`wc_lang` model with factored options
+
+        Args:
+            :obj:`str`: path to model_options.yml
+
+        Returns:
+            :obj:`wc_lang.Model`: model
+        """
+        yaml_reader = yaml.YAML()
+        with open(option_path, 'rb') as file:
+            options = yaml_reader.load(file)
+
+        model = wc_lang.Model()
+        model.id = self.options.get('id')
+        model.name = self.options.get('name')
+        model.version = self.options.get('version')
+
+        # basic parameters
+        Avogadro = model.parameters.create(id='Avogadro',
+                                           type=None,
+                                           value=scipy.constants.Avogadro,
+                                           units=unit_registry.parse_units('molecule mol^-1'))
+
+        # cell
+        self.gen_cell_options(model, options=options['cell'])
+
+        # compartment
+        self.gen_compartments(model, options=options['compartments'])
+
+        # # species types, species, and init concentrations
+        # self.gen_species(model)
+        #
+        # # submodels
+        # self.gen_submodels(model)
+        #
+        # # reactions and ratelaws
+        # self.gen_reactions(model)
+
+
+
+        return model
+
+
+
 
     def run(self):
         """ Generate a :obj:`wc_lang` model
@@ -694,3 +978,11 @@ if __name__ == '__main__':
     results = RunResults(results_dirname)
 
     plot(model, results, 'results-{}.pdf')
+
+
+
+    pass
+
+    # model_2_filename = pkg_resources.resource_filename('rand_wc_model_gen', os.path.join('model_gen', 'model_2.xlsx'))
+    # model_2 = RandModelGen(options={'id':'test_rand', 'name':'test random model', 'version':'0.0'}).run_with_options('model_options.yml')
+    # wc_lang.io.Writer().run(model_2_filename, model_2, data_repo_metadata=False)

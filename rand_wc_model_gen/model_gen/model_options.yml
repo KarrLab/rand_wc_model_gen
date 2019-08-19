@@ -1,0 +1,19 @@
+cell:
+    cellCycleLength:
+        value: 21600
+        units: s
+compartments:
+    c:
+        id: c
+        name: Cytosol
+        init_volume:
+            distribution: WC:normal_distribution
+            mean: 5.0E-17
+            std: 0.0
+        ph:
+            distribution: WC:normal_distribution
+            mean: 7.75
+            std: 0.775
+        init_density:
+            value: 1100.
+            units: g l^-1
