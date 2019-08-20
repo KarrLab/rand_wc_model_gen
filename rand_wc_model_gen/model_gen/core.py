@@ -15,8 +15,10 @@ from matplotlib import pyplot
 import numpy
 import os
 import pkg_resources
+import random
 from ruamel import yaml
 import scipy.constants
+from scipy import stats
 import wc_lang
 import wc_lang.io
 from wc_onto import onto as wc_ontology
@@ -95,7 +97,7 @@ class RandModelGen(object):
         assert error is None, str(error)
 
     def gen_species(self, model, options):
-        """ Generate species type, and init concentrations of the random model
+        """ Generate species type, species, and init concentrations of the random model
 
         Args:
             model (:obj:`wc_lang.Model`): model
@@ -117,95 +119,48 @@ class RandModelGen(object):
             model.species_types.create(id=species_type['id'], name=species_type['name'], type=wc_ontology[species_type['type']], structure=species_type_structure)
             init_concs[species_type['id']] = species_type['init_conc'] * Avogadro.value * c.init_volume.mean
 
-        #
-        # # RNA
-        # # half life = 3 min
-        # rna_1_str = 'AAUGUGC'
-        # rna_1_structure = wc_lang.ChemicalStructure(
-        #                     value=rna_1_str,
-        #                     format=wc_lang.ChemicalStructureFormat.BpForms,
-        #                     alphabet=wc_lang.ChemicalStructureAlphabet.rna)
-        # rna_1_structure.empirical_formula = rna_1_structure.get_structure().get_formula()
-        # rna_1_structure.molecular_weight = rna_1_structure.empirical_formula.get_molecular_weight()
-        # rna_1_structure.charge = rna_1_structure.get_structure().get_charge()
-        # rna_1 = model.species_types.create(id='rna_1',
-        #                             name='RNA 1',
-        #                             type=wc_ontology['WC:RNA'],
-        #                             structure=rna_1_structure)
-        # half_life_rna_1 = model.parameters.create(id='half_life_rna_1',
-        #                                           type=None,
-        #                                           value=180,
-        #                                           units=unit_registry.parse_units('s'))
-        # init_concs['rna_1'] = 1
-        #
-        # rna_2_str = 'UCAG'
-        # rna_2_structure = wc_lang.ChemicalStructure(
-        #                     value=rna_2_str,
-        #                     format=wc_lang.ChemicalStructureFormat.BpForms,
-        #                     alphabet=wc_lang.ChemicalStructureAlphabet.rna)
-        # rna_2_structure.empirical_formula = rna_2_structure.get_structure().get_formula()
-        # rna_2_structure.molecular_weight = rna_2_structure.empirical_formula.get_molecular_weight()
-        # rna_2_structure.charge = rna_2_structure.get_structure().get_charge()
-        # rna_2 = model.species_types.create(id='rna_2',
-        #                             name='RNA 2',
-        #                             type=wc_ontology['WC:RNA'],
-        #                             structure=rna_2_structure)
-        # half_life_rna_2 = model.parameters.create(id='half_life_rna_2',
-        #                                           type=None,
-        #                                           value=180,
-        #                                           units=unit_registry.parse_units('s'))
-        # init_concs['rna_2'] = 1
-        #
-        # rna_3_str = 'ACGUC'
-        # rna_3_structure = wc_lang.ChemicalStructure(
-        #                     value=rna_3_str,
-        #                     format=wc_lang.ChemicalStructureFormat.BpForms,
-        #                     alphabet=wc_lang.ChemicalStructureAlphabet.rna)
-        # rna_3_structure.empirical_formula = rna_3_structure.get_structure().get_formula()
-        # rna_3_structure.molecular_weight = rna_3_structure.empirical_formula.get_molecular_weight()
-        # rna_3_structure.charge = rna_3_structure.get_structure().get_charge()
-        # rna_3 = model.species_types.create(id='rna_3',
-        #                             name='RNA 3',
-        #                             type=wc_ontology['WC:RNA'],
-        #                             structure=rna_3_structure)
-        # half_life_rna_3 = model.parameters.create(id='half_life_rna_3',
-        #                                           type=None,
-        #                                           value=180,
-        #                                           units=unit_registry.parse_units('s'))
-        # init_concs['rna_3'] = 1
-        #
-        # # enzymes
-        # rna_pol = model.species_types.create(id='rna_pol', name='RNA polymerase', type=wc_ontology['WC:metabolite'])
-        # init_concs['rna_pol'] = 10 ** 2
-        # rna_se = model.species_types.create(id='rna_se', name='RNAse', type=wc_ontology['WC:metabolite'])
-        # init_concs['rna_se'] = 10 ** 2
-        # atp_synthase = model.species_types.create(
-        #     id='atp_synthase',
-        #     name='ATP synthase',
-        #     type=wc_ontology['WC:protein'])
-        # init_concs['atp_synthase'] = 10 ** 3
-        # gtp_synthase = model.species_types.create(
-        #     id='gtp_synthase',
-        #     name='GTP synthase',
-        #     type=wc_ontology['WC:protein'])
-        # init_concs['gtp_synthase'] = 10 ** 3
-        # ctp_synthase = model.species_types.create(
-        #     id='ctp_synthase',
-        #     name='CTP synthase',
-        #     type=wc_ontology['WC:protein'])
-        # init_concs['ctp_synthase'] = 10 ** 3
-        # utp_synthase = model.species_types.create(
-        #     id='utp_synthase',
-        #     name='UTP synthase',
-        #     type=wc_ontology['WC:protein'])
-        # init_concs['utp_synthase'] = 10 ** 3
-        #
-        # # species and initial concentrations
-        # for model_species_type in model.species_types:
-        #     model_species = model.species.get_or_create(species_type=model_species_type, compartment=c)
-        #     model_species.id = model_species.gen_id()
-        #     conc = model.distribution_init_concentrations.create(species=model_species, mean=init_concs[model_species_type.id], units=unit_registry.parse_units('molecule'))
-        #     conc.id = conc.gen_id()
+        # RNA
+        mean_gc_frac = options['rna']['mean_gc_frac']
+        RNA_BASES = ['A', 'C', 'G', 'U']
+        PROB_BASES = [(1 - mean_gc_frac) / 2, mean_gc_frac /2, mean_gc_frac/2, (1-mean_gc_frac)/2]
+
+
+        rna_lens = 3 * self.rand(options['rna']['mean_rna_len'], count=options['rna']['num_rna'], min=2)
+        for i in range(options['rna']['num_rna']):
+            rna_str = "".join(random.choices(RNA_BASES, weights=PROB_BASES, k=rna_lens[i]))
+            rna_str_structure = wc_lang.ChemicalStructure(
+                                value=rna_str,
+                                format=wc_lang.ChemicalStructureFormat.BpForms,
+                                alphabet=wc_lang.ChemicalStructureAlphabet.rna)
+            rna_str_structure.empirical_formula = rna_str_structure.get_structure().get_formula()
+            rna_str_structure.molecular_weight = rna_str_structure.empirical_formula.get_molecular_weight()
+            rna_str_structure.charge = rna_str_structure.get_structure().get_charge()
+            rna_id = 'rna_'+str(i+1)
+            rna = model.species_types.create(id=rna_id,
+                                        name='RNA '+str(i+1),
+                                        type=wc_ontology['WC:RNA'],
+                                        structure=rna_str_structure)
+            half_life_rna = model.parameters.create(id='half_life_'+rna_id,
+                                                      type=None,
+                                                      value=180,
+                                                      units=unit_registry.parse_units('s'))
+            init_concs[rna_id] = 1
+
+
+        # enzymes
+        for species_type in options['enzymes']:
+            enzyme = model.species_types.create(id=species_type['id'],
+                                                name=species_type['name'],
+                                                type=wc_ontology['WC:protein'])
+            init_concs[species_type['id']] = species_type['init_conc']
+
+
+        # species and initial concentrations
+        for model_species_type in model.species_types:
+            model_species = model.species.get_or_create(species_type=model_species_type, compartment=c)
+            model_species.id = model_species.gen_id()
+            conc = model.distribution_init_concentrations.create(species=model_species, mean=init_concs[model_species_type.id], units=unit_registry.parse_units('molecule'))
+            conc.id = conc.gen_id()
 
     def gen_submodels(self, model, options):
         """ Generate submodels of the random model
@@ -214,7 +169,8 @@ class RandModelGen(object):
             model (:obj:`wc_lang.Model`): model
             options (:obj:`dict`): dictionary of options
         """
-        submodel = model.submodels.create(id='submodel_rna')
+        for submodel in options:
+            model.submodels.create(id=submodel)
 
     def gen_reactions(self, model, options):
         """ Generate reactions and rate laws of the random model
@@ -223,6 +179,22 @@ class RandModelGen(object):
             model (:obj:`wc_lang.Model`): model
             options (:obj:`dict`): dictionary of options
         """
+
+        # basic reactions
+        for basic_reaction in options['basic']:
+
+            c = model.compartments.get_one(id='c')
+
+            # reaction
+            reaction = model.reactions.get_or_create(submodel=model.submodels.get_one(id=basic_reaction['submodel']), id=basic_reaction['id'])
+            reaction.name = basic_reaction['name']
+            reaction.participants = []
+            for participant in basic_reaction['participants']:
+                reaction.participants.add(model.species_types.get_one(id=participant['id']).species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=participant['coefficient']))
+
+            # rate law
+
+
 
     def run_with_options(self, option_path):
         """ Generate a :obj:`wc_lang` model with factored options
@@ -257,16 +229,28 @@ class RandModelGen(object):
         # species types, and init concentrations
         self.gen_species(model, options=options['species_types'])
 
-        # # submodels
-        # self.gen_submodels(model)
-        #
-        # # reactions and ratelaws
-        # self.gen_reactions(model)
+        # submodels
+        self.gen_submodels(model, options=options['submodels'])
+
+        # reactions and ratelaws
+        self.gen_reactions(model, options=options['reactions'])
 
 
 
         return model
 
+    def rand(self, mean, count=1, min=0, max=numpy.inf):
+        """ Generated 1 or more random normally distributed integer(s) with standard deviation equal
+        to the square root of the mean value.
+        Args:
+            mean (:obj:`float`): mean value
+            count (:obj:`int`): number of random numbers to generate
+        Returns:
+            :obj:`int` or :obj:`numpy.ndarray` of :obj:`int`: random normally distributed integer(s)
+        """
+        a = (min-mean)/numpy.sqrt(mean)
+        b = (max - mean)/numpy.sqrt(mean)
+        return numpy.int64(numpy.round(stats.truncnorm.rvs(a, b, loc=mean, scale=numpy.sqrt(mean), size=count)))
 
 
 
@@ -891,17 +875,17 @@ if __name__ == '__main__':
 
     # hard-coded rna model
 
-    model_filename = pkg_resources.resource_filename('rand_wc_model_gen', os.path.join('model_gen', 'model.xlsx'))
-    results_parent_dirname = 'results'
-    checkpoint_period = 100.
-    end_time = 3600. * 10.
-
-    # generate model
-    model = RandModelGen(options={'id':'test_rand', 'name':'test random model', 'version':'0.0'}).run()
-
-    # write model
-    wc_lang.io.Writer().run(model_filename, model, data_repo_metadata=False)
-
+    # model_filename = pkg_resources.resource_filename('rand_wc_model_gen', os.path.join('model_gen', 'model.xlsx'))
+    # results_parent_dirname = 'results'
+    # checkpoint_period = 100.
+    # end_time = 3600. * 10.
+    #
+    # # generate model
+    # model = RandModelGen(options={'id':'test_rand', 'name':'test random model', 'version':'0.0'}).run()
+    #
+    # # write model
+    # wc_lang.io.Writer().run(model_filename, model, data_repo_metadata=False)
+    #
     # model = wc_lang.io.Reader().run(model_filename)[wc_lang.Model][0]
     #
     # # simulate model
@@ -919,6 +903,6 @@ if __name__ == '__main__':
 
     # run the new refactored version of run() to build model
 
-    # model_2_filename = pkg_resources.resource_filename('rand_wc_model_gen', os.path.join('model_gen', 'model_2.xlsx'))
-    # model_2 = RandModelGen(options={'id':'test_rand', 'name':'test random model', 'version':'0.0'}).run_with_options('model_options.yml')
-    # wc_lang.io.Writer().run(model_2_filename, model_2, data_repo_metadata=False)
+    model_2_filename = pkg_resources.resource_filename('rand_wc_model_gen', os.path.join('model_gen', 'model_2.xlsx'))
+    model_2 = RandModelGen(options={'id':'test_rand', 'name':'test random model', 'version':'0.0'}).run_with_options('model_options.yml')
+    wc_lang.io.Writer().run(model_2_filename, model_2, data_repo_metadata=False)

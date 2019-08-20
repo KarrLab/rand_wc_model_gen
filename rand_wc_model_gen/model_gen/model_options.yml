@@ -85,3 +85,87 @@ species_types:
           structure_format: wc_lang.ChemicalStructureFormat.SMILES
           structure_string: 'C1=CN(C(=O)NC1=O)C2C(C(C(O2)COP(=O)([O-])[O-])O)O'
           init_conc: 0.001
+    rna:
+        num_rna: 3
+        mean_rna_len: 4
+        mean_gc_frac: 0.5
+        halflife: 180
+    enzymes:
+        - id: rna_pol
+          name: RNA polymerase
+          init_conc: 1e2
+        - id: rna_se
+          name: RNAse
+          init_conc: 1e2
+        - id: atp_synthase
+          name: ATP synthase
+          init_conc: 1e3
+        - id: gtp_synthase
+          name: GTP synthase
+          init_conc: 1e3
+        - id: ctp_synthase
+          name: CTP synthase
+          init_conc: 1e3
+        - id: utp_synthase
+          name: UTP synthase
+          init_conc: 1e3
+submodels:
+    - rna_submodel
+reactions:
+    basic:
+        - submodel: rna_submodel
+          id: syn_atp
+          name: synthesis ATP
+          participants:
+              - id: amp
+                coefficient: -1
+              - id: ppi
+                coefficient: -1
+              - id: h
+                coefficient: -1
+              - id: atp
+                coefficient: 1
+              - id: h2o
+                coefficient: 1
+        - submodel: rna_submodel
+          id: syn_gtp
+          name: synthesis GTP
+          participants:
+              - id: gmp
+                coefficient: -1
+              - id: ppi
+                coefficient: -1
+              - id: h
+                coefficient: -1
+              - id: gtp
+                coefficient: 1
+              - id: h2o
+                coefficient: 1
+        - submodel: rna_submodel
+          id: syn_ctp
+          name: synthesis CTP
+          participants:
+              - id: cmp
+                coefficient: -1
+              - id: ppi
+                coefficient: -1
+              - id: h
+                coefficient: -1
+              - id: ctp
+                coefficient: 1
+              - id: h2o
+                coefficient: 1
+        - submodel: rna_submodel
+          id: syn_utp
+          name: synthesis UTP
+          participants:
+              - id: ump
+                coefficient: -1
+              - id: ppi
+                coefficient: -1
+              - id: h
+                coefficient: -1
+              - id: utp
+                coefficient: 1
+              - id: h2o
+                coefficient: 1
