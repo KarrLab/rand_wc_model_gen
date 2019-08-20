@@ -180,19 +180,49 @@ class RandModelGen(object):
             options (:obj:`dict`): dictionary of options
         """
 
-        # basic reactions
+        # basic metabolic reactions
         for basic_reaction in options['basic']:
 
             c = model.compartments.get_one(id='c')
 
             # reaction
-            reaction = model.reactions.get_or_create(submodel=model.submodels.get_one(id=basic_reaction['submodel']), id=basic_reaction['id'])
+            reaction = model.reactions.get_or_create(submodel=model.submodels.get_one(id=basic_reaction['submodel']),
+                                                     id=basic_reaction['id'])
             reaction.name = basic_reaction['name']
             reaction.participants = []
             for participant in basic_reaction['participants']:
                 reaction.participants.add(model.species_types.get_one(id=participant['id']).species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=participant['coefficient']))
 
             # rate law
+            model.parameters.create(id='kcat_'+basic_reaction['id'],
+                                    value=basic_reaction['rate_law']['k_cat']['value'],
+                                    type=wc_ontology['WC:k_cat'],
+                                    units=unit_registry.parse_units(basic_reaction['rate_law']['k_cat']['units']))
+            for km in basic_reaction['rate_law']['k_m']:
+                model.parameters.create(id='km_{}_{}'.format(basic_reaction['id'], km['id']),
+                                        value=km['value'],
+                                        type=wc_ontology['WC:K_m'],
+                                        units=unit_registry.parse_units('M'))
+            reactants = [participant['id'] for participant in basic_reaction['participants'] if participant['coefficient']<0]
+            if 'h' in reactants:
+                reactants.remove('h')
+            if 'h2o' in reactants:
+                reactants.remove('h2o')
+            rate_law_exp, errors = wc_lang.RateLawExpression.deserialize(
+                '{}{}'.format('kcat_'+basic_reaction['id'], ' '.join(['* ({}[c] / (km_{}_{} * Avogadro * volume_c + {}[c]))'.format(reactant, basic_reaction['id'], reactant, reactant) for reactant in reactants])),
+                self.get_rate_law_context(model))
+
+            rate_law = model.rate_laws.create(direction=wc_lang.RateLawDirection.forward,
+                                  type=None,
+                                  expression=rate_law_exp,
+                                  reaction=reaction,
+                                  )
+            rate_law.id = rate_law.gen_id()
+
+        # rna transcription
+
+        # rna degradation
+
 
 
 

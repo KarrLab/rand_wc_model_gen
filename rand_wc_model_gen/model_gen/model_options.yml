@@ -127,6 +127,16 @@ reactions:
                 coefficient: 1
               - id: h2o
                 coefficient: 1
+          rate_law:
+              enzyme: atp_synthase
+              k_cat:
+                  value: 0.003080654
+                  units: s^-1
+              k_m:
+                  - id: amp
+                    value: 0.001
+                  - id: ppi
+                    value: 0.00005
         - submodel: rna_submodel
           id: syn_gtp
           name: synthesis GTP
@@ -141,6 +151,16 @@ reactions:
                 coefficient: 1
               - id: h2o
                 coefficient: 1
+          rate_law:
+              enzyme: gtp_synthase
+              k_cat:
+                  value: 0.003080654
+                  units: s^-1
+              k_m:
+                  - id: gmp
+                    value: 0.001
+                  - id: ppi
+                    value: 0.00005
         - submodel: rna_submodel
           id: syn_ctp
           name: synthesis CTP
@@ -155,6 +175,16 @@ reactions:
                 coefficient: 1
               - id: h2o
                 coefficient: 1
+          rate_law:
+              enzyme: ctp_synthase
+              k_cat:
+                  value: 0.003080654
+                  units: s^-1
+              k_m:
+                  - id: cmp
+                    value: 0.001
+                  - id: ppi
+                    value: 0.00005
         - submodel: rna_submodel
           id: syn_utp
           name: synthesis UTP
@@ -169,3 +199,13 @@ reactions:
                 coefficient: 1
               - id: h2o
                 coefficient: 1
+          rate_law:
+              enzyme: utp_synthase
+              k_cat:
+                  value: 0.003080654
+                  units: s^-1
+              k_m:
+                  - id: ump
+                    value: 0.001
+                  - id: ppi
+                    value: 0.00005
