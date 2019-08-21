@@ -209,3 +209,16 @@ reactions:
                     value: 0.001
                   - id: ppi
                     value: 0.00005
+    rna:
+        submodel: rna_submodel
+        transcription:
+            k_m:
+                - id: atp
+                  value: 0.001
+                - id: gtp
+                  value: 0.001
+                - id: ctp
+                  value: 0.001
+                - id: utp
+                  value: 0.001
+        degradation:

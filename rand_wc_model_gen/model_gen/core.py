@@ -219,7 +219,55 @@ class RandModelGen(object):
                                   )
             rate_law.id = rate_law.gen_id()
 
+        # rna
+        rna_species_types = [species_types for species_types in model.species_types if species_types.type == wc_ontology['WC:RNA']]
+
         # rna transcription
+        for km in options['rna']['transcription']['k_m']:
+            model.parameters.create(id='km_{}_trans'.format(km['id']), value=km['value'], type=wc_ontology['WC:K_m'], units=unit_registry.parse_units('M'))
+
+        for i, rna_species_type in enumerate(rna_species_types):
+            reaction = model.reactions.get_or_create(submodel=model.submodels.get_one(id=options['rna']['submodel']), id='transcription_{}'.format(rna_species_type.id))
+            reaction.name = 'transcription {}'.format(rna_species_type.name)
+            reaction.participants = []
+            # participants
+            rna_str = rna_species_type.structure.value
+            # lhs
+            reaction.participants.add(model.species_types.get_one(id='atp').species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=-rna_str.count('A')))
+            reaction.participants.add(model.species_types.get_one(id='gtp').species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=-rna_str.count('G')))
+            reaction.participants.add(model.species_types.get_one(id='ctp').species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=-rna_str.count('C')))
+            reaction.participants.add(model.species_types.get_one(id='utp').species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=-rna_str.count('U')))
+            reaction.participants.add(model.species_types.get_one(id='h2o').species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=-1))
+            # rhs
+            reaction.participants.add(rna_species_type.species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
+            reaction.participants.add(model.species_types.get_one(id='ppi').species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=len(rna_str)))
+            reaction.participants.add(model.species_types.get_one(id='h').species.get_one(compartment=c).species_coefficients.get_or_create(coefficient=1))
+            # rate law
+            model.parameters.create(
+                id='k_trans_{}'.format(rna_species_type.id),
+                value=math.log(2)/model.parameters.get_one(id='half_life_{}'.format(rna_species_type.id)).value * 8,
+                type=wc_ontology['WC:k_cat'],
+                units=unit_registry.parse_units('s^-1 / M'))
+            rate_law_str = 'k_trans_{}'.format(rna_species_type.id)
+            if 'A' in rna_str:
+                rate_law_str += ' * (atp[c] / (km_atp_trans * Avogadro * volume_c + atp[c]))'
+            if 'G' in rna_str:
+                rate_law_str += ' * (gtp[c] / (km_gtp_trans * Avogadro * volume_c + gtp[c]))'
+            if 'C' in rna_str:
+                rate_law_str += ' * (ctp[c] / (km_ctp_trans * Avogadro * volume_c + ctp[c]))'
+            if 'U' in rna_str:
+                rate_law_str += ' * (utp[c] / (km_utp_trans * Avogadro * volume_c + utp[c]))'
+            rate_law_str += ' * rna_pol[c] / (Avogadro * volume_c)'
+
+            reaction_rate_law_exp, errors = wc_lang.RateLawExpression.deserialize(
+                rate_law_str,
+                self.get_rate_law_context(model))
+            reaction_rate_law = model.rate_laws.create(direction=wc_lang.RateLawDirection.forward,
+                                  type=None,
+                                  expression=reaction_rate_law_exp,
+                                  reaction=reaction,
+                                  )
+            reaction_rate_law.id = reaction_rate_law.gen_id()
 
         # rna degradation
 
