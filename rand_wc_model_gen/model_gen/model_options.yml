@@ -86,7 +86,7 @@ species_types:
           structure_string: 'C1=CN(C(=O)NC1=O)C2C(C(C(O2)COP(=O)([O-])[O-])O)O'
           init_conc: 0.001
     rna:
-        num_rna: 3
+        num_rna: 5
         mean_rna_len: 4
         mean_gc_frac: 0.5
         halflife: 180
