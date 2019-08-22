@@ -85,6 +85,126 @@ species_types:
           structure_format: wc_lang.ChemicalStructureFormat.SMILES
           structure_string: 'C1=CN(C(=O)NC1=O)C2C(C(C(O2)COP(=O)([O-])[O-])O)O'
           init_conc: 0.001
+        - id: Ala
+          name: Alanine
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: CC(C(=O)O)N
+          init_conc: 0.001
+        - id: Ile
+          name: Isoleucine
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: CCC(C)C(C(=O)O)N
+          init_conc: 0.001
+        - id: Leu
+          name: Leucine
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: CC(C)CC(C(=O)O)N
+          init_conc: 0.001
+        - id: Met
+          name: Methionine
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: CSCCC(C(=O)O)N
+          init_conc: 0.001
+        - id: Val
+          name: Valine
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: CC(C)C(C(=O)O)N
+          init_conc: 0.001
+        - id: Phe
+          name: Phenylalanine
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: C1=CC=C(C=C1)CC(C(=O)O)N
+          init_conc: 0.001
+        - id: Trp
+          name: Tryptophan
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: C1=CC=C2C(=C1)C(=CN2)CC(C(=O)O)N
+          init_conc: 0.001
+        - id: Tyr
+          name: Tyrosine
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: C1=CC(=CC=C1CC(C(=O)O)N)O
+          init_conc: 0.001
+        - id: Asn
+          name: Asparagine
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: C(C(C(=O)O)N)C(=O)N
+          init_conc: 0.001
+        - id: Cys
+          name: Cysteine
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: C(C(C(=O)O)N)S
+          init_conc: 0.001
+        - id: Gln
+          name: Glutamine
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: C(CC(=O)N)C(C(=O)O)N
+          init_conc: 0.001
+        - id: Ser
+          name: Serine
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: C(C(C(=O)O)N)O
+          init_conc: 0.001
+        - id: Thr
+          name: Threonine
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: CC(C(C(=O)O)N)O
+          init_conc: 0.001
+        - id: Asp
+          name: Aspartic acid
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: C(C(C(=O)O)N)C(=O)O
+          init_conc: 0.001
+        - id: Glu
+          name: Glutamic acid
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: C(CC(=O)O)C(C(=O)O)N
+          init_conc: 0.001
+        - id: Arg
+          name: Arginine
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: C(CC(C(=O)O)N)CN=C(N)N
+          init_conc: 0.001
+        - id: His
+          name: Histidine
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: C1=C(NC=N1)CC(C(=O)O)N
+          init_conc: 0.001
+        - id: Lys
+          name: Lysine
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: C(CCN)CC(C(=O)O)N
+          init_conc: 0.001
+        - id: Gly
+          name: Glycine
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: C(C(=O)O)N
+          init_conc: 0.001
+        - id: Pro
+          name: Proline
+          type: WC:metabolite
+          structure_format: wc_lang.ChemicalStructureFormat.SMILES
+          structure_string: C1CC(NC1)C(=O)O
+          init_conc: 0.001
     rna:
         num_rna: 5
         mean_rna_len: 4
