@@ -96,7 +96,7 @@ class RandModelGen(object):
             self.get_rate_law_context(model))
         assert error is None, str(error)
 
-    def gen_species(self, model, options):
+    def gen_species(self, model, options, misc_options):
         """ Generate species type, species, and init concentrations of the random model
 
         Args:
@@ -127,7 +127,13 @@ class RandModelGen(object):
 
         rna_lens = 3 * self.rand(options['rna']['mean_rna_len'], count=options['rna']['num_rna'], min=2)
         for i in range(options['rna']['num_rna']):
-            rna_str = "".join(random.choices(RNA_BASES, weights=PROB_BASES, k=rna_lens[i]))
+            rna_str = 'AUG'
+            for j in range(0, rna_lens[i], 3):
+                codon = "".join(random.choices(RNA_BASES, weights=PROB_BASES, k=3))
+                while codon in ['UAA', 'UAG', 'UGA']:
+                    codon = "".join(random.choices(RNA_BASES, weights=PROB_BASES, k=3))
+                rna_str += codon
+            rna_str += random.choice(['UAA', 'UAG', 'UGA'])
             rna_str_structure = wc_lang.ChemicalStructure(
                                 value=rna_str,
                                 format=wc_lang.ChemicalStructureFormat.BpForms,
@@ -142,9 +148,41 @@ class RandModelGen(object):
                                         structure=rna_str_structure)
             half_life_rna = model.parameters.create(id='half_life_'+rna_id,
                                                       type=None,
-                                                      value=180,
+                                                      value=options['rna']['halflife'],
                                                       units=unit_registry.parse_units('s'))
             init_concs[rna_id] = 1
+
+        # protein
+        codon_translation = misc_options['codon_translation']
+        rna_species_types = [species_types for species_types in model.species_types if species_types.type == wc_ontology['WC:RNA']]
+        for rna_species_type in rna_species_types:
+            rna_str = rna_species_type.structure.value
+            prot_str = ''
+            for i in range(0, len(rna_str), 3):
+                codon = rna_str[i:i+3]
+                aa = codon_translation[codon]
+                if aa == 'STOP':
+                    break
+                else:
+                    prot_str += codon_translation[codon]
+            prot_str_structure = wc_lang.ChemicalStructure(
+                                value=prot_str,
+                                format=wc_lang.ChemicalStructureFormat.BpForms,
+                                alphabet=wc_lang.ChemicalStructureAlphabet.protein)
+            prot_str_structure.empirical_formula = prot_str_structure.get_structure().get_formula()
+            prot_str_structure.molecular_weight = prot_str_structure.empirical_formula.get_molecular_weight()
+            prot_str_structure.charge = prot_str_structure.get_structure().get_charge()
+            prot_id = 'prot_'+rna_species_type.id[4:]
+            prot = model.species_types.create(id=prot_id,
+                                        name='Protein '+rna_species_type.id[4:],
+                                        type=wc_ontology['WC:protein'],
+                                        structure=prot_str_structure)
+            half_life_prot = model.parameters.create(id='half_life_'+prot_id,
+                                                      type=None,
+                                                      value=options['protein']['halflife'],
+                                                      units=unit_registry.parse_units('s'))
+            init_concs[prot_id] = 5
+
 
 
         # enzymes
@@ -340,7 +378,7 @@ class RandModelGen(object):
         self.gen_compartments(model, options=options['compartments'])
 
         # species types, and init concentrations
-        self.gen_species(model, options=options['species_types'])
+        self.gen_species(model, options=options['species_types'], misc_options=options['miscellaneous'])
 
         # submodels
         self.gen_submodels(model, options=options['submodels'])
