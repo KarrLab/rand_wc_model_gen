@@ -4,10 +4,3 @@ matplotlib
 numpy
 scipy
 setuptools
-wc_analysis
-wc_kb
-wc_kb_gen
-wc_lang
-wc_model_gen
-wc_sim
-wc_utils
