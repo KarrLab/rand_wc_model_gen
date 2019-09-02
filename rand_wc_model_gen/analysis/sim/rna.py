@@ -9,7 +9,7 @@ import glob
 import numpy
 import os
 import wc_analysis
-import wc_sim.multialgorithm.run_results
+import wc_sim.run_results
 
 
 class RnaSimulationAnalysis(wc_analysis.SimulationAnalysis):
@@ -19,7 +19,7 @@ class RnaSimulationAnalysis(wc_analysis.SimulationAnalysis):
         # load run results
         self._run_results = []
         for sim_results_path in os.listdir(self.sim_results_path):
-            self._run_results.append(wc_sim.multialgorithm.run_results.RunResults(
+            self._run_results.append(wc_sim.run_results.RunResults(
                 os.path.join(self.sim_results_path, sim_results_path)).run_results)
 
         # draw and show/save figures

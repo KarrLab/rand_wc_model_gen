@@ -14,7 +14,7 @@ import tempfile
 import time
 import unittest
 import wc_model_gen.prokaryote
-import wc_sim.multialgorithm.simulation
+import wc_sim.simulation
 
 @unittest.skip("broken_legacy")
 class RnaSimulationAnalysisTestCase(unittest.TestCase):
@@ -43,7 +43,7 @@ class RnaSimulationAnalysisTestCase(unittest.TestCase):
         # run simulations
         sim_results_path = os.path.join(self.temp_dir, 'sim_results')
         for i_sim in range(3):
-            sim = wc_sim.multialgorithm.simulation.Simulation(model)
+            sim = wc_sim.simulation.Simulation(model)
             sim.run(end_time=1e-1,
                     time_step=1e-2,
                     seed=i_sim,

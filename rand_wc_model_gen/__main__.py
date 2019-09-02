@@ -18,8 +18,8 @@ import wc_kb_gen.random
 import wc_lang
 import wc_lang.io
 import wc_model_gen.prokaryote
-import wc_sim.multialgorithm.run_results
-import wc_sim.multialgorithm.simulation
+import wc_sim.run_results
+import wc_sim.simulation
 
 
 class BaseController(cement.Controller):
@@ -98,7 +98,7 @@ class SimulateController(cement.Controller):
         seed = args.seed
         if seed is None:
             seed = config['sim']['seed']
-        simulation = wc_sim.multialgorithm.simulation.Simulation(model)
+        simulation = wc_sim.simulation.Simulation(model)
         num_events, sim_results_path = simulation.run(end_time=config['sim']['end_time'],
                                                       time_step=config['sim']['time_step'],
                                                       seed=seed,

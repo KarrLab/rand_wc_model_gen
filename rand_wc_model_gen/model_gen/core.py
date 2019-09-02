@@ -22,8 +22,8 @@ from scipy import stats
 import wc_lang
 import wc_lang.io
 from wc_onto import onto as wc_ontology
-from wc_sim.multialgorithm.simulation import Simulation
-from wc_sim.multialgorithm.run_results import RunResults
+from wc_sim.simulation import Simulation
+from wc_sim.run_results import RunResults
 from wc_utils.util.chem import EmpiricalFormula, OpenBabelUtils
 from wc_utils.util.units import unit_registry
 
