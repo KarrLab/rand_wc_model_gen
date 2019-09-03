@@ -92,7 +92,7 @@ class ChromosomesGenesTusGenerator(wc_kb_gen.KbComponentGenerator):
                                                    numpy.concatenate((numpy.round(intergene_lens[0:1] / 2), intergene_lens[1:]))))
             for i_gene in range(num_genes):
                 tu = cell.loci.get_or_create(id='tu_{}_{}'.format(
-                    i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote_schema.TranscriptionUnitLocus)
+                    i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote.TranscriptionUnitLocus)
                 tu.polymer = chr
                 tu.name = 'Transcription unit {}-{}'.format(
                     i_chr + 1, i_gene + 1)
@@ -102,7 +102,7 @@ class ChromosomesGenesTusGenerator(wc_kb_gen.KbComponentGenerator):
                     (wc_kb.core.PolymerStrand.positive, wc_kb.core.PolymerStrand.negative))
 
                 gene = cell.loci.get_or_create(id='gene_{}_{}'.format(
-                    i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote_schema.GeneLocus)
+                    i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote.GeneLocus)
                 gene.polymer = chr
                 gene.transcription_units.append(tu)
                 gene.name = 'Gene {}-{}'.format(i_chr + 1, i_gene + 1)

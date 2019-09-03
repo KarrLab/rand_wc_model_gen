@@ -33,7 +33,7 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
         assigned_trnas = options.get('assigned_trnas', default_assigned_trnas)
 
         rnas = self.knowledge_base.cell.species_types.get(
-            __type=wc_kb.prokaryote_schema.RnaSpeciesType)
+            __type=wc_kb.prokaryote.RnaSpeciesType)
 
         count = 0
         for rna in rnas:
@@ -57,7 +57,7 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
             ])
 
         prots = self.knowledge_base.cell.species_types.get(
-            __type=wc_kb.prokaryote_schema.ProteinSpeciesType)
+            __type=wc_kb.prokaryote.ProteinSpeciesType)
 
         assert(len(assigned_proteins) <= len(prots))
         options['assigned_proteins'] = assigned_proteins
@@ -71,9 +71,9 @@ class ObservablesGenerator(wc_kb_gen.KbComponentGenerator):
         assigned_proteins = self.options['assigned_proteins']
 
         prots = self.knowledge_base.cell.species_types.get(
-            __type=wc_kb.prokaryote_schema.ProteinSpeciesType)
+            __type=wc_kb.prokaryote.ProteinSpeciesType)
         rnas = self.knowledge_base.cell.species_types.get(
-            __type=wc_kb.prokaryote_schema.RnaSpeciesType)
+            __type=wc_kb.prokaryote.RnaSpeciesType)
 
         trnas = []
         for rna in rnas:

@@ -23,7 +23,7 @@ class RnaGeneratorTestCase(unittest.TestCase):
 
         tus = []
         for i_tu in range(1000):
-            tu = cell.loci.create(__type=wc_kb.prokaryote_schema.TranscriptionUnitLocus,
+            tu = cell.loci.create(__type=wc_kb.prokaryote.TranscriptionUnitLocus,
                                   id='tu_{}'.format(i_tu + 1),
                                   name='Transcription unit {}'.format(i_tu + 1),
                                   start=10 + 20 * (i_tu), end=20 + 20 * (i_tu), strand=wc_kb.core.PolymerStrand.positive)
@@ -36,7 +36,7 @@ class RnaGeneratorTestCase(unittest.TestCase):
         })
         gen.run()
 
-        rnas = cell.species_types.get(__type=wc_kb.prokaryote_schema.RnaSpeciesType)
+        rnas = cell.species_types.get(__type=wc_kb.prokaryote.RnaSpeciesType)
         self.assertEqual(len(rnas), 1000)
 
         self.assertEqual(rnas[0].transcription_units, [tus[0]])

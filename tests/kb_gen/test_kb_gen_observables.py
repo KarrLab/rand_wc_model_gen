@@ -49,9 +49,9 @@ class ObservablesGeneratorTestCase(unittest.TestCase):
         cell = self.cell
 
         self.assertIsInstance(cell.species_types.get_one(
-            id='a'), wc_kb.prokaryote_schema.ProteinSpeciesType)
+            id='a'), wc_kb.prokaryote.ProteinSpeciesType)
         self.assertIsInstance(cell.species_types.get_one(
-            id='x'), wc_kb.prokaryote_schema.RnaSpeciesType)
+            id='x'), wc_kb.prokaryote.RnaSpeciesType)
 
     def test_observables(self):
         cell = self.cell
@@ -61,6 +61,6 @@ class ObservablesGeneratorTestCase(unittest.TestCase):
         species = obs1.expression.species[0]
         species_type = species.species_type
         self.assertIsInstance(species, wc_kb.core.Species)
-        self.assertIsInstance(species_type, wc_kb.prokaryote_schema.ProteinSpeciesType)
+        self.assertIsInstance(species_type, wc_kb.prokaryote.ProteinSpeciesType)
         self.assertEqual(species.id(), 'a[c]')
         self.assertEqual(species_type.id, 'a')

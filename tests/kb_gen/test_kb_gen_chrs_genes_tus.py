@@ -42,8 +42,8 @@ class ChromosomesGenesTusGeneratorTestCase(unittest.TestCase):
             chr_len += len(chr.seq)
         self.assertEqual(gc / chr_len, 1)
 
-        tus = cell.loci.get(__type=wc_kb.prokaryote_schema.TranscriptionUnitLocus)
-        genes = cell.loci.get(__type=wc_kb.prokaryote_schema.GeneLocus)
+        tus = cell.loci.get(__type=wc_kb.prokaryote.TranscriptionUnitLocus)
+        genes = cell.loci.get(__type=wc_kb.prokaryote.GeneLocus)
         self.assertAlmostEqual(len(tus), mean_num_genes, delta=5 * numpy.sqrt(mean_num_genes))
         self.assertAlmostEqual(len(genes), mean_num_genes, delta=5 * numpy.sqrt(mean_num_genes))
 

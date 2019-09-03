@@ -213,7 +213,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
             # creates GeneLocus objects for the genes and labels their GeneType (which type of RNA they transcribe)
             for i_gene, gene_start in enumerate(gene_starts):
                 gene = self.knowledge_base.cell.loci.get_or_create(
-                    id='gene_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote_schema.GeneLocus)
+                    id='gene_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote.GeneLocus)
                 gene.start = gene_start + 1  # 1-indexed
                 gene.polymer = chro
                 gene.end = gene.start + gene_lens[i_gene] - 1  # 1-indexed
@@ -266,12 +266,12 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
                 locus = chromosome.loci[i]
 
-                if type(locus) == wc_kb.prokaryote_schema.TranscriptionUnitLocus:
+                if type(locus) == wc_kb.prokaryote.TranscriptionUnitLocus:
                     tu = locus
 
                     # creates RnaSpeciesType for RNA sequence corresponding to gene
                     rna = cell.species_types.get_or_create(
-                        id='rna_{}'.format(tu.id), __type=wc_kb.prokaryote_schema.RnaSpeciesType)
+                        id='rna_{}'.format(tu.id), __type=wc_kb.prokaryote.RnaSpeciesType)
                     rna.name = 'rna {}'.format(tu.id)
                     # GeneLocus object for gene sequence, attribute of ProteinSpeciesType object
                     if tu.genes[0].type == wc_kb.core.GeneType.mRna:
@@ -299,7 +299,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                             # creates ProteinSpecipe object for corresponding protein sequence(s)
                             # print(gene.get_seq()[0:3])
                             prot = cell.species_types.get_or_create(
-                                id='prot_{}'.format(gene.id), __type=wc_kb.prokaryote_schema.ProteinSpeciesType)
+                                id='prot_{}'.format(gene.id), __type=wc_kb.prokaryote.ProteinSpeciesType)
                             prot.name = 'prot_{}'.format(gene.id)
 
                             prot.cell = cell
@@ -353,7 +353,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
 
                         # add 3', 5' UTRs to the ends of the transcription unit (upstream of first gene, downstream of last gene)
                         tu = self.knowledge_base.cell.loci.get_or_create(
-                            id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote_schema.TranscriptionUnitLocus)
+                            id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote.TranscriptionUnitLocus)
                         tu.name = 'tu {} {}'.format(i_chr+1, i_gene+1)
 
                         five_prime_start = gene.start - five_prime
@@ -393,7 +393,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                         if three_prime_end >= len(seq):
                             three_prime_end = len(seq) - 1
                         tu = self.knowledge_base.cell.loci.get_or_create(
-                            id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote_schema.TranscriptionUnitLocus)
+                            id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote.TranscriptionUnitLocus)
                         tu.start = five_prime_start
                         tu.end = three_prime_end
                         tu.name = 'tu {} {}'.format(i_chr+1, i_gene+1)
@@ -404,7 +404,7 @@ class GenomeGenerator(wc_kb_gen.KbComponentGenerator):
                 else:
                    # print("not mrna")
                     tu = self.knowledge_base.cell.loci.get_or_create(
-                        id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote_schema.TranscriptionUnitLocus)
+                        id='tu_{}_{}'.format(i_chr + 1, i_gene + 1), __type=wc_kb.prokaryote.TranscriptionUnitLocus)
                     tu.name = 'tu {} {}'.format(i_chr+1, i_gene+1)
                     tu.start = gene.start
                     tu.end = gene.end

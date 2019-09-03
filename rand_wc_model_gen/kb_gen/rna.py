@@ -46,9 +46,9 @@ class RnaGenerator(wc_kb_gen.KbComponentGenerator):
 
         # generate RNA
         cytosol = cell.compartments.get_one(id='c')
-        tus = cell.loci.get(__type=wc_kb.prokaryote_schema.TranscriptionUnitLocus)
+        tus = cell.loci.get(__type=wc_kb.prokaryote.TranscriptionUnitLocus)
         for tu in tus:
-            rna = cell.species_types.get_or_create(id=tu.id.replace('tu_', 'rna_'), __type=wc_kb.prokaryote_schema.RnaSpeciesType)
+            rna = cell.species_types.get_or_create(id=tu.id.replace('tu_', 'rna_'), __type=wc_kb.prokaryote.RnaSpeciesType)
             rna.transcription_units = [tu]
             rna.name = tu.name.replace('Transcription unit', 'RNA')
             rna.type = wc_kb.core.RnaType[tu.genes[0].type.name]
