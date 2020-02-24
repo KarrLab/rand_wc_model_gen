@@ -1,9 +1,6 @@
 # description
 README.rst
 
-# version
-include rand_wc_model_gen/VERSION
-
 # license
 include LICENSE
 
