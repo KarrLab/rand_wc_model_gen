@@ -10,5 +10,6 @@ wc_kb
 wc_kb_gen
 wc_lang
 wc_model_gen
+wc_onto
 wc_sim
 wc_utils
